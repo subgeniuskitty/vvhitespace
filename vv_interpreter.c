@@ -21,10 +21,10 @@
 void
 print_usage(char ** argv)
 {
-    printf( "Whitespace Interpreter v%d (www.subgeniuskitty.com)\n"
+    printf( "VVhitespace Interpreter v%d (www.subgeniuskitty.com)\n"
             "Usage: %s -i <file>\n"
             "  -h         Help (prints this message)\n"
-            "  -i <file>  Specify a Whitespace source file to interpret.\n"
+            "  -i <file>  Specify a VVhitespace source file to interpret.\n"
             , VERSION, argv[0]
     );
 }
@@ -83,6 +83,7 @@ next_code_byte(uint8_t * code, size_t * pc)
 uint16_t
 parse_label(uint8_t * code, size_t * pc)
 {
+    // TODO: Check for invalid label and die.
     uint16_t label = 0;
     uint8_t c;
     while ((c = code[(*pc)++]) != '\n') {
@@ -90,6 +91,12 @@ parse_label(uint8_t * code, size_t * pc)
         if (c == ' ') label++;
     }
     return label;
+}
+
+void
+populate_labels(uint32_t * labels, uint8_t * code, size_t code_size)
+{
+    // TODO
 }
 
 void
@@ -104,13 +111,14 @@ process_imp_stack(uint8_t * code, size_t * pc, int32_t ** sp)
                 switch (next_code_byte(code,pc)) {
                     case ' ' :  sign = 1;                       break;
                     case '\t':  sign = -1;                      break;
-                    case '\n':  ws_die(pc, "expected sign");    break;
+                    default  :  ws_die(pc, "expected sign");    break;
                 }
 
                 /* Now, construct the number and push to TOS. */
                 /* I'm assuming the numbers are read MSb first. */
                 int32_t temp, number = 0;
                 while ((temp = next_code_byte(code,pc)) != '\n') {
+                    if (temp == '\v') ws_die(pc, "non-binary digit in number");
                     number <<= 1;
                     if (temp == '\t') number++;
                 }
@@ -138,10 +146,13 @@ process_imp_stack(uint8_t * code, size_t * pc, int32_t ** sp)
                     case '\n':
                         stack_pop(sp);
                         break;
+                    default:
+                        ws_die(pc, "malformed stack IMP");
+                        break;
                 }
             }
             break;
-        case '\t': ws_die(pc, "malformed stack IMP"); break;
+        default: ws_die(pc, "malformed stack IMP"); break;
     }
 }
 
@@ -166,6 +177,9 @@ process_imp_arithmetic(uint8_t * code, size_t * pc, int32_t ** sp)
                         /* Multiplication */
                         stack_push(sp, stack_pop(sp)*stack_pop(sp));
                         break;
+                    default:
+                        ws_die(pc, "malformed arithmetic IMP");
+                        break;
                 }
             }
             break;
@@ -182,11 +196,11 @@ process_imp_arithmetic(uint8_t * code, size_t * pc, int32_t ** sp)
                         temp = stack_pop(sp);
                         stack_push(sp, stack_pop(sp)%temp);
                         break;
-                    case '\n': ws_die(pc, "malformed arithmetic IMP"); break;
+                    default: ws_die(pc, "malformed arithmetic IMP"); break;
                 }
             }
             break;
-        case '\n': ws_die(pc, "malformed arithmetic IMP"); break;
+        default: ws_die(pc, "malformed arithmetic IMP"); break;
     }
 }
 
@@ -205,6 +219,7 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int32_t ** sp, uint32_t * l
                 switch (next_code_byte(code,pc)) {
                     case ' ':
                         /* Mark a location in the program. */
+                        // TODO: Verify this is a label, but do nothing else.
                         labels[parse_label(code, pc)] = *pc;
                         break;
                     case '\t':
@@ -215,6 +230,9 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int32_t ** sp, uint32_t * l
                     case '\n':
                         /* Jump unconditionally to a label. */
                         *pc = labels[parse_label(code, pc)];
+                        break;
+                    default:
+                        ws_die(pc, "malformed flow control IMP");
                         break;
                 }
             }
@@ -234,8 +252,14 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int32_t ** sp, uint32_t * l
                         /* Return from subroutine. */
                         *pc = *(--(*rsp));
                         break;
+                    default:
+                        ws_die(pc, "malformed flow control IMP");
+                        break;
                 }
             }
+            break;
+        default:
+            ws_die(pc, "malformed flow control IMP");
             break;
     }
 }
@@ -246,7 +270,7 @@ process_imp_heap(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
     switch (next_code_byte(code,pc)) {
         case ' ' : /* Store to heap      */ *(*hp + *((*sp)-1)) = **sp; *sp -= 2; break;
         case '\t': /* Retrieve from heap */ **sp = *(*hp + **sp);                 break;
-        case '\n': ws_die(pc, "malformed heap IMP");                              break;
+        default: ws_die(pc, "malformed heap IMP");                              break;
     }
 }
 
@@ -260,7 +284,7 @@ process_imp_io(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
                 switch (next_code_byte(code,pc)) {
                     case ' ' : /* Output character from TOS */ printf("%c", stack_pop(sp)); break;
                     case '\t': /* Output number from TOS    */ printf("%d", stack_pop(sp)); break;
-                    case '\n': ws_die(pc, "malformed output IMP");                          break;
+                    default: ws_die(pc, "malformed output IMP");                          break;
                 }
                 fflush(stdout);
             }
@@ -273,15 +297,13 @@ process_imp_io(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
                 switch (next_code_byte(code,pc)) {
                     case '\t': /* Input digit     */ c -= '0';                /* fallthrough */
                     case ' ' : /* Input character */ *(*hp + *((*sp)--)) = c; break;
-                    case '\n': ws_die(pc, "malformed input IMP");             break;
+                    default: ws_die(pc, "malformed input IMP");             break;
                 }
             }
             break;
-        case '\n': ws_die(pc, "malformed i/o IMP"); break;
+        default: ws_die(pc, "malformed i/o IMP"); break;
     }
 }
-
-/* TODO: Continue cleanup here */
 
 int
 main(int argc, char ** argv)
@@ -307,25 +329,29 @@ main(int argc, char ** argv)
         }
     }
     if (input == NULL) {
-        fprintf(stderr, "ERROR: Must specify a Whitespace source file with -f flag.\n");
+        fprintf(stderr, "ERROR: Must specify a VVhitespace source file with -f flag.\n");
         print_usage(argv);
         exit(EXIT_FAILURE);
     }
 
     /*
-     * Read just the Whitespace source code into memory.
+     * Read just the VVhitespace source code into memory.
      * We will use the array indices as addresses for the virtual PC when jumping to labels.
      */
     size_t ws_code_size = 0;
     uint8_t temp_byte;
     while (fread(&temp_byte, 1, 1, input)) {
-        if (temp_byte == ' ' || temp_byte == '\t' || temp_byte == '\n') ws_code_size++;
+        if (temp_byte == ' ' || temp_byte == '\t' || temp_byte == '\n' || temp_byte == '\v') {
+            ws_code_size++;
+        }
     }
     rewind(input);
     uint8_t * ws_code_space = malloc(ws_code_size);
     ws_code_size = 0;
     while (fread(&temp_byte, 1, 1, input)) {
-        if (temp_byte == ' ' || temp_byte == '\t' || temp_byte == '\n') ws_code_space[ws_code_size++] = temp_byte;
+        if (temp_byte == ' ' || temp_byte == '\t' || temp_byte == '\n' || temp_byte == '\v') {
+            ws_code_space[ws_code_size++] = temp_byte;
+        }
     }
     fclose(input);
 
@@ -333,6 +359,7 @@ main(int argc, char ** argv)
      * Setup a stack and heap.
      * Assume a 32-bit word size.
      */
+    // TODO: Make everything 64-bit.
     int32_t * hp = malloc(HEAPSIZE*4);
     int32_t * sp = malloc(STACKSIZE*4);
 
@@ -340,7 +367,8 @@ main(int argc, char ** argv)
      * Setup the return stack and the label array.
      */
     uint32_t * rsp = malloc(RETURNSTACKSIZE*4);
-    uint32_t labels[65536];
+    uint32_t labels[65536] = {0};
+    populate_labels(labels, ws_code_space, ws_code_size);
 
     /*
      * Main Loop
@@ -349,7 +377,8 @@ main(int argc, char ** argv)
     size_t pc = 0; /* Virtual program counter. Operates in the ws_code_space[] address space. */
     while (1) {
         if (pc >= ws_code_size) {
-            fprintf(stderr, "SIM_ERROR: PC Overrun\n    Requested PC: %lu\n    Max Address: %lu\n", pc, ws_code_size-1);
+            fprintf(stderr, "SIM_ERROR: PC Overrun\n    Requested PC: %lu\n    Max Address: %lu\n",
+                pc, ws_code_size-1);
             exit(EXIT_FAILURE);
         }
 
@@ -382,6 +411,7 @@ main(int argc, char ** argv)
                     }
                 }
                 break;
+            default: ws_die(pc, "unexpected VTab"); break;
         }
     }
 
