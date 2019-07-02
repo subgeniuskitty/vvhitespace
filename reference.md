@@ -42,13 +42,13 @@ representation.
 
     [Space] [Tab][Space][Tab][Space][Tab][Space] [LF]
 
-Labels consist of an opening [VTab] followed by a [LF] terminated list of up
-to sixteen spaces and tabs. There is only one global namespace so all labels
-must be unique. Labels are left-padded with [Space] up to sixteen characters;
-the following two labels are interchangeable.
+Labels consist of an [LF] terminated list of up to sixteen spaces and tabs. The
+program must not begin with a label. There is only one global namespace so all
+labels must be unique. Labels are left-padded with [Space] up to sixteen
+characters; the following two labels are interchangeable.
 
-    [VTab]        [Tab][Space][Tab] [LF]
-    [VTab] [Space][Tab][Space][Tab] [LF]
+           [Tab][Space][Tab] [LF]
+    [Space][Tab][Space][Tab] [LF]
 
 ## Stack Manipulation (IMP: [Space]) ##
 
@@ -96,15 +96,15 @@ well as the targets of conditional and unconditional jumps, by which loops can
 be implemented. Programs must be ended by means of [LF][LF][LF] so that the
 interpreter can exit cleanly.
 
-| Command        | Params | Meaning                          |
-| :------------- | :----- | :------------------------------- |
-| [Space][Space] | Label  | Mark a location in the program   |
-| [Space][Tab]   | Label  | Call a subroutine                |
-| [Space][LF]    | Label  | Jump unconditionally to a label  |
-| [Tab][Space]   | Label  | Jump to label if TOS is zero     |
-| [Tab][Tab]     | Label  | Jump to label if TOS is negative |
-| [Tab][LF]      | ---    | Return from subroutine           |
-| [LF][LF]       | ---    | End the program                  |
+| Command              | Params | Meaning                          |
+| :------------------- | :----- | :------------------------------- |
+| [Space][Space][VTab] | Label  | Mark a location in the program   |
+| [Space][Tab]         | Label  | Call a subroutine                |
+| [Space][LF]          | Label  | Jump unconditionally to a label  |
+| [Tab][Space]         | Label  | Jump to label if TOS is zero     |
+| [Tab][Tab]           | Label  | Jump to label if TOS is negative |
+| [Tab][LF]            | ---    | Return from subroutine           |
+| [LF][LF]             | ---    | End the program                  |
 
 ## I/O (IMP: [Tab][LF]) ##
 
