@@ -1,0 +1,30 @@
+## This program outputs "Hello, world!"
+## It was copied from Wikipedia.
+
+SSSTSSTSSSN     | ST: Push +72 (ASCII H)
+TNSS            | IO: Output character
+SSSTTSSTSTN     | ST: Push +101 (ASCII e)
+TNSS            | IO: Output character
+SSSTTSTTSSN     | ST: Push +108 (ASCII l)
+TNSS            | IO: Output character
+SSSTTSTTSSN     | ST: Push +108 (ASCII l)
+TNSS            | IO: Output character
+SSSTTSTTTTN     | ST: Push +111 (ASCII o)
+TNSS            | IO: Output character
+SSSTSTTSSN      | ST: Push +44 (ASCII ,)
+TNSS            | IO: Output character
+SSSTSSSSSN      | ST: Push +32 (ASCII space)
+TNSS            | IO: Output character
+SSSTTTSTTTN     | ST: Push +119 (ASCII w)
+TNSS            | IO: Output character
+SSSTTSTTTTN     | ST: Push +111 (ASCII o)
+TNSS            | IO: Output character
+SSSTTTSSTSN     | ST: Push +114 (ASCII r)
+TNSS            | IO: Output character
+SSSTTSTTSSN     | ST: Push +108 (ASCII l)
+TNSS            | IO: Output character
+SSSTTSSTSSN     | ST: Push +100 (ASCII d)
+TNSS            | IO: Output character
+SSSTSSSSTN      | ST: Push +33 (ASCII !)
+TNSS            | IO: Output character
+NNN             | FC: Terminate program
