@@ -80,23 +80,35 @@ next_code_byte(uint8_t * code, size_t * pc)
     return code[(*pc)++];
 }
 
+/*
+ * In addition to returning the parsed label, this function advances the PC to
+ * the next instruction.
+ */
 uint16_t
 parse_label(uint8_t * code, size_t * pc)
 {
-    // TODO: Check for invalid label and die.
     uint16_t label = 0;
     uint8_t c;
     while ((c = code[(*pc)++]) != '\n') {
         label = label << 1;
         if (c == ' ') label++;
     }
+    // TODO: Where should I handle attempts to access an unitialized label?
+    //       For now, leave it undefined in a nasal demon sense.
     return label;
 }
 
 void
 populate_labels(uint32_t * labels, uint8_t * code, size_t code_size)
 {
-    // TODO
+    size_t cp = 0;
+    while (cp <= code_size) {
+        if (code[cp] == '\v') {
+            uint16_t temp_label = parse_label(code, &cp);
+            labels[temp_label] = cp;
+        }
+        cp++;
+    }
 }
 
 void
@@ -219,8 +231,10 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int32_t ** sp, uint32_t * l
                 switch (next_code_byte(code,pc)) {
                     case ' ':
                         /* Mark a location in the program. */
-                        // TODO: Verify this is a label, but do nothing else.
-                        labels[parse_label(code, pc)] = *pc;
+                        if (next_code_byte(code,pc) != '\v') ws_die(pc,"expected vtab, "
+                                "perhaps a whitespace program, rather than vvhitespace?");
+                        /* Jump to next instruction since labels were parsed during startup. */
+                        parse_label( code, pc);
                         break;
                     case '\t':
                         /* Call a subroutine. */
@@ -270,7 +284,7 @@ process_imp_heap(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
     switch (next_code_byte(code,pc)) {
         case ' ' : /* Store to heap      */ *(*hp + *((*sp)-1)) = **sp; *sp -= 2; break;
         case '\t': /* Retrieve from heap */ **sp = *(*hp + **sp);                 break;
-        default: ws_die(pc, "malformed heap IMP");                              break;
+        default  : ws_die(pc, "malformed heap IMP");                              break;
     }
 }
 
@@ -284,7 +298,7 @@ process_imp_io(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
                 switch (next_code_byte(code,pc)) {
                     case ' ' : /* Output character from TOS */ printf("%c", stack_pop(sp)); break;
                     case '\t': /* Output number from TOS    */ printf("%d", stack_pop(sp)); break;
-                    default: ws_die(pc, "malformed output IMP");                          break;
+                    default  : ws_die(pc, "malformed output IMP");                          break;
                 }
                 fflush(stdout);
             }
@@ -297,7 +311,7 @@ process_imp_io(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
                 switch (next_code_byte(code,pc)) {
                     case '\t': /* Input digit     */ c -= '0';                /* fallthrough */
                     case ' ' : /* Input character */ *(*hp + *((*sp)--)) = c; break;
-                    default: ws_die(pc, "malformed input IMP");             break;
+                    default  : ws_die(pc, "malformed input IMP");             break;
                 }
             }
             break;
@@ -381,6 +395,8 @@ main(int argc, char ** argv)
                 pc, ws_code_size-1);
             exit(EXIT_FAILURE);
         }
+// TODO: Have the SIGTERM signal handler and normal term point return the value
+// on TOS so I can do rudimentary automated tests.
 
         /* Decode the IMPs */
         switch (ws_code_space[pc++]) {
@@ -411,7 +427,7 @@ main(int argc, char ** argv)
                     }
                 }
                 break;
-            default: ws_die(pc, "unexpected VTab"); break;
+            default: ws_die(&pc, "unexpected VTab"); break;
         }
     }
 
