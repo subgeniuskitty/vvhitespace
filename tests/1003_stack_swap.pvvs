@@ -1,0 +1,8 @@
+# This test verifies stack IMP swap.
+
+SSSTSSSSSTN     | ST: Push +65 (ASCII A)
+SSSTSSSSTSN     | ST: Push +66 (ASCII B)
+SNT             | ST: Swap TOS and NOS
+TNSS            | IO: Output character
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

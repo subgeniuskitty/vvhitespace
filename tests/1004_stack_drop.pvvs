@@ -1,10 +1,7 @@
-# This test verifies operations under the Stack IMP ([Space]).
+# This test verifies stack IMP drop.
 
 SSSTSSSSSTN     | ST: Push +65 (ASCII A)
 SSSTSSSSTSN     | ST: Push +66 (ASCII B)
-SNS             | ST: Duplicate TOS
-TNSS            | IO: Output character
-SNT             | ST: Swap TOS and NOS
 SNN             | ST: Discard TOS
 TNSS            | IO: Output character
 NNN             | FC: Terminate program

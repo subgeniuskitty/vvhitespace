@@ -1,0 +1,5 @@
+# This test verifies stack IMP push.
+
+SSSTSSSSSTN     | ST: Push +65 (ASCII A)
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

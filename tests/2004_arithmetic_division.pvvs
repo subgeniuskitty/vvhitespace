@@ -1,0 +1,7 @@
+# This test verifies arithmetic IMP division.
+
+SSSTSSSSSTSN    | ST: Push +130
+SSSTSN          | ST: Push +2
+TSTS            | MA: Divide
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

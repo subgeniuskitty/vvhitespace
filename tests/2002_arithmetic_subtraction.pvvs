@@ -1,0 +1,7 @@
+# This test verifies arithmetic IMP subtraction.
+
+SSSTSSSSTSN     | ST: Push +66 (ASCII B)
+SSSTN           | ST: Push +1
+TSST            | MA: Subtract
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

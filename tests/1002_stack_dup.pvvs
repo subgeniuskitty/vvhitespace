@@ -1,0 +1,7 @@
+# This test verifies stack IMP duplicate.
+
+SSSTSSSSSTN     | ST: Push +65 (ASCII A)
+SNS             | ST: Duplicate TOS
+TNSS            | IO: Output character
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

@@ -1,0 +1,7 @@
+# This test verifies arithmetic IMP multiplication.
+
+SSSTSSSSTN      | ST: Push +33
+SSSTSN          | ST: Push +2
+TSSN            | MA: Multiply
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

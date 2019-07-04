@@ -1,0 +1,7 @@
+# This test verifies arithmetic IMP addition.
+
+SSSTSSSSSTN     | ST: Push +65 (ASCII A)
+SSSTN           | ST: Push +1
+TSSS            | MA: Add
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

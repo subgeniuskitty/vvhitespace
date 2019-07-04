@@ -1,0 +1,7 @@
+# This test verifies arithmetic IMP remainder.
+
+SSSTTSSSSTSN    | ST: Push +194
+SSSTSSSSSSTN    | ST: Push +128
+TSTT            | MA: Remainder
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

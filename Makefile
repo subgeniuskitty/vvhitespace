@@ -19,7 +19,7 @@ vvc:
 	$(CC) $(CC_FLAGS) -o $@ vv_compiler.c
 
 test: all
-	@echo "Starting test suite..."
+	@echo "Starting test suite:"
 	@./vv_test.py
 
 clean:
