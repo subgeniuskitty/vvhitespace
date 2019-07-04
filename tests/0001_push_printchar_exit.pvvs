@@ -1,0 +1,7 @@
+# This test verifies we can push a number on the stack, print it as a
+# character, and cleanly exit. These three functions form a basis for further
+# tests.
+
+SSSTSSSSSTN     | ST: Push +65 (ASCII A)
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

@@ -49,7 +49,6 @@ stdin_empty(void)
 void
 ws_die(size_t * pc, char * msg)
 {
-    printf("\n");
     printf("SIM_ERROR @ PC %lu: %s\n", *pc, msg);
     fflush(stdout);
     exit(EXIT_FAILURE);
@@ -223,7 +222,6 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int32_t ** sp, uint32_t * l
     switch (next_code_byte(code,pc)) {
         case '\n':
             /* Technically another LF is required but we ignore it. */
-            printf("\n");
             fflush(stdout);
             exit(EXIT_SUCCESS);
         case ' ':

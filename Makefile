@@ -18,5 +18,9 @@ vvi:
 vvc:
 	$(CC) $(CC_FLAGS) -o $@ vv_compiler.c
 
+test: all
+	@echo "Starting test suite..."
+	@./vv_test.py
+
 clean:
 	@rm -f vvc vvc.core vvi vvi.core

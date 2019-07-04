@@ -108,7 +108,5 @@ main(int argc, char ** argv)
     fclose(input);
     fclose(output);
 
-    printf("Successfully converted source code.\n");
-
     exit(EXIT_SUCCESS);
 }
