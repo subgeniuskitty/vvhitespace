@@ -1,0 +1,5 @@
+# This test verifies the input/output IMP output digit.
+
+SSSTSN          | ST: Push +2
+TNST            | IO: Output digit
+NNN             | FC: Terminate program

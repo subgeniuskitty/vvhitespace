@@ -1,0 +1,5 @@
+# This test verifies the input/output IMP output character.
+
+SSSTSSSSSTN     | ST: Push +65 (ASCII A)
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

@@ -232,7 +232,7 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int32_t ** sp, uint32_t * l
                         if (next_code_byte(code,pc) != '\v') ws_die(pc,"expected vtab, "
                                 "perhaps a whitespace program, rather than vvhitespace?");
                         /* Jump to next instruction since labels were parsed during startup. */
-                        parse_label( code, pc);
+                        parse_label(code, pc);
                         break;
                     case '\t':
                         /* Call a subroutine. */
@@ -311,8 +311,8 @@ process_imp_io(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
             /* Output */
             {
                 switch (next_code_byte(code,pc)) {
-                    case ' ' : /* Output character from TOS */ printf("%c", stack_pop(sp)); break;
-                    case '\t': /* Output number from TOS    */ printf("%d", stack_pop(sp)); break;
+                    case ' ' : /* Output char from TOS  */ printf("%c", stack_pop(sp));     break;
+                    case '\t': /* Output digit from TOS */ printf("%c", stack_pop(sp)+'0'); break;
                     default  : ws_die(pc, "malformed output IMP");                          break;
                 }
                 fflush(stdout);
