@@ -1,0 +1,21 @@
+# This test verifies the heap IMP.
+
+SSSTSSSSSTN     | ST: Push +65 (ASCII A)
+SSSTN           | ST: Push +1 (used as an address)
+SSSTSSSSTSN     | ST: Push +66 (ASCII B)
+TTS             | HP: Store
+SSSTSSSSTTN     | ST: Push +67 (ASCII C)
+SSSTN           | ST: Push +1 (used as an address)
+TTT             | HP: Load
+
+
+TNSS
+TNSS
+TNSS
+NNN
+
+
+TNSS            | IO: Output character
+TNSS            | IO: Output character
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

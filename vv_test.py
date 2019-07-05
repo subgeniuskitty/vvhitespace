@@ -24,6 +24,7 @@ tests = [
         ['2003_arithmetic_multiplication', 'B'],
         ['2004_arithmetic_division', 'A'],
         ['2005_arithmetic_remainder', 'A'],
+        ['3001_heap', 'BCA'],
         ] 
 
 for test in tests:

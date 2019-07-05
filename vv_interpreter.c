@@ -280,9 +280,21 @@ void
 process_imp_heap(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
 {
     switch (next_code_byte(code,pc)) {
-        case ' ' : /* Store to heap      */ *(*hp + *((*sp)-1)) = **sp; *sp -= 2; break;
-        case '\t': /* Retrieve from heap */ **sp = *(*hp + **sp);                 break;
-        default  : ws_die(pc, "malformed heap IMP");                              break;
+        case ' ' :
+            /* Store to heap */
+            {
+                int32_t value = stack_pop(sp);
+                int32_t addr = stack_pop(sp);
+                *(*hp + addr) = value;
+            }
+            break;
+        case '\t':
+            /* Retrieve from heap */
+            stack_push(sp, *(*hp + stack_pop(sp)));
+            break;
+        default:
+            ws_die(pc, "malformed heap IMP");
+            break;
     }
 }
 
