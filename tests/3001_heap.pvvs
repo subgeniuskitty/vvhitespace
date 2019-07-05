@@ -7,14 +7,6 @@ TTS             | HP: Store
 SSSTSSSSTTN     | ST: Push +67 (ASCII C)
 SSSTN           | ST: Push +1 (used as an address)
 TTT             | HP: Load
-
-
-TNSS
-TNSS
-TNSS
-NNN
-
-
 TNSS            | IO: Output character
 TNSS            | IO: Output character
 TNSS            | IO: Output character
