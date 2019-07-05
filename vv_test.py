@@ -25,6 +25,12 @@ tests = [
         ['2004_arithmetic_division', 'A'],
         ['2005_arithmetic_remainder', 'A'],
         ['3001_heap', 'BCA'],
+        ['4001_flowcontrol_exit', ''],
+        ['4002_flowcontrol_unconditional_jump_to_label', 'A'],
+        ['4003_flowcontrol_jump_if_tos_is_zero', 'A'],
+        ['4004_flowcontrol_jump_if_tos_is_negative', 'A'],
+        ['4005_flowcontrol_jump_to_subroutine', 'A'],
+        ['4006_flowcontrol_return_from_subroutine', 'A'],
         ] 
 
 for test in tests:

@@ -236,8 +236,11 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int32_t ** sp, uint32_t * l
                         break;
                     case '\t':
                         /* Call a subroutine. */
-                        *((*rsp)++) = *pc;
-                        *pc = labels[parse_label(code, pc)];
+                        {
+                            size_t temp_pc = labels[parse_label(code, pc)];
+                            *((*rsp)++) = *pc;
+                            *pc = temp_pc;
+                        }
                         break;
                     case '\n':
                         /* Jump unconditionally to a label. */
@@ -254,10 +257,12 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int32_t ** sp, uint32_t * l
                 switch (next_code_byte(code,pc)) {
                     case ' ':
                         /* Jump to a label if TOS == 0 */
+                        /* TODO: Does WS pop or peek the TOS? */
                         if (stack_peek(sp,0) == 0) *pc = labels[parse_label(code, pc)];
                         break;
                     case '\t':
                         /* Jump to a label if TOS < 0. */
+                        /* TODO: Does WS pop or peek the TOS? */
                         if (stack_peek(sp,0) < 0) *pc = labels[parse_label(code, pc)];
                         break;
                     case '\n':

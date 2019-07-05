@@ -1,0 +1,10 @@
+# This test verifies the flow control IMP for jumping if TOS is negative.
+
+SSSTSSSSSTN     | ST: Push +65 (ASCII A)
+SSTTN           | ST: Push -1
+NTTTSTSTSN      | FC: BLZ -> '42'
+NNN             | FC: Terminate program
+NSSVTSTSTSN     | FC: Mark label '42'
+SNN             | ST: Drop TOS
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

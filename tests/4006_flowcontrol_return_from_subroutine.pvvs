@@ -1,0 +1,8 @@
+# This test verifies the flow control IMP rts.
+
+NSTTSTSTSN      | FC: JSR -> '42'
+TNSS            | IO: Output character
+NNN             | FC: Terminate program
+NSSVTSTSTSN     | FC: Mark label '42'
+SSSTSSSSSTN     | ST: Push +65 (ASCII A)
+NTN             | FC: RTS
