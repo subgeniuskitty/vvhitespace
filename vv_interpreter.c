@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <sys/select.h>
 #include <getopt.h>
+#include <termios.h>
 
 #define VERSION 1
 
@@ -47,10 +48,37 @@ stdin_empty(void)
 }
 
 void
+set_terminal_mode(void)
+{
+    struct termios options;
+    tcgetattr(STDIN_FILENO, &options);
+    /* Create a cbreak-like environment through the following options. */
+    options.c_lflag &= ~ECHO; /* Disable echoing of input characters. */
+    options.c_lflag &= ~ICANON; /* Disable cooked/line-oriented mode. */
+    options.c_cc[VMIN] = 1;
+    options.c_cc[VTIME] = 0;
+    tcsetattr(STDIN_FILENO, TCSANOW, &options);
+}
+
+void
+unset_terminal_mode(void)
+{
+    struct termios options;
+    tcgetattr(STDIN_FILENO, &options);
+    /* Undo the changes made in set_terminal_mode(). */
+    options.c_lflag |= ECHO; /* Enable echoing of input characters. */
+    options.c_lflag |= ICANON; /* Enable cooked/line-oriented mode. */
+    options.c_cc[VMIN] = 1; /* Default value from /usr/src/sys/sys/ttydefaults.h */
+    options.c_cc[VTIME] = 0; /* Default value from /usr/src/sys/sys/ttydefaults.h */
+    tcsetattr(STDIN_FILENO, TCSANOW, &options);
+}
+
+void
 ws_die(size_t * pc, char * msg)
 {
     printf("SIM_ERROR @ PC %lu: %s\n", *pc, msg);
     fflush(stdout);
+    unset_terminal_mode();
     exit(EXIT_FAILURE);
 }
 
@@ -223,6 +251,7 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int32_t ** sp, uint32_t * l
         case '\n':
             /* Technically another LF is required but we ignore it. */
             fflush(stdout);
+            unset_terminal_mode();
             exit(EXIT_SUCCESS);
         case ' ':
             {
@@ -325,7 +354,7 @@ process_imp_io(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
                 char c = getchar();
                 switch (next_code_byte(code,pc)) {
                     case '\t': /* Input digit     */ c -= '0';                /* fallthrough */
-                    case ' ' : /* Input character */ *(*hp + *((*sp)--)) = c; break;
+                    case ' ' : /* Input character */ *(*hp + *(--(*sp))) = c; break;
                     default  : ws_die(pc, "malformed input IMP");             break;
                 }
             }
@@ -402,13 +431,14 @@ main(int argc, char ** argv)
     /*
      * Main Loop
      */
-
+    set_terminal_mode();
     size_t pc = 0; /* Virtual program counter. Operates in the ws_code_space[] address space. */
     while (1) {
         if (pc >= ws_code_size) {
             fprintf(stderr, "SIM_ERROR: PC Overrun\n    Requested PC: %lu\n    Max Address: %lu\n",
                 pc, ws_code_size-1);
             exit(EXIT_FAILURE);
+            unset_terminal_mode();
         }
 // TODO: Have the SIGTERM signal handler and normal term point return the value
 // on TOS so I can do rudimentary automated tests.
@@ -450,4 +480,5 @@ main(int argc, char ** argv)
     printf("Program executed.\n");
 
     exit(EXIT_SUCCESS);
+    unset_terminal_mode();
 }
