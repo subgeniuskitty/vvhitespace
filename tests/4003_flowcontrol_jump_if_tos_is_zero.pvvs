@@ -5,6 +5,5 @@ SSSSN           | ST: Push +0
 NTSTSTSTSN      | FC: BRZ -> '42'
 NNN             | FC: Terminate program
 NSSVTSTSTSN     | FC: Mark label '42'
-SNN             | ST: Drop TOS
 TNSS            | IO: Output character
 NNN             | FC: Terminate program
