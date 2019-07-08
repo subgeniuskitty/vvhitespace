@@ -440,8 +440,6 @@ main(int argc, char ** argv)
             exit(EXIT_FAILURE);
             unset_terminal_mode();
         }
-// TODO: Have the SIGTERM signal handler and normal term point return the value
-// on TOS so I can do rudimentary automated tests.
 
         /* Decode the IMPs */
         switch (ws_code_space[pc++]) {
