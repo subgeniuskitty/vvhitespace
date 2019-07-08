@@ -15,9 +15,9 @@
 
 #define VERSION 1
 
-#define STACKSIZE 1024
-#define HEAPSIZE  1024
-#define RETURNSTACKSIZE 1024
+#define HEAPSIZE        1024    /* Size of heap in words        */
+#define DATASTACKSIZE   1024    /* Size of stack in words       */
+#define RETURNSTACKSIZE 1024    /* Max subroutine call depth    */
 
 void
 print_usage(char ** argv)
@@ -83,19 +83,19 @@ ws_die(size_t * pc, char * msg)
 }
 
 void
-stack_push(int32_t ** sp, int32_t word)
+stack_push(int64_t ** sp, int64_t word)
 {
     *((*sp)++) = word;
 }
 
-int32_t
-stack_pop(int32_t ** sp)
+int64_t
+stack_pop(int64_t ** sp)
 {
     return *(--(*sp));
 }
 
-int32_t
-stack_peek(int32_t ** sp, size_t offset)
+int64_t
+stack_peek(int64_t ** sp, size_t offset)
 /* offset=0 peeks TOS, offset=1 peeks NOS, etc. */
 {
     return *((*sp)-offset-1);
@@ -126,7 +126,7 @@ parse_label(uint8_t * code, size_t * pc)
 }
 
 void
-populate_labels(uint32_t * labels, uint8_t * code, size_t code_size)
+populate_labels(size_t * labels, uint8_t * code, size_t code_size)
 {
     size_t cp = 0;
     while (cp <= code_size) {
@@ -139,14 +139,14 @@ populate_labels(uint32_t * labels, uint8_t * code, size_t code_size)
 }
 
 void
-process_imp_stack(uint8_t * code, size_t * pc, int32_t ** sp)
+process_imp_stack(uint8_t * code, size_t * pc, int64_t ** sp)
 {
     switch (next_code_byte(code,pc)) {
         case ' ':
             /* Push number onto TOS. */
             {
                 /* First, pick off the sign */
-                int32_t sign = 0;
+                int64_t sign = 0;
                 switch (next_code_byte(code,pc)) {
                     case ' ' :  sign = 1;                       break;
                     case '\t':  sign = -1;                      break;
@@ -155,7 +155,8 @@ process_imp_stack(uint8_t * code, size_t * pc, int32_t ** sp)
 
                 /* Now, construct the number and push to TOS. */
                 /* I'm assuming the numbers are read MSb first. */
-                int32_t temp, number = 0;
+                int64_t number = 0;
+                uint8_t temp;
                 while ((temp = next_code_byte(code,pc)) != '\n') {
                     if (temp == '\v') ws_die(pc, "non-binary digit in number");
                     number <<= 1;
@@ -175,8 +176,8 @@ process_imp_stack(uint8_t * code, size_t * pc, int32_t ** sp)
                         /* Swap TOS and NOS. */
                     case '\t':
                         {
-                            int32_t t1 = stack_pop(sp);
-                            int32_t t2 = stack_pop(sp);
+                            int64_t t1 = stack_pop(sp);
+                            int64_t t2 = stack_pop(sp);
                             stack_push(sp, t1);
                             stack_push(sp, t2);
                         }
@@ -196,9 +197,9 @@ process_imp_stack(uint8_t * code, size_t * pc, int32_t ** sp)
 }
 
 void
-process_imp_arithmetic(uint8_t * code, size_t * pc, int32_t ** sp)
+process_imp_arithmetic(uint8_t * code, size_t * pc, int64_t ** sp)
 {
-    int32_t temp;
+    int64_t temp;
     switch (next_code_byte(code,pc)) {
         case ' ':
             {
@@ -244,8 +245,8 @@ process_imp_arithmetic(uint8_t * code, size_t * pc, int32_t ** sp)
 }
 
 void
-process_imp_flowcontrol(uint8_t * code, size_t * pc, int32_t ** sp, uint32_t * labels,
-                        uint32_t ** rsp)
+process_imp_flowcontrol(uint8_t * code, size_t * pc, int64_t ** sp, size_t * labels,
+                        size_t ** rsp)
 {
     switch (next_code_byte(code,pc)) {
         case '\n':
@@ -309,14 +310,14 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int32_t ** sp, uint32_t * l
 }
 
 void
-process_imp_heap(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
+process_imp_heap(uint8_t * code, size_t * pc, int64_t ** sp, int64_t ** hp)
 {
     switch (next_code_byte(code,pc)) {
         case ' ' :
             /* Store to heap */
             {
-                int32_t value = stack_pop(sp);
-                int32_t addr = stack_pop(sp);
+                int64_t value = stack_pop(sp);
+                int64_t addr  = stack_pop(sp);
                 *(*hp + addr) = value;
             }
             break;
@@ -331,15 +332,15 @@ process_imp_heap(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
 }
 
 void
-process_imp_io(uint8_t * code, size_t * pc, int32_t ** sp, int32_t ** hp)
+process_imp_io(uint8_t * code, size_t * pc, int64_t ** sp, int64_t ** hp)
 {
     switch (next_code_byte(code,pc)) {
         case ' ':
             /* Output */
             {
                 switch (next_code_byte(code,pc)) {
-                    case ' ' : /* Output char from TOS  */ printf("%c", stack_pop(sp));     break;
-                    case '\t': /* Output digit from TOS */ printf("%c", stack_pop(sp)+'0'); break;
+                    case ' ' : /* Output char from TOS  */ printf("%c", (uint8_t) stack_pop(sp));     break;
+                    case '\t': /* Output digit from TOS */ printf("%c", (uint8_t) stack_pop(sp)+'0'); break;
                     default  : ws_die(pc, "malformed output IMP");                          break;
                 }
                 fflush(stdout);
@@ -391,7 +392,7 @@ main(int argc, char ** argv)
     }
 
     /*
-     * Read just the VVhitespace source code into memory.
+     * Read just the VVhitespace source code into memory, stripping comment characters.
      * We will use the array indices as addresses for the virtual PC when jumping to labels.
      */
     size_t ws_code_size = 0;
@@ -413,17 +414,16 @@ main(int argc, char ** argv)
 
     /*
      * Setup a stack and heap.
-     * Assume a 32-bit word size.
      */
-    // TODO: Make everything 64-bit.
-    int32_t * hp = malloc(HEAPSIZE*4);
-    int32_t * sp = malloc(STACKSIZE*4);
+    int64_t * hp = malloc(HEAPSIZE*sizeof(int64_t));
+    int64_t * sp = malloc(DATASTACKSIZE*sizeof(int64_t));
 
     /* 
      * Setup the return stack and the label array.
      */
-    uint32_t * rsp = malloc(RETURNSTACKSIZE*4);
-    uint32_t labels[65536] = {0};
+    size_t * rsp = malloc(RETURNSTACKSIZE*sizeof(size_t));
+    size_t labels[65536] = {0}; /* 65536 = 2^16 => Holds all possible labels.               */
+                                /* Default value of zero indicates an uninitialized label.  */
     populate_labels(labels, ws_code_space, ws_code_size);
 
     /*
@@ -468,13 +468,7 @@ main(int argc, char ** argv)
                     }
                 }
                 break;
-            default: ws_die(&pc, "unexpected VTab"); break;
+            default: ws_die(&pc, "unexpected byte"); break;
         }
     }
-
-    printf("\n");
-    printf("Program executed.\n");
-
-    exit(EXIT_SUCCESS);
-    unset_terminal_mode();
 }
