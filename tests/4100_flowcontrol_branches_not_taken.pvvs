@@ -1,0 +1,15 @@
+# This test verifies correct program flow when not
+# following a conditional branch.
+
+SSSTSSSSSTN     | ST: Push +65 (ASCII A)
+SSSTN           | ST: Push +1
+NTSTSTSTSN      | FC: BRZ -> '42'
+SSSTN           | ST: Push +1
+NTTTSTSTSN      | FC: BMI -> '42'
+TNSS            | IO: Output character
+NNN             | FC: Terminate program
+
+NSSVTSTSTSN     | FC: Mark label '42'
+SSSTSSSSTSN     | ST: Push +66 (ASCII B)
+TNSS            | IO: Output character
+NNN             | FC: Terminate program

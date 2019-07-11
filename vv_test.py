@@ -32,6 +32,7 @@ tests = [
         ['4004_flowcontrol_jump_if_tos_is_negative', '', 'A'],
         ['4005_flowcontrol_jump_to_subroutine', '', 'A'],
         ['4006_flowcontrol_return_from_subroutine', '', 'A'],
+        ['4100_flowcontrol_branches_not_taken', '', 'A'],
         ['5001_io_output_character', '', 'A'],
         ['5002_io_output_digit', '', '2'],
         ['5003_io_input_character', 'A', 'A'],

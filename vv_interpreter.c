@@ -118,7 +118,7 @@ parse_label(uint8_t * code, size_t * pc)
     uint8_t c;
     while ((c = code[(*pc)++]) != '\n') {
         label = label << 1;
-        if (c == ' ') label++;
+        if (c == '\t') label++;
     }
     // TODO: Where should I handle attempts to access an unitialized label?
     //       For now, leave it undefined in a nasal demon sense.
@@ -130,11 +130,10 @@ populate_labels(size_t * labels, uint8_t * code, size_t code_size)
 {
     size_t cp = 0;
     while (cp <= code_size) {
-        if (code[cp] == '\v') {
+        if (code[cp++] == '\v') {
             uint16_t temp_label = parse_label(code, &cp);
             labels[temp_label] = cp;
         }
-        cp++;
     }
 }
 
@@ -248,6 +247,7 @@ void
 process_imp_flowcontrol(uint8_t * code, size_t * pc, int64_t ** sp, size_t * labels,
                         size_t ** rsp)
 {
+    size_t temp_pc;
     switch (next_code_byte(code,pc)) {
         case '\n':
             /* Technically another LF is required but we ignore it. */
@@ -266,11 +266,9 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int64_t ** sp, size_t * lab
                         break;
                     case '\t':
                         /* Call a subroutine. */
-                        {
-                            size_t temp_pc = labels[parse_label(code, pc)];
-                            *((*rsp)++) = *pc;
-                            *pc = temp_pc;
-                        }
+                        temp_pc = labels[parse_label(code, pc)];
+                        *((*rsp)++) = *pc;
+                        *pc = temp_pc;
                         break;
                     case '\n':
                         /* Jump unconditionally to a label. */
@@ -287,11 +285,13 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int64_t ** sp, size_t * lab
                 switch (next_code_byte(code,pc)) {
                     case ' ':
                         /* Jump to a label if TOS == 0 */
-                        if (stack_pop(sp) == 0) *pc = labels[parse_label(code, pc)];
+                        temp_pc = labels[parse_label(code, pc)];
+                        if (stack_pop(sp) == 0) *pc = temp_pc;
                         break;
                     case '\t':
                         /* Jump to a label if TOS < 0. */
-                        if (stack_pop(sp) < 0) *pc = labels[parse_label(code, pc)];
+                        temp_pc = labels[parse_label(code, pc)];
+                        if (stack_pop(sp) < 0) *pc = temp_pc;
                         break;
                     case '\n':
                         /* Return from subroutine. */
