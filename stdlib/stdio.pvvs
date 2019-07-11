@@ -1,0 +1,42 @@
+################################################################################
+# Description:
+#   This function prints a null-terminated string from the stack.
+# Call Stack:
+#   null-terminator (ASCII '\0')
+#   char n
+#   ...
+#   char 2
+#   char 1 <-- TOS
+# Return Stack:
+#   <empty>
+################################################################################
+NSSVTSSSN               | Mark: 1000 (print string from stack)
+SNS                     | DUP
+NTSSSSSTSSSSSSSSSSTN    | BRZ > 00001000 00000001
+TNSS                    | Print character
+NSNTSSSN                | JMP > 1000
+NSSVSSSSTSSSSSSSSSSTN   | Mark: 00001000 00000001
+SNN                     | DROP
+NTN                     | RTS
+
+################################################################################
+# Description:
+#   This function prints a null-terminated string from the heap.
+# Call Stack:
+#   pointer to first character  <-- TOS
+# Return Stack:
+#   <empty>
+################################################################################
+NSSVTSSTN               | Mark: 1001 (print string from heap)
+SNS                     | DUP
+TTT                     | LOAD
+SNS                     | DUP
+NTSSSSSTSSTSSSSSSSTN    | BRZ > 00001001 00000001
+TNSS                    | Print character
+SSSTN                   | Push +1
+TSSS                    | ADD
+NSNTSSTN                | JMP > 1001
+NSSVSSSSTSSTSSSSSSSTN   | Mark: 00001001 00000001
+SNN                     | DROP
+SNN                     | DROP
+NTN                     | RTS
