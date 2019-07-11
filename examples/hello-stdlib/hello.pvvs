@@ -1,0 +1,18 @@
+## This program outputs "Hello, world!"
+
+SSSSN           | ST: Push +0 (ASCII '\0')
+SSSTSSSSTN      | ST: Push +33 (ASCII !)
+SSSTTSSTSSN     | ST: Push +100 (ASCII d)
+SSSTTSTTSSN     | ST: Push +108 (ASCII l)
+SSSTTTSSTSN     | ST: Push +114 (ASCII r)
+SSSTTSTTTTN     | ST: Push +111 (ASCII o)
+SSSTTTSTTTN     | ST: Push +119 (ASCII w)
+SSSTSSSSSN      | ST: Push +32 (ASCII space)
+SSSTSTTSSN      | ST: Push +44 (ASCII ,)
+SSSTTSTTTTN     | ST: Push +111 (ASCII o)
+SSSTTSTTSSN     | ST: Push +108 (ASCII l)
+SSSTTSTTSSN     | ST: Push +108 (ASCII l)
+SSSTTSSTSTN     | ST: Push +101 (ASCII e)
+SSSTSSTSSSN     | ST: Push +72 (ASCII H)
+NSTTSSSN        | FC: JSR>1000 (print string from stack; see stdlib)
+NNN             | FC: Terminate program
