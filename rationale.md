@@ -57,3 +57,4 @@ WS Interpreter Evaluations:
         whitespacers/ruby: (c) 2003 by Wayne E. Conrad
         whitespacers/perl: (c) 2003 Micheal Koelbl
         whitespacers/haskell: (c) 2003 Edwin Brady
+        threeifbywhiskey/satan
