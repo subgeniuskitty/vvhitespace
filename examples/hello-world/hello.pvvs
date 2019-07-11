@@ -27,4 +27,6 @@ SSSTTSSTSSN     | ST: Push +100 (ASCII d)
 TNSS            | IO: Output character
 SSSTSSSSTN      | ST: Push +33 (ASCII !)
 TNSS            | IO: Output character
+SSSTSTSN        | ST: Push +10 (ASCII '\n')
+TNSS            | IO: Output character
 NNN             | FC: Terminate program

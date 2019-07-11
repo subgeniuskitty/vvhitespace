@@ -8,7 +8,7 @@ all: hello
 hello:
 	$(VVS_COMPILER) -i hello.pvvs -o hello.vvs
 
-run:
+run: hello
 	$(VVS_INTERPRETER) -i hello.vvs
 
 clean:

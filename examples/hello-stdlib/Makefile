@@ -10,7 +10,7 @@ hello:
 	$(VVS_COMPILER) -i temp.pvvs -o hello.vvs
 	@rm -f temp.pvvs
 
-run:
+run: hello
 	$(VVS_INTERPRETER) -i hello.vvs
 
 clean:

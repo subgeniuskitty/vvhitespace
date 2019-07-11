@@ -1,6 +1,7 @@
 @@ This program outputs "Hello, world!"
 
 SSSSN           | ST: Push +0 (ASCII '\0')
+SSSTSTSN        | ST: Push +10 (ASCII '\n')
 SSSTSSSSTN      | ST: Push +33 (ASCII !)
 SSSTTSSTSSN     | ST: Push +100 (ASCII d)
 SSSTTSTTSSN     | ST: Push +108 (ASCII l)
