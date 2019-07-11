@@ -1,4 +1,4 @@
-## This program outputs "Hello, world!"
+@@ This program outputs "Hello, world!"
 
 SSSSN           | ST: Push +0 (ASCII '\0')
 SSSTSSSSTN      | ST: Push +33 (ASCII !)
@@ -16,3 +16,5 @@ SSSTTSSTSTN     | ST: Push +101 (ASCII e)
 SSSTSSTSSSN     | ST: Push +72 (ASCII H)
 NSTTSSSN        | FC: JSR>1000 (print string from stack; see stdlib)
 NNN             | FC: Terminate program
+
+#include "stdio.pvvs"
