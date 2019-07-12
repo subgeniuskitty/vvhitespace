@@ -1,0 +1,22 @@
+#ifndef VVS_STDLIB_MATH
+#define VVS_STDLIB_MATH
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Description:
+@   This function returns the absolute value of its argument
+@ Call Stack:
+@   signed number  <-- TOS
+@ Return Stack:
+@   abs(signed number)  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSTN              | Mark: 10001 (absolute value)
+SNS                     | DUP
+NTTSSSTSSSTSSSSSSSSN    | BMI > 00010001 00000000
+NSNSSSTSSSTSSSSSSSTN    | JMP > 00010001 00000001
+NSSVSSSTSSSTSSSSSSSSN   | Mark: 00010001 00000000
+SSTTN                   | PUSH -1
+TSSN                    | MULTIPLY
+NSSVSSSTSSSTSSSSSSSTN   | Mark: 00010001 00000001
+NTN                     | RTS
+
+#endif

@@ -25,9 +25,21 @@ following reservations:
 The following labels are entry points to stdlib functions. Read the
 header comment for each function to learn the call and return stack.
 
-    stdio.pvvs:
-           1000 - print string from stack
-           1001 - print string from heap
+         000xxx - reserved
+         001xxx - print functions
+           1000 ----- print string from stack       (stdio.pvvs)
+           1001 ----- print string from heap        (stdio.pvvs)
+           1010 ----- print number from stack       (stdio.pvvs)
+         010xxx - math functions
+          10001 ----- absolute value                (math.pvvs)
+         011xxx - unassigned
+         100xxx - unassigned
+         101xxx - unassigned
+         110xxx - unassigned
+         111xxx - conversion functions
+        1xxxxxx - reserved for less common entry points
+        1000000 ----- print sign of number          (stdio.pvvs)
+        1000001 ----- print magnitude of number     (stdio.pvvs)
 
 # Misc #
 

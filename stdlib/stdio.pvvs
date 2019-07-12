@@ -44,4 +44,77 @@ SNN                     | DROP
 SNN                     | DROP
 NTN                     | RTS
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Description:
+@   This functions prints a number from the stack in sign-magnitude format.
+@   Leading zeros are suppressed.
+@ Call Stack:
+@   number to print  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSTSN               | Mark: 1010 (print number from stack)
+SNS                     | DUP
+NSTTSSSSSSN             | JSR > 1000000
+NSTTSSSSSTN             | JSR > 1000001
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Description:
+@   This functions prints the sign of a number from the stack.
+@ Call Stack:
+@   number to print  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSSSSN            | Mark: 1000000 (print sign of number from stack)
+NTTSTSSSSSSSSSSSSSTN    | BMI > 010000000 00000001
+SSSTSTSTTN              | PUSH ASCII '+'
+NSNSTSSSSSSSSSSSSTSN    | JMP > 010000000 00000010
+NSSVSTSSSSSSSSSSSSSTN   | Mark: 010000000 00000001
+SSSTSTTSTN              | PUSH ASCII '-'
+NSSVSTSSSSSSSSSSSSTSN   | Mark: 010000000 00000010
+TNSS                    | PUTC
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Description:
+@   This functions prints the magnitude of a number from the stack.
+@ Call Stack:
+@   number to print  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSSSTN            | Mark: 1000001 (print magnitude of number from stack)
+NSTTSSSTN               | JSR > 10001 (absolute value)
+
+SSSSN                   | PUSH ASCII '\0'
+SNT                     | SWAP
+
+@ Pick off one digit on each pass through this loop.
+NSSVSTSSSSSTSSSSSSSSN   | Mark: 01000001 00000000
+SNS                     | DUP
+
+@ Mod-off a digit, convert to ASCII, store on stack as part of the string.
+SSSTSTSN                | PUSH +10
+TSTT                    | MODULO
+SSSTTSSSSN              | PUSH ASCII '0'
+TSSS                    | ADD
+SNT                     | SWAP
+
+@ Divide down to next digit and keep looping if number != 0 yet.
+SSSTSTSN                | PUSH +10
+TSTS                    | DIVIDE
+SNS                     | DUP
+NTSSTSSSSSTSSSSSSSTN    | BRZ > 01000001 00000001
+NSNSTSSSSSTSSSSSSSSN    | JMP > 01000001 00000000
+
+@ Print the string we have built on the stack.
+NSSVSTSSSSSTSSSSSSSTN   | Mark: 01000001 00000001
+SNN                     | DROP
+NSTTSSSN                | JSR > 1000 (print string from stack)
+NTN                     | RTS
+
+#include <math.pvvs>
+
 #endif
