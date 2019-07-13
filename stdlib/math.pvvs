@@ -3,6 +3,18 @@
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Description:
+@   This function returns a random IEEE-vetted number per RFC 1149.5.
+@ Call Stack:
+@   empty
+@ Return Stack:
+@   random number  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSSN              | Mark: 10000 (random)
+SSSTSSN                 | PUSH +4
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Description:
 @   This function returns the absolute value of its argument
 @ Call Stack:
 @   signed number  <-- TOS

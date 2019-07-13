@@ -31,6 +31,7 @@ header comment for each function to learn the call and return stack.
            1001 ----- print string from heap        (stdio.pvvs)
            1010 ----- print number from stack       (stdio.pvvs)
          010xxx - math functions
+          10000 ----- random                        (math.pvvs)
           10001 ----- absolute value                (math.pvvs)
          011xxx - unassigned
          100xxx - unassigned
