@@ -149,10 +149,72 @@ SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
 NSNSSSTTSTSSSSSSSSSN    | JMP > 00011010 00000000
 
-NNN
 @ Clean up and return
 NSSVSSSTTSTSSSSSSSSTN   | Mark: 00011010 00000001
 SNN                     | DROP
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Description:
+@   This function compares two blocks of memory:
+@     blk1ptr -> blk1ptr+count
+@       -- versus --
+@     blk2ptr -> blk2ptr+count
+@   The return value is zero if the blocks are identical, otherwise non-zero.
+@ Call Stack:
+@   count
+@   blk1ptr
+@   blk2ptr  <-- TOS
+@ Return Stack:
+@   retvalue <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTSTTN              | Mark: 11011 (memcmp)
+
+@ Prepare the stack for computation.
+@ Addr | Contents
+@    0 | blk2ptr
+@    1 | blk1ptr
+
+SSSSN                   | PUSH 0 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+SSSTN                   | PUSH 1 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+
+@ Compare one word on each pass through this loop.
+NSSVSSSTTSTTSSSSSSSSN   | Mark: 00011011 00000000
+SNS                     | DUP
+SNS                     | DUP
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+TTT                     | LOAD
+SNT                     | SWAP
+SSSTN                   | PUSH 1 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+TTT                     | LOAD
+TSST                    | SUBTRACT
+NTSSSSTTSTTSSSSSSTSN    | BRZ > 00011011 00000010 (jump if words match)
+
+@ Return 'match? = false'
+SNN                     | DROP
+SSSTN                   | PUSH 1
+NTN                     | RTS
+
+@ Decrement and loop again if loop isn't complete.
+NSSVSSSTTSTTSSSSSSTSN   | Mark: 00011011 00000010
+SNS                     | DUP
+NTSSSSTTSTTSSSSSSSTN    | BRZ > 00011011 00000001 (jump if loop is complete)
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+NSNSSSTTSTTSSSSSSSSN    | JMP > 00011011 00000000
+
+@ Return 'match? = true'
+NSSVSSSTTSTTSSSSSSSTN   | Mark: 00011011 00000001
+SNN                     | DROP
+SSSSN                   | PUSH 0
 NTN                     | RTS
 
 #include <math.pvvs>

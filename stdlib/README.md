@@ -37,6 +37,7 @@ header comment for each function to learn the call and return stack.
           11000 ----- memset                        (heap.pvvs)
           11001 ----- memcpy                        (heap.pvvs)
           11010 ----- memrand                       (heap.pvvs)
+          11011 ----- memcmp                        (heap.pvvs)
          100xxx - unassigned
          101xxx - unassigned
          110xxx - conversion functions
