@@ -33,7 +33,8 @@ header comment for each function to learn the call and return stack.
          010xxx - math functions
           10000 ----- random                        (math.pvvs)
           10001 ----- absolute value                (math.pvvs)
-         011xxx - unassigned
+         011xxx - heap functions
+          11000 ----- memset                        (heap.pvvs)
          100xxx - unassigned
          101xxx - unassigned
          110xxx - conversion functions

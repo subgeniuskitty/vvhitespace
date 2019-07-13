@@ -1,0 +1,61 @@
+#ifndef VVS_STDLIB_HEAP
+#define VVS_STDLIB_HEAP
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Description:
+@   This function writes pattern into the memory locations:
+@     startaddr -> startaddr+numbytes
+@ Call Stack:
+@   pattern
+@   startaddr
+@   numbytes  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTSSSN              | Mark: 11000 (memset)
+
+@ Prepare the stack for computation.
+@ Addr | Contents
+@    0 | numbytes
+@    1 | startaddr
+@    2 | pattern
+
+SSSSN                   | PUSH 0 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+SSSTN                   | PUSH 1 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+SSSTSN                  | PUSH 2 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+
+@ Store pattern into one memory location on each pass through this loop.
+NSSVSSSTTSSSSSSSSSSSN   | Mark: 00011000 00000000
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+SSSTN                   | PUSH 1 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+SSSTSN                  | PUSH 2 (ptr)
+TTT                     | LOAD
+TTS                     | STORE
+
+@ Decrement and check for loop end condition numbytes == 0.
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+SNS                     | DUP
+NTSSSSTTSSSSSSSSSSTN    | BRZ > 00011000 00000001
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+SSSSN                   | PUSH 0 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+NSNSSSTTSSSSSSSSSSSN    | JMP > 00011000 00000000
+
+@ Clean up and return
+NSSVSSSTTSSSSSSSSSSTN   | Mark: 00011000 00000001
+SNN                     | DROP
+NTN                     | RTS
+
+#endif
