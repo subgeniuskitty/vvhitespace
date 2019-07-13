@@ -4,11 +4,11 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Description:
 @   This function writes pattern into the memory locations:
-@     startaddr -> startaddr+numbytes
+@     startaddr -> startaddr+count
 @ Call Stack:
 @   pattern
 @   startaddr
-@   numbytes  <-- TOS
+@   count  <-- TOS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -16,7 +16,7 @@ NSSVTTSSSN              | Mark: 11000 (memset)
 
 @ Prepare the stack for computation.
 @ Addr | Contents
-@    0 | numbytes
+@    0 | count
 @    1 | startaddr
 @    2 | pattern
 
@@ -41,7 +41,7 @@ SSSTSN                  | PUSH 2 (ptr)
 TTT                     | LOAD
 TTS                     | STORE
 
-@ Decrement and check for loop end condition numbytes == 0.
+@ Decrement and check for loop end condition count == 0.
 SSSSN                   | PUSH 0 (ptr)
 TTT                     | LOAD
 SNS                     | DUP
@@ -55,6 +55,66 @@ NSNSSSTTSSSSSSSSSSSN    | JMP > 00011000 00000000
 
 @ Clean up and return
 NSSVSSSTTSSSSSSSSSSTN   | Mark: 00011000 00000001
+SNN                     | DROP
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Description:
+@   This function copies count+1 words from source to destination.
+@ Call Stack:
+@   source
+@   destination
+@   count  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTSSTN              | Mark: 11001 (memcpy)
+
+@ Prepare the stack for computation.
+@ Addr | Contents
+@    0 | count
+@    1 | destination
+@    2 | source
+
+SSSSN                   | PUSH 0 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+SSSTN                   | PUSH 1 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+SSSTSN                  | PUSH 2 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+
+@ Copy one word on each pass through this loop.
+NSSVSSSTTSSTSSSSSSSSN   | Mark: 00011001 00000000
+SSSTN                   | PUSH 1 (ptr)
+TTT                     | LOAD
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+SSSTSN                  | PUSH 2 (ptr)
+TTT                     | LOAD
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+TTT                     | LOAD
+TTS                     | STORE
+
+@ Decrement and check for loop end conditions.
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+SNS                     | DUP
+NTSSSSTTSSTSSSSSSSTN    | BRZ > 00011001 00000001
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+SSSSN                   | PUSH 0 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+NSNSSSTTSSTSSSSSSSSN    | JMP > 00011001 00000000
+
+@ Clean up and return
+NSSVSSSTTSSTSSSSSSSTN   | Mark: 00011001 00000001
 SNN                     | DROP
 NTN                     | RTS
 

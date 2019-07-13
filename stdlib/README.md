@@ -35,6 +35,7 @@ header comment for each function to learn the call and return stack.
           10001 ----- absolute value                (math.pvvs)
          011xxx - heap functions
           11000 ----- memset                        (heap.pvvs)
+          11001 ----- memcpy                        (heap.pvvs)
          100xxx - unassigned
          101xxx - unassigned
          110xxx - conversion functions
