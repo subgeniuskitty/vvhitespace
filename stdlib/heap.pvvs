@@ -118,4 +118,43 @@ NSSVSSSTTSSTSSSSSSSTN   | Mark: 00011001 00000001
 SNN                     | DROP
 NTN                     | RTS
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Description:
+@   This function writes random words into the memory locations:
+@     startaddr -> startaddr+count
+@ Call Stack:
+@   count
+@   startaddr  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTSTSN              | Mark: 11010 (memrand)
+SSSSN                   | PUSH 0 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+
+@ Store random word into one memory location on each pass through this loop.
+NSSVSSSTTSTSSSSSSSSSN   | Mark: 00011010 00000000
+SNS                     | DUP
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+NSTTSSSSN               | JSR > 10000 (random)
+TTS                     | STORE
+
+@ Decrement and check loop end conditions
+SNS                     | DUP
+NTSSSSTTSTSSSSSSSSTN    | BRZ > 00011010 00000001
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+NSNSSSTTSTSSSSSSSSSN    | JMP > 00011010 00000000
+
+NNN
+@ Clean up and return
+NSSVSSSTTSTSSSSSSSSTN   | Mark: 00011010 00000001
+SNN                     | DROP
+NTN                     | RTS
+
+#include <math.pvvs>
+
 #endif

@@ -1,0 +1,13 @@
+@@ Populate heap[18]-heap[29] with random values
+SSSTSTTN   | PUSH 11
+SSSTSSTSN  | PUSH 18
+NSTTTSTSN  | JSR > 11010 (memrand)
+
+@@ Print heap[16]-heap[31]
+SSSTTTTTN  | PUSH 31
+SSSTSSSSN  | PUSH 16
+NSTTTTSSSN | JSR > 111000 (dump heap)
+NNN        | DIE
+
+#include "debug.pvvs"
+#include "heap.pvvs"
