@@ -203,7 +203,7 @@ SNN                     | DROP
 SSSTN                   | PUSH 1
 NTN                     | RTS
 
-@ Decrement and loop again if loop isn't complete.
+@ Decrement and loop again if loop is not complete.
 NSSVSSSTTSTTSSSSSSTSN   | Mark: 00011011 00000010
 SNS                     | DUP
 NTSSSSTTSTTSSSSSSSTN    | BRZ > 00011011 00000001 (jump if loop is complete)
