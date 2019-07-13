@@ -36,8 +36,9 @@ header comment for each function to learn the call and return stack.
          011xxx - unassigned
          100xxx - unassigned
          101xxx - unassigned
-         110xxx - unassigned
-         111xxx - conversion functions
+         110xxx - conversion functions
+         111xxx - debug functions
+         111000 ----- dump heap                     (debug.pvvs)
         1xxxxxx - reserved for less common entry points
         1000000 ----- print sign of number          (stdio.pvvs)
         1000001 ----- print magnitude of number     (stdio.pvvs)

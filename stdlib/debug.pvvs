@@ -1,0 +1,53 @@
+#ifndef VVS_STDLIB_DEBUG
+#define VVS_STDLIB_DEBUG
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Description:
+@   This function dumps the heap from startaddr to endaddr.
+@ Call Stack:
+@   endaddr
+@   startaddr  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTTSSSN              | Mark: 111000 (dump heap)
+
+@ Prepare a numeric address and value on the stack
+SNS                      | DUP
+SNS                      | DUP
+TTT                      | LOAD
+SNT                      | SWAP
+
+@ Print output line for this memory location
+NSTTSSSSSTN              | JSR>1000001 (print absolute value of number)
+SSSTTTSTSN               | PUSH ASCII ':'
+SSSTSSTN                 | PUSH ASCII '\t'
+TNSS                     | PUTC
+TNSS                     | PUTC
+NSTTSTSN                 | JSR>1010 (print number from stack)
+SSSTSTSN                 | PUSH ASCII '\n'
+TNSS                     | PUTC
+
+@ Figure out if the loop is complete.
+SSSSN                    | PUSH 0 (ptr)
+SNT                      | SWAP
+TTS                      | STORE
+SNS                      | DUP
+SSSSN                    | PUSH 0 (ptr)
+TTT                      | LOAD
+TSST                     | SUBTRACT
+NTSSSTTTSSSSSSSSSSSN     | BRZ > 00111000 00000000
+SSSSN                    | PUSH 0 (ptr)
+TTT                      | LOAD
+SSSTN                    | PUSH 1
+TSSS                     | ADD
+NSNTTTSSSN               | JMP>111000 (dump heap)
+
+@ Clean up and return
+NSSVSSTTTSSSSSSSSSSSN    | Mark: 00111000 00000000
+SNN                      | DROP
+NTN                      | RTS
+
+#include <stdio.pvvs>
+
+#endif
