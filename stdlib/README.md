@@ -38,6 +38,7 @@ header comment for each function to learn the call and return stack.
           11001 ----- memcpy                        (heap.pvvs)
           11010 ----- memrand                       (heap.pvvs)
           11011 ----- memcmp                        (heap.pvvs)
+          11100 ----- memsrch                       (heap.pvvs)
          100xxx - unassigned
          101xxx - unassigned
          110xxx - conversion functions
@@ -55,3 +56,6 @@ private label space associated with it, formed as follows:
     00001000 xxxxxxxx - for use by 1000
     00001001 xxxxxxxx - for use by 1001
     ...etc
+
+Also by convention, functions which return a pointer will use the value `0` to
+represent a `NULL` pointer.

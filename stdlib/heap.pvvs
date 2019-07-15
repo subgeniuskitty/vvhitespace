@@ -217,6 +217,71 @@ SNN                     | DROP
 SSSSN                   | PUSH 0
 NTN                     | RTS
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Description:
+@   This function searches the heap from address to address+count.
+@   If pattern is found, the return value is a pointer to the matching word.
+@   If not found, the return value is a null pointer.
+@ Call Stack:
+@   pattern
+@   count
+@   address <-- TOS
+@ Return Stack:
+@   pointer <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTTSSN              | Mark: 11100 (memsrch)
+
+@ Prepare the stack for computation.
+@ Stack:
+@   offset  <-- TOS
+@ Addr | Contents
+@    0 | address
+@    1 | count
+@    2 | pattern
+
+SSSSN                   | PUSH 0 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+SSSTN                   | PUSH 1 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+SSSTSN                  | PUSH 2 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+
+@ Compare one word on each pass through this loop.
+NSSVSSSTTTSSSSSSSSSSN   | Mark: 00011100 00000000
+SNS                     | DUP
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+TTT                     | LOAD
+SSSTSN                  | PUSH 2 (ptr)
+TTT                     | LOAD
+TSST                    | SUBTRACT
+NTSSSSTTTSSSSSSSSSTN    | BRZ > 00011100 00000001
+SNS                     | DUP
+SSSTN                   | PUSH 1 (ptr)
+TTT                     | LOAD
+TSST                    | SUBTRACT
+NTSSSSTTTSSSSSSSSTSN    | BRZ > 00011100 00000010
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+NSNSSSTTTSSSSSSSSSSN    | JMP > 00011100 00000000
+
+@ Found a match. Clean up and return.
+NSSVSSSTTTSSSSSSSSSTN   | Mark: 00011100 00000001
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+NTN                     | RTS
+
+@ No match found. Clean up and return.
+NSSVSSSTTTSSSSSSSSTSN   | Mark: 00011100 00000010
+SNN                     | DROP
+SSSSN                   | PUSH 0
+NTN                     | RTS
+
 #include <math.pvvs>
 
 #endif
