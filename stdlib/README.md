@@ -16,9 +16,12 @@ following reservations:
     0xxxxxxx xxxxxxxx - reserved for private use by stdlib
     1xxxxxxx xxxxxxxx - available for use in user programs
 
-## Heap ##
+## Heap and Pointers ##
 
-    The first 256 heap addresses are reserved when using the stdlib.
+The first 16 heap addresses (`0-15`) are reserved when using the stdlib.
+
+By convention, functions which return a pointer will use the address `0` to
+represent a `NULL` pointer.
 
 # Entry Points #
 
@@ -39,6 +42,9 @@ header comment for each function to learn the call and return stack.
           11010 ----- memrand                       (heap.pvvs)
           11011 ----- memcmp                        (heap.pvvs)
           11100 ----- memsrch                       (heap.pvvs)
+          11101 ----- <empty>
+          11110 ----- slurp                         (heap.pvvs)
+          11111 ----- spew                          (heap.pvvs)
          100xxx - unassigned
          101xxx - unassigned
          110xxx - conversion functions
@@ -57,5 +63,12 @@ private label space associated with it, formed as follows:
     00001001 xxxxxxxx - for use by 1001
     ...etc
 
-Also by convention, functions which return a pointer will use the value `0` to
-represent a `NULL` pointer.
+# Slurp and Spew #
+
+The stdlib uses heap[1] to heap[15] as registers.
+
+The `slurp` and `spew` functions facilitate this by `spew`ing the stack onto
+the heap's pseudo-registers or `slurp`ing the pseudo-registers back to the
+stack.  The functions preserve order in complementary fashion.
+
+The `spew` function uses `heap[0]` for storage.

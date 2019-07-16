@@ -2,9 +2,10 @@
 #define VVS_STDLIB_HEAP
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   memset (11000)
 @ Description:
-@   This function writes pattern into the memory locations:
-@     startaddr -> startaddr+count
+@   Writes 'pattern' in memory locations 'startaddr' to 'startaddr+count'.
 @ Call Stack:
 @   pattern
 @   startaddr
@@ -13,42 +14,28 @@
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTTSSSN              | Mark: 11000 (memset)
+SSSTTN                  | PUSH 3
+NSTTTTTTN               | JSR > 11111 (spew)
 
-@ Prepare the stack for computation.
-@ Addr | Contents
-@    0 | count
-@    1 | startaddr
-@    2 | pattern
-
-SSSSN                   | PUSH 0 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
-SSSTN                   | PUSH 1 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
-SSSTSN                  | PUSH 2 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
-
-@ Store pattern into one memory location on each pass through this loop.
+@ Store 'pattern' into one memory location on each pass through this loop.
 NSSVSSSTTSSSSSSSSSSSN   | Mark: 00011000 00000000
-SSSSN                   | PUSH 0 (ptr)
-TTT                     | LOAD
 SSSTN                   | PUSH 1 (ptr)
+TTT                     | LOAD
+SSSTSN                  | PUSH 2 (ptr)
 TTT                     | LOAD
 TSSS                    | ADD
-SSSTSN                  | PUSH 2 (ptr)
+SSSTTN                  | PUSH 3 (ptr)
 TTT                     | LOAD
 TTS                     | STORE
 
-@ Decrement and check for loop end condition count == 0.
-SSSSN                   | PUSH 0 (ptr)
+@ Decrement and check for loop end condition 'count == 0'.
+SSSTN                   | PUSH 1 (ptr)
 TTT                     | LOAD
 SNS                     | DUP
 NTSSSSTTSSSSSSSSSSTN    | BRZ > 00011000 00000001
 SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
-SSSSN                   | PUSH 0 (ptr)
+SSSTN                   | PUSH 1 (ptr)
 SNT                     | SWAP
 TTS                     | STORE
 NSNSSSTTSSSSSSSSSSSN    | JMP > 00011000 00000000
@@ -59,8 +46,10 @@ SNN                     | DROP
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   memcpy (11001)
 @ Description:
-@   This function copies count+1 words from source to destination.
+@   Copies 'count+1' words from 'source' to 'destination'.
 @ Call Stack:
 @   source
 @   destination
@@ -69,46 +58,32 @@ NTN                     | RTS
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTTSSTN              | Mark: 11001 (memcpy)
-
-@ Prepare the stack for computation.
-@ Addr | Contents
-@    0 | count
-@    1 | destination
-@    2 | source
-
-SSSSN                   | PUSH 0 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
-SSSTN                   | PUSH 1 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
-SSSTSN                  | PUSH 2 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
+SSSTTN                  | PUSH 3
+NSTTTTTTN               | JSR > 11111 (spew)
 
 @ Copy one word on each pass through this loop.
 NSSVSSSTTSSTSSSSSSSSN   | Mark: 00011001 00000000
-SSSTN                   | PUSH 1 (ptr)
-TTT                     | LOAD
-SSSSN                   | PUSH 0 (ptr)
-TTT                     | LOAD
-TSSS                    | ADD
 SSSTSN                  | PUSH 2 (ptr)
 TTT                     | LOAD
-SSSSN                   | PUSH 0 (ptr)
+SSSTN                   | PUSH 1 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+SSSTTN                  | PUSH 3 (ptr)
+TTT                     | LOAD
+SSSTN                   | PUSH 1 (ptr)
 TTT                     | LOAD
 TSSS                    | ADD
 TTT                     | LOAD
 TTS                     | STORE
 
 @ Decrement and check for loop end conditions.
-SSSSN                   | PUSH 0 (ptr)
+SSSTN                   | PUSH 1 (ptr)
 TTT                     | LOAD
 SNS                     | DUP
 NTSSSSTTSSTSSSSSSSTN    | BRZ > 00011001 00000001
 SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
-SSSSN                   | PUSH 0 (ptr)
+SSSTN                   | PUSH 1 (ptr)
 SNT                     | SWAP
 TTS                     | STORE
 NSNSSSTTSSTSSSSSSSSN    | JMP > 00011001 00000000
@@ -119,24 +94,25 @@ SNN                     | DROP
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   memrand (11010)
 @ Description:
-@   This function writes random words into the memory locations:
-@     startaddr -> startaddr+count
+@   Writes random words into memory locations 'startaddr' to 'startaddr+count'.
 @ Call Stack:
 @   count
 @   startaddr  <-- TOS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <math.pvvs>
 NSSVTTSTSN              | Mark: 11010 (memrand)
-SSSSN                   | PUSH 0 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
+SSSTN                   | PUSH 1
+NSTTTTTTN               | JSR > 11111 (spew)
 
 @ Store random word into one memory location on each pass through this loop.
 NSSVSSSTTSTSSSSSSSSSN   | Mark: 00011010 00000000
 SNS                     | DUP
-SSSSN                   | PUSH 0 (ptr)
+SSSTN                   | PUSH 1 (ptr)
 TTT                     | LOAD
 TSSS                    | ADD
 NSTTSSSSN               | JSR > 10000 (random)
@@ -155,8 +131,10 @@ SNN                     | DROP
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   memcmp (11011)
 @ Description:
-@   This function compares two blocks of memory:
+@   Compares two blocks of memory:
 @     blk1ptr -> blk1ptr+count
 @       -- versus --
 @     blk2ptr -> blk2ptr+count
@@ -169,29 +147,19 @@ NTN                     | RTS
 @   retvalue <-- TOS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTTSTTN              | Mark: 11011 (memcmp)
-
-@ Prepare the stack for computation.
-@ Addr | Contents
-@    0 | blk2ptr
-@    1 | blk1ptr
-
-SSSSN                   | PUSH 0 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
-SSSTN                   | PUSH 1 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
+SSSTSN                  | PUSH 2
+NSTTTTTTN               | JSR > 11111 (spew)
 
 @ Compare one word on each pass through this loop.
 NSSVSSSTTSTTSSSSSSSSN   | Mark: 00011011 00000000
 SNS                     | DUP
 SNS                     | DUP
-SSSSN                   | PUSH 0 (ptr)
+SSSTN                   | PUSH 1 (ptr)
 TTT                     | LOAD
 TSSS                    | ADD
 TTT                     | LOAD
 SNT                     | SWAP
-SSSTN                   | PUSH 1 (ptr)
+SSTSN                   | PUSH 2 (ptr)
 TTT                     | LOAD
 TSSS                    | ADD
 TTT                     | LOAD
@@ -218,9 +186,11 @@ SSSSN                   | PUSH 0
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   memsrch (11100)
 @ Description:
-@   This function searches the heap from address to address+count.
-@   If pattern is found, the return value is a pointer to the matching word.
+@   Searches the heap from 'address' to 'address+count'.
+@   If 'pattern' is found, the return value is a pointer to the matching word.
 @   If not found, the return value is a null pointer.
 @ Call Stack:
 @   pattern
@@ -230,38 +200,22 @@ NTN                     | RTS
 @   pointer <-- TOS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTTTSSN              | Mark: 11100 (memsrch)
-
-@ Prepare the stack for computation.
-@ Stack:
-@   offset  <-- TOS
-@ Addr | Contents
-@    0 | address
-@    1 | count
-@    2 | pattern
-
-SSSSN                   | PUSH 0 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
-SSSTN                   | PUSH 1 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
-SSSTSN                  | PUSH 2 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
+SSSTTN                  | PUSH 3
+NSTTTTTTN               | JSR > 11111 (spew)
 
 @ Compare one word on each pass through this loop.
 NSSVSSSTTTSSSSSSSSSSN   | Mark: 00011100 00000000
 SNS                     | DUP
-SSSSN                   | PUSH 0 (ptr)
+SSSTN                   | PUSH 1 (ptr)
 TTT                     | LOAD
 TSSS                    | ADD
 TTT                     | LOAD
-SSSTSN                  | PUSH 2 (ptr)
+SSSTTN                  | PUSH 3 (ptr)
 TTT                     | LOAD
 TSST                    | SUBTRACT
 NTSSSSTTTSSSSSSSSSTN    | BRZ > 00011100 00000001
 SNS                     | DUP
-SSSTN                   | PUSH 1 (ptr)
+SSSTSN                  | PUSH 2 (ptr)
 TTT                     | LOAD
 TSST                    | SUBTRACT
 NTSSSSTTTSSSSSSSSTSN    | BRZ > 00011100 00000010
@@ -271,7 +225,7 @@ NSNSSSTTTSSSSSSSSSSN    | JMP > 00011100 00000000
 
 @ Found a match. Clean up and return.
 NSSVSSSTTTSSSSSSSSSTN   | Mark: 00011100 00000001
-SSSSN                   | PUSH 0 (ptr)
+SSSTN                   | PUSH 1 (ptr)
 TTT                     | LOAD
 TSSS                    | ADD
 NTN                     | RTS
@@ -282,6 +236,90 @@ SNN                     | DROP
 SSSSN                   | PUSH 0
 NTN                     | RTS
 
-#include <math.pvvs>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   slurp (11110)
+@ Description:
+@   Reads 'count' values from heap to stack in complementary order to 'spew'.
+@ Call Stack:
+@   count
+@ Return Stack:
+@   heap[count]
+@   ...
+@   heap[2]
+@   heap[1]      <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTTTSN              | Mark: 11110 (slurp)
+
+@ Load one word from heap on each pass.
+NSSVSSSTTTTSSSSSSSSSN   | Mark: 00011110 00000000
+SNS                     | DUP
+TTT                     | LOAD
+SNT                     | SWAP
+
+@ Check for loop completion.
+@ As a side effect, prepare the next address.
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+SNS                     | DUP
+NTSSSSTTTTSSSSSSSSTN    | BRZ > 00011110 00000001
+NSNSSSTTTTSSSSSSSSSN    | JMP > 00011110 00000000
+NSSVSSSTTTTSSSSSSSSTN   | Mark: 00011110 00000001
+SNN                     | DROP
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   spew (11111)
+@ Description:
+@   Writes 'count' values from stack to heap in this order:
+@     TOS   -> heap[1]
+@     TOS+1 -> heap[2]
+@     ...
+@     TOS+n -> heap[count]
+@   This is the only stdlib function which uses heap[0] for storage.
+@ Call Stack:
+@   data-words
+@   ...
+@   data-words
+@   count  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTTTTN              | Mark: 11111 (spew)
+
+@ Create a counter in heap[0] that doubles as a destination pointer generator.
+SSSSN                   | PUSH 0 (ptr)
+SSSTN                   | PUSH 1
+TTS                     | STORE
+
+@ Store one word to heap on each pass.
+NSSVSSSTTTTTSSSSSSSSN   | Mark: 00011111 00000000
+SNT                     | SWAP
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+SNT                     | SWAP
+TTS                     | STORE
+
+@ Check for loop completion.
+SNS                     | DUP
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+TSST                    | SUBTRACT
+NTSSSSTTTTTSSSSSSSTN    | BRZ > 00011111 00000001
+
+@ Increment heap[0] if continuing.
+SSSSN                   | PUSH 0 (ptr)
+SNS                     | DUP
+TTT                     | LOAD
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+TTS                     | STORE
+NSNSSSTTTTTSSSSSSSSN    | JMP > 00011111 00000000
+
+@ Clean up and return.
+NSSVSSSTTTTTSSSSSSSTN   | Mark: 00011111 00000001
+SNN                     | DROP
+NTN                     | RTS
 
 #endif

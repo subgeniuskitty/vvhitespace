@@ -2,8 +2,10 @@
 #define VVS_STDLIB_STDIO
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   printstackstring (1000)
 @ Description:
-@   This function prints a null-terminated string from the stack.
+@   Prints a null-terminated string from the stack.
 @ Call Stack:
 @   null-terminator (ASCII '\0')
 @   char n
@@ -23,8 +25,10 @@ SNN                     | DROP
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   printheapstring (1001)
 @ Description:
-@   This function prints a null-terminated string from the heap.
+@   Prints a null-terminated string from the heap.
 @ Call Stack:
 @   pointer to first character  <-- TOS
 @ Return Stack:
@@ -45,11 +49,13 @@ SNN                     | DROP
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   printstacknumber (1010)
 @ Description:
-@   This functions prints a number from the stack in sign-magnitude format.
+@   Prints 'number' from the stack in sign-magnitude format.
 @   Leading zeros are suppressed.
 @ Call Stack:
-@   number to print  <-- TOS
+@   number  <-- TOS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -60,10 +66,12 @@ NSTTSSSSSTN             | JSR > 1000001
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   printstacknumbersign (1000000)
 @ Description:
-@   This functions prints the sign of a number from the stack.
+@   Prints the sign of 'number' from the stack.
 @ Call Stack:
-@   number to print  <-- TOS
+@   number  <-- TOS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -78,13 +86,16 @@ TNSS                    | PUTC
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   printstacknumbermagnitude (1000001)
 @ Description:
-@   This functions prints the magnitude of a number from the stack.
+@   Prints the magnitude of 'number' from the stack.
 @ Call Stack:
-@   number to print  <-- TOS
+@   number  <-- TOS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <math.pvvs>
 NSSVTSSSSSTN            | Mark: 1000001 (print magnitude of number from stack)
 NSTTSSSTN               | JSR > 10001 (absolute value)
 
@@ -114,7 +125,5 @@ NSSVSTSSSSSTSSSSSSSTN   | Mark: 01000001 00000001
 SNN                     | DROP
 NSTTSSSN                | JSR > 1000 (print string from stack)
 NTN                     | RTS
-
-#include <math.pvvs>
 
 #endif

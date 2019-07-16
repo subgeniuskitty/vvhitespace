@@ -2,14 +2,17 @@
 #define VVS_STDLIB_DEBUG
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   dumpheap (111000)
 @ Description:
-@   This function dumps the heap from startaddr to endaddr.
+@   Dumps the heap from 'startaddr' to 'endaddr'.
 @ Call Stack:
 @   endaddr
 @   startaddr  <-- TOS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stdio.pvvs>
 NSSVTTTSSSN              | Mark: 111000 (dump heap)
 
 @ Prepare a numeric address and value on the stack
@@ -29,15 +32,15 @@ SSSTSTSN                 | PUSH ASCII '\n'
 TNSS                     | PUTC
 
 @ Figure out if the loop is complete.
-SSSSN                    | PUSH 0 (ptr)
+SSSTN                    | PUSH 1 (ptr)
 SNT                      | SWAP
 TTS                      | STORE
 SNS                      | DUP
-SSSSN                    | PUSH 0 (ptr)
+SSSTN                    | PUSH 1 (ptr)
 TTT                      | LOAD
 TSST                     | SUBTRACT
 NTSSSTTTSSSSSSSSSSSN     | BRZ > 00111000 00000000
-SSSSN                    | PUSH 0 (ptr)
+SSSTN                    | PUSH 1 (ptr)
 TTT                      | LOAD
 SSSTN                    | PUSH 1
 TSSS                     | ADD
@@ -47,7 +50,5 @@ NSNTTTSSSN               | JMP>111000 (dump heap)
 NSSVSSTTTSSSSSSSSSSSN    | Mark: 00111000 00000000
 SNN                      | DROP
 NTN                      | RTS
-
-#include <stdio.pvvs>
 
 #endif

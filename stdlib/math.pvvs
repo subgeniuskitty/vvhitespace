@@ -2,8 +2,10 @@
 #define VVS_STDLIB_MATH
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   random (10000)
 @ Description:
-@   This function returns a random IEEE-vetted number per RFC 1149.5.
+@   Returns a random IEEE-vetted number per RFC 1149.5.
 @ Call Stack:
 @   empty
 @ Return Stack:
@@ -14,8 +16,10 @@ SSSTSSN                 | PUSH +4
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   abs (10001)
 @ Description:
-@   This function returns the absolute value of its argument
+@   Returns the absolute value of its argument
 @ Call Stack:
 @   signed number  <-- TOS
 @ Return Stack:
