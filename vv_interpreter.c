@@ -120,8 +120,13 @@ parse_label(uint8_t * code, size_t * pc)
         label = label << 1;
         if (c == '\t') label++;
     }
-    // TODO: Where should I handle attempts to access an unitialized label?
-    //       For now, leave it undefined in a nasal demon sense.
+    return label;
+}
+
+uint16_t
+check_label(size_t * labels, uint16_t label, size_t * pc)
+{
+    if(!labels[label]) ws_die(pc, "uninitialized label (forgot an include?)");
     return label;
 }
 
@@ -266,13 +271,13 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int64_t ** sp, size_t * lab
                         break;
                     case '\t':
                         /* Call a subroutine. */
-                        temp_pc = labels[parse_label(code, pc)];
+                        temp_pc = labels[check_label(labels, parse_label(code, pc), pc)];
                         *((*rsp)++) = *pc;
                         *pc = temp_pc;
                         break;
                     case '\n':
                         /* Jump unconditionally to a label. */
-                        *pc = labels[parse_label(code, pc)];
+                        *pc = labels[check_label(labels, parse_label(code, pc), pc)];
                         break;
                     default:
                         ws_die(pc, "malformed flow control IMP");
@@ -285,12 +290,12 @@ process_imp_flowcontrol(uint8_t * code, size_t * pc, int64_t ** sp, size_t * lab
                 switch (next_code_byte(code,pc)) {
                     case ' ':
                         /* Jump to a label if TOS == 0 */
-                        temp_pc = labels[parse_label(code, pc)];
+                        temp_pc = labels[check_label(labels, parse_label(code, pc), pc)];
                         if (stack_pop(sp) == 0) *pc = temp_pc;
                         break;
                     case '\t':
                         /* Jump to a label if TOS < 0. */
-                        temp_pc = labels[parse_label(code, pc)];
+                        temp_pc = labels[check_label(labels, parse_label(code, pc), pc)];
                         if (stack_pop(sp) < 0) *pc = temp_pc;
                         break;
                     case '\n':
