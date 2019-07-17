@@ -45,14 +45,18 @@ header comment for each function to learn the call and return stack.
           11101 ----- <empty>
           11110 ----- slurp                         (heap.pvvs)
           11111 ----- spew                          (heap.pvvs)
-         100xxx - unassigned
+         100xxx - string functions
+         100000 ----- strlen                        (string.pvvs)
          101xxx - unassigned
          110xxx - conversion functions
          111xxx - debug functions
          111000 ----- dump heap                     (debug.pvvs)
+         111001 ----- dump stack                    (debug.pvvs)
         1xxxxxx - reserved for less common entry points
-        1000000 ----- print sign of number          (stdio.pvvs)
-        1000001 ----- print magnitude of number     (stdio.pvvs)
+        1000000 ----- slurp registers               (heap.pvvs)
+        1000001 ----- spew registers                (heap.pvvs)
+        1000010 ----- print sign of number          (stdio.pvvs)
+        1000011 ----- print magnitude of number     (stdio.pvvs)
 
 # Misc #
 
@@ -67,8 +71,8 @@ private label space associated with it, formed as follows:
 
 The stdlib uses heap[1] to heap[15] as registers.
 
-The `slurp` and `spew` functions facilitate this by `spew`ing the stack onto
-the heap's pseudo-registers or `slurp`ing the pseudo-registers back to the
+The `slurpreg` and `spewreg` functions facilitate this by `spew`ing the stack
+onto the heap's pseudo-registers or `slurp`ing the pseudo-registers back to the
 stack.  The functions preserve order in complementary fashion.
 
-The `spew` function uses `heap[0]` for storage.
+The `spewreg` function uses `heap[0]` for storage.

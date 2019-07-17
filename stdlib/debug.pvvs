@@ -22,7 +22,7 @@ TTT                      | LOAD
 SNT                      | SWAP
 
 @ Print output line for this memory location
-NSTTSSSSSTN              | JSR>1000001 (print absolute value of number)
+NSTTSSSSTTN              | JSR>1000011 (print absolute value of number)
 SSSTTTSTSN               | PUSH ASCII ':'
 SSSTSSTN                 | PUSH ASCII '\t'
 TNSS                     | PUTC
@@ -48,6 +48,43 @@ NSNTTTSSSN               | JMP>111000 (dump heap)
 
 @ Clean up and return
 NSSVSSTTTSSSSSSSSSSSN    | Mark: 00111000 00000000
+SNN                      | DROP
+NTN                      | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   dumpstack (111001)
+@ Description:
+@   Dumps 'count' entries from the stack.
+@ Call Stack:
+@   count <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stdio.pvvs>
+NSSVTTTSSTN              | Mark: 111001 (dump stack)
+
+@ Print output line for the current TOS.
+SNS                      | DUP
+NSTTSSSSTTN              | JSR>1000011 (print absolute value of number)
+SSSTTTSTSN               | PUSH ASCII ':'
+SSSTSSTN                 | PUSH ASCII '\t'
+TNSS                     | PUTC
+TNSS                     | PUTC
+SNT                      | SWAP
+NSTTSTSN                 | JSR>1010 (print number from stack)
+SSSTSTSN                 | PUSH ASCII '\n'
+TNSS                     | PUTC
+
+@ Figure out if the loop is complete.
+SNS                      | DUP
+NTSSSTTTSSTSSSSSSSSN     | BRZ > 00111001 00000000
+SSSTN                    | PUSH 1
+TSST                     | SUBTRACT
+NSNTTTSSTN               | JMP>111001 (dump stack)
+
+@ Clean up and return
+NSSVSSTTTSSTSSSSSSSSN    | Mark: 00111001 00000000
 SNN                      | DROP
 NTN                      | RTS
 

@@ -1,0 +1,39 @@
+#ifndef VVS_STDLIB_STRING
+#define VVS_STDLIB_STRING
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   strlen (100000)
+@ Description:
+@   Counts number of words in a null-terminated string.
+@   Returned number does not include the null-terminator.
+@ Call Stack:
+@   pointer to first character <-- TOS
+@ Return Stack:
+@   number of words in string  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSSSN             | Mark: 100000 (strlen)
+
+@ Create a length counter.
+SSSSN                   | PUSH 0
+SNT                     | SWAP
+
+@ Increment the counter (and pointer) on each pass through the loop.
+NSSVSSTSSSSSSSSSSSSSN   | Mark: 00100000 00000000
+SNS                     | DUP
+TTT                     | LOAD
+NTSSSTSSSSSSSSSSSSTN    | BRZ > 00100000 00000001
+SNT                     | SWAP
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+SNT                     | SWAP
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+NSNSSTSSSSSSSSSSSSSN    | JMP > 00100000 00000000
+
+@ Clean up and return.
+NSSVSSTSSSSSSSSSSSSTN   | Mark: 00100000 00000001
+SNN                     | DROP
+NTN                     | RTS
+
+#endif

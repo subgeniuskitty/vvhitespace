@@ -61,13 +61,13 @@ NTN                     | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTSTSN               | Mark: 1010 (print number from stack)
 SNS                     | DUP
-NSTTSSSSSSN             | JSR > 1000000
-NSTTSSSSSTN             | JSR > 1000001
+NSTTSSSSTSN             | JSR > 1000010
+NSTTSSSSTTN             | JSR > 1000011
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
-@   printstacknumbersign (1000000)
+@   printstacknumbersign (1000010)
 @ Description:
 @   Prints the sign of 'number' from the stack.
 @ Call Stack:
@@ -75,19 +75,19 @@ NTN                     | RTS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-NSSVTSSSSSSN            | Mark: 1000000 (print sign of number from stack)
-NTTSTSSSSSSSSSSSSSTN    | BMI > 010000000 00000001
+NSSVTSSSSTSN            | Mark: 1000010 (print sign of number from stack)
+NTTSTSSSSTSSSSSSSSTN    | BMI > 01000010 00000001
 SSSTSTSTTN              | PUSH ASCII '+'
-NSNSTSSSSSSSSSSSSTSN    | JMP > 010000000 00000010
-NSSVSTSSSSSSSSSSSSSTN   | Mark: 010000000 00000001
+NSNSTSSSSTSSSSSSSTSN    | JMP > 01000010 00000010
+NSSVSTSSSSTSSSSSSSSTN   | Mark: 01000010 00000001
 SSSTSTTSTN              | PUSH ASCII '-'
-NSSVSTSSSSSSSSSSSSTSN   | Mark: 010000000 00000010
+NSSVSTSSSSTSSSSSSSTSN   | Mark: 01000010 00000010
 TNSS                    | PUTC
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
-@   printstacknumbermagnitude (1000001)
+@   printstacknumbermagnitude (1000011)
 @ Description:
 @   Prints the magnitude of 'number' from the stack.
 @ Call Stack:
@@ -96,14 +96,14 @@ NTN                     | RTS
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #include <math.pvvs>
-NSSVTSSSSSTN            | Mark: 1000001 (print magnitude of number from stack)
+NSSVTSSSSTTN            | Mark: 1000011 (print magnitude of number from stack)
 NSTTSSSTN               | JSR > 10001 (absolute value)
 
 SSSSN                   | PUSH ASCII '\0'
 SNT                     | SWAP
 
 @ Pick off one digit on each pass through this loop.
-NSSVSTSSSSSTSSSSSSSSN   | Mark: 01000001 00000000
+NSSVSTSSSSTTSSSSSSSSN   | Mark: 01000011 00000000
 SNS                     | DUP
 
 @ Mod-off a digit, convert to ASCII, store on stack as part of the string.
@@ -117,11 +117,11 @@ SNT                     | SWAP
 SSSTSTSN                | PUSH +10
 TSTS                    | DIVIDE
 SNS                     | DUP
-NTSSTSSSSSTSSSSSSSTN    | BRZ > 01000001 00000001
-NSNSTSSSSSTSSSSSSSSN    | JMP > 01000001 00000000
+NTSSTSSSSTTSSSSSSSTN    | BRZ > 01000011 00000001
+NSNSTSSSSTTSSSSSSSSN    | JMP > 01000011 00000000
 
 @ Print the string we have built on the stack.
-NSSVSTSSSSSTSSSSSSSTN   | Mark: 01000001 00000001
+NSSVSTSSSSTTSSSSSSSTN   | Mark: 01000011 00000001
 SNN                     | DROP
 NSTTSSSN                | JSR > 1000 (print string from stack)
 NTN                     | RTS

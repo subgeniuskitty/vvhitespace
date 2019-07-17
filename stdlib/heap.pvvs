@@ -15,7 +15,7 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTTSSSN              | Mark: 11000 (memset)
 SSSTTN                  | PUSH 3
-NSTTTTTTN               | JSR > 11111 (spew)
+NSTTSSSSSTN             | JSR > 1000001 (spewreg)
 
 @ Store 'pattern' into one memory location on each pass through this loop.
 NSSVSSSTTSSSSSSSSSSSN   | Mark: 00011000 00000000
@@ -59,7 +59,7 @@ NTN                     | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTTSSTN              | Mark: 11001 (memcpy)
 SSSTTN                  | PUSH 3
-NSTTTTTTN               | JSR > 11111 (spew)
+NSTTSSSSSTN             | JSR > 1000001 (spewreg)
 
 @ Copy one word on each pass through this loop.
 NSSVSSSTTSSTSSSSSSSSN   | Mark: 00011001 00000000
@@ -107,7 +107,7 @@ NTN                     | RTS
 #include <math.pvvs>
 NSSVTTSTSN              | Mark: 11010 (memrand)
 SSSTN                   | PUSH 1
-NSTTTTTTN               | JSR > 11111 (spew)
+NSTTSSSSSTN             | JSR > 1000001 (spewreg)
 
 @ Store random word into one memory location on each pass through this loop.
 NSSVSSSTTSTSSSSSSSSSN   | Mark: 00011010 00000000
@@ -148,7 +148,7 @@ NTN                     | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTTSTTN              | Mark: 11011 (memcmp)
 SSSTSN                  | PUSH 2
-NSTTTTTTN               | JSR > 11111 (spew)
+NSTTSSSSSTN             | JSR > 1000001 (spewreg)
 
 @ Compare one word on each pass through this loop.
 NSSVSSSTTSTTSSSSSSSSN   | Mark: 00011011 00000000
@@ -201,7 +201,7 @@ NTN                     | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTTTSSN              | Mark: 11100 (memsrch)
 SSSTTN                  | PUSH 3
-NSTTTTTTN               | JSR > 11111 (spew)
+NSTTSSSSSTN             | JSR > 1000001 (spewreg)
 
 @ Compare one word on each pass through this loop.
 NSSVSSSTTTSSSSSSSSSSN   | Mark: 00011100 00000000
@@ -238,9 +238,9 @@ NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
-@   slurp (11110)
+@   slurpreg (1000000)
 @ Description:
-@   Reads 'count' values from heap to stack in complementary order to 'spew'.
+@   Reads 'count' values from heap to stack in complementary order to 'spewreg'.
 @ Call Stack:
 @   count
 @ Return Stack:
@@ -249,10 +249,10 @@ NTN                     | RTS
 @   heap[2]
 @   heap[1]      <-- TOS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-NSSVTTTTSN              | Mark: 11110 (slurp)
+NSSVTSSSSSSN            | Mark: 1000000 (slurpreg)
 
 @ Load one word from heap on each pass.
-NSSVSSSTTTTSSSSSSSSSN   | Mark: 00011110 00000000
+NSSVSTSSSSSSSSSSSSSSN   | Mark: 01000000 00000000
 SNS                     | DUP
 TTT                     | LOAD
 SNT                     | SWAP
@@ -262,15 +262,15 @@ SNT                     | SWAP
 SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
 SNS                     | DUP
-NTSSSSTTTTSSSSSSSSTN    | BRZ > 00011110 00000001
-NSNSSSTTTTSSSSSSSSSN    | JMP > 00011110 00000000
-NSSVSSSTTTTSSSSSSSSTN   | Mark: 00011110 00000001
+NTSSTSSSSSSSSSSSSSTN    | BRZ > 01000000 00000001
+NSNSTSSSSSSSSSSSSSSN    | JMP > 01000000 00000000
+NSSVSTSSSSSSSSSSSSSTN   | Mark: 01000000 00000001
 SNN                     | DROP
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
-@   spew (11111)
+@   spewreg (1000001)
 @ Description:
 @   Writes 'count' values from stack to heap in this order:
 @     TOS   -> heap[1]
@@ -286,7 +286,7 @@ NTN                     | RTS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-NSSVTTTTTN              | Mark: 11111 (spew)
+NSSVTSSSSSTN            | Mark: 1000001 (spewreg)
 
 @ Create a counter in heap[0] that doubles as a destination pointer generator.
 SSSSN                   | PUSH 0 (ptr)
@@ -294,7 +294,7 @@ SSSTN                   | PUSH 1
 TTS                     | STORE
 
 @ Store one word to heap on each pass.
-NSSVSSSTTTTTSSSSSSSSN   | Mark: 00011111 00000000
+NSSVSTSSSSSTSSSSSSSSN   | Mark: 01000001 00000000
 SNT                     | SWAP
 SSSSN                   | PUSH 0 (ptr)
 TTT                     | LOAD
@@ -306,10 +306,112 @@ SNS                     | DUP
 SSSSN                   | PUSH 0 (ptr)
 TTT                     | LOAD
 TSST                    | SUBTRACT
-NTSSSSTTTTTSSSSSSSTN    | BRZ > 00011111 00000001
+NTSSTSSSSSTSSSSSSSTN    | BRZ > 01000001 00000001
 
 @ Increment heap[0] if continuing.
 SSSSN                   | PUSH 0 (ptr)
+SNS                     | DUP
+TTT                     | LOAD
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+TTS                     | STORE
+NSNSTSSSSSTSSSSSSSSN    | JMP > 01000001 00000000
+
+@ Clean up and return.
+NSSVSTSSSSSTSSSSSSSTN   | Mark: 01000001 00000001
+SNN                     | DROP
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   slurp (11110)
+@ Description:
+@   Reads values from heap to stack in complementary order to 'spew'.
+@ Call Stack:
+@   address
+@   count  <-- TOS
+@ Return Stack:
+@   heap[address+count]
+@   ...
+@   heap[address+1]
+@   heap[address]  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTTTSN              | Mark: 11110 (slurp)
+SSSTSN                  | PUSH 2
+NSTTSSSSSTN             | JSR > 1000001 (spewreg)
+
+@ Load one word from heap on each pass.
+NSSVSSSTTTTSSSSSSSSSN   | Mark: 00011110 00000000
+SSSTN                   | PUSH 1 (ptr)
+TTT                     | LOAD
+SSSTSN                  | PUSH 2 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+TTT                     | LOAD
+
+@ Check for loop completion.
+@ As a side effect, prepare the next address.
+SSSTN                   | PUSH 1 (ptr)
+SNS                     | DUP
+TTT                     | LOAD
+SNS                     | DUP
+NTSSSSTTTTSSSSSSSSTN    | BRZ > 00011110 00000001
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+TTS                     | STORE
+NSNSSSTTTTSSSSSSSSSN    | JMP > 00011110 00000000
+NSSVSSSTTTTSSSSSSSSTN   | Mark: 00011110 00000001
+SNN                     | DROP
+SNN                     | DROP
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   spew (11111)
+@ Description:
+@   Writes values from stack to heap in this order:
+@     TOS   -> heap[address]
+@     TOS+1 -> heap[address+1]
+@     ...
+@     TOS+n -> heap[address+count]
+@ Call Stack:
+@   data-words
+@   ...
+@   data-words
+@   address
+@   count  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTTTTN              | Mark: 11111 (spew)
+SSSTSN                  | PUSH 2
+NSTTSSSSSTN             | JSR > 1000001 (spewreg)
+
+@ Create a counter in heap[3] that doubles as a dest. pointer offset generator.
+SSSTTN                  | PUSH 3 (ptr)
+SSSSN                   | PUSH 0
+TTS                     | STORE
+
+@ Store one word to heap on each pass.
+NSSVSSSTTTTTSSSSSSSSN   | Mark: 00011111 00000000
+SSSTSN                  | PUSH 2 (ptr)
+TTT                     | LOAD
+SSSTTN                  | PUSH 3 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+SNT                     | SWAP
+TTS                     | STORE
+
+@ Check for loop completion.
+SSSTN                   | PUSH 1 (ptr)
+TTT                     | LOAD
+SSSTTN                  | PUSH 3 (ptr)
+TTT                     | LOAD
+TSST                    | SUBTRACT
+NTSSSSTTTTTSSSSSSSTN    | BRZ > 00011111 00000001
+
+@ Increment heap[3] if continuing.
+SSSTTN                  | PUSH 3 (ptr)
 SNS                     | DUP
 TTT                     | LOAD
 SSSTN                   | PUSH 1
@@ -319,7 +421,6 @@ NSNSSSTTTTTSSSSSSSSN    | JMP > 00011111 00000000
 
 @ Clean up and return.
 NSSVSSSTTTTTSSSSSSSTN   | Mark: 00011111 00000001
-SNN                     | DROP
 NTN                     | RTS
 
 #endif
