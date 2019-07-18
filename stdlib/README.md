@@ -60,6 +60,8 @@ header comment for each function to learn the call and return stack.
         1000001 ----- spew registers                (heap.pvvs)
         1000010 ----- print sign of number          (stdio.pvvs)
         1000011 ----- print magnitude of number     (stdio.pvvs)
+        1000100 ----- print string from stack       (stdio.pvvs)
+        1000101 ----- print string from heap        (stdio.pvvs)
 
 # Misc #
 

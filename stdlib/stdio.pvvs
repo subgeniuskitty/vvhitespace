@@ -3,7 +3,7 @@
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
-@   printstackstring (1000)
+@   printstackstring (1000100)
 @ Description:
 @   Prints a null-terminated string from the stack.
 @ Call Stack:
@@ -15,18 +15,18 @@
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-NSSVTSSSN               | Mark: 1000 (print string from stack)
+NSSVTSSSTSSN            | Mark: 1000100 (print string from stack)
 SNS                     | DUP
-NTSSSSSTSSSSSSSSSSTN    | BRZ > 00001000 00000001
+NTSSTSSSTSSSSSSSSSTN    | BRZ > 01000100 00000001
 TNSS                    | Print character
-NSNTSSSN                | JMP > 1000
-NSSVSSSSTSSSSSSSSSSTN   | Mark: 00001000 00000001
+NSNTSSSTSSN             | JMP > 1000100
+NSSVSTSSSTSSSSSSSSSTN   | Mark: 01000100 00000001
 SNN                     | DROP
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
-@   printheapstring (1001)
+@   printheapstring (1000101)
 @ Description:
 @   Prints a null-terminated string from the heap.
 @ Call Stack:
@@ -34,16 +34,16 @@ NTN                     | RTS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-NSSVTSSTN               | Mark: 1001 (print string from heap)
+NSSVTSSSTSTN            | Mark: 1000101 (print string from heap)
 SNS                     | DUP
 TTT                     | LOAD
 SNS                     | DUP
-NTSSSSSTSSTSSSSSSSTN    | BRZ > 00001001 00000001
+NTSSTSSSTSTSSSSSSSTN    | BRZ > 01000101 00000001
 TNSS                    | Print character
 SSSTN                   | Push +1
 TSSS                    | ADD
-NSNTSSTN                | JMP > 1001
-NSSVSSSSTSSTSSSSSSSTN   | Mark: 00001001 00000001
+NSNTSSSTSTN             | JMP > 1000101
+NSSVSTSSSTSTSSSSSSSTN   | Mark: 01000101 00000001
 SNN                     | DROP
 SNN                     | DROP
 NTN                     | RTS

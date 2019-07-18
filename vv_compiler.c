@@ -25,6 +25,44 @@ print_usage(char ** argv)
     );
 }
 
+/* Allows building an ASCII string on the stack.                             */
+/* This syntax: A"test"                                                      */
+/* Results in five PUSH_IMMEDIATE commands for the four letters and newline. */
+/* Expects 'input' to present a double-quoted ('"') ASCII string.            */
+/* The 'A' has already been chomped.                                         */
+void
+parse_ascii_string(FILE * input, FILE * output)
+{
+    uint8_t temp_byte;
+    fread(&temp_byte, 1, 1, input);
+    if (temp_byte != '"') fprintf(stderr, "WARNING: Expected double-quote to begin string.\n");
+
+    /* Put the letters on the stack in reverse. Don't forget to put a null-terminator first. */
+    for (fread(&temp_byte,1,1,input); temp_byte != '"'; fread(&temp_byte,1,1,input)) continue;
+    temp_byte = '\0';
+
+    while (temp_byte != '"') {
+        /* First, push three spaces to start a PUSH_IMMEDIATE command for a positive number. */
+        uint8_t temp_output = ' ';
+        for(int i=0;i<3;i++) fwrite(&temp_output, 1, 1, output);
+        /* Second, push the ASCII character, 7 bits total, most signficant bit first. */
+        /* Remember, [Tab]=1 and [Space]=0. */
+        uint8_t index = 7; /* 7 bits needed per ASCII character. */
+        while (index) {
+            ((temp_byte >> (index-1)) & 1) ? (temp_output = '\t') : (temp_output = ' ');
+            fwrite(&temp_output, 1, 1, output);
+            index--;
+        }
+        /* Third, close the number with a newline. */
+        temp_output = '\n';
+        fwrite(&temp_output, 1, 1, output);
+
+        /* Read the next byte to prepare for the loop test. */
+        fseek(input, -2, SEEK_CUR);
+        fread(&temp_byte, 1, 1, input);
+    }
+}
+
 int
 main(int argc, char ** argv)
 {
@@ -90,11 +128,15 @@ main(int argc, char ** argv)
                 temp_byte = '\v';
                 fwrite(&temp_byte, 1, 1, output);
                 break;
+            case 'a':
+            case 'A':
+                parse_ascii_string(input, output);
+                break;
             case '\n':
                 /* Intentionally empty */
                 break;
             default:
-                /* The first non-[tTsSnNvV] character begins a comment lasting until end of line. */
+                /* The first non-[tTsSnNvVaA] character begins a comment lasting until end of line. */
                 while (fread(&temp_byte, 1, 1, input)) {
                     if (temp_byte == '\n') break;
                 }
