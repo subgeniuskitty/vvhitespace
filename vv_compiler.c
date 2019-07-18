@@ -25,9 +25,9 @@ print_usage(char ** argv)
     );
 }
 
-/* Allows building an ASCII string on the stack.                             */
-/* This syntax: A"test"                                                      */
-/* Results in five PUSH_IMMEDIATE commands for the four letters and newline. */
+/* Builds an ASCII string on the stack using VVS PUSH_IMMEDIATE commands.    */
+/* The syntax: A"test" results in six PUSH_IMMEDIATE commands for the four   */
+/*   letters, newline, and null-terminator.                                  */
 /* Expects 'input' to present a double-quoted ('"') ASCII string.            */
 /* The 'A' has already been chomped.                                         */
 void
