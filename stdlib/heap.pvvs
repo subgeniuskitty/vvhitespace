@@ -277,7 +277,10 @@ NTN                     | RTS
 @     TOS+1 -> heap[2]
 @     ...
 @     TOS+n -> heap[count]
-@   This is the only stdlib function which uses heap[0] for storage.
+@   This function uses heap[15] for temporary storage, thus limiting the total
+@   registers to 14 since heap[0] is reserved. Since this function populates
+@   the registers, encoding the value here seems a natural location to document
+@   the limit. TODO: Should this be turned into a CPP define?
 @ Call Stack:
 @   data-words
 @   ...
@@ -288,28 +291,28 @@ NTN                     | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTSSSSSTN            | Mark: 1000001 (spewreg)
 
-@ Create a counter in heap[0] that doubles as a destination pointer generator.
-SSSSN                   | PUSH 0 (ptr)
+@ Create a counter in heap[15] that doubles as a destination pointer generator.
+SSSTTTTN                | PUSH 15 (ptr)
 SSSTN                   | PUSH 1
 TTS                     | STORE
 
 @ Store one word to heap on each pass.
 NSSVSTSSSSSTSSSSSSSSN   | Mark: 01000001 00000000
 SNT                     | SWAP
-SSSSN                   | PUSH 0 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 SNT                     | SWAP
 TTS                     | STORE
 
 @ Check for loop completion.
 SNS                     | DUP
-SSSSN                   | PUSH 0 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 TSST                    | SUBTRACT
 NTSSTSSSSSTSSSSSSSTN    | BRZ > 01000001 00000001
 
-@ Increment heap[0] if continuing.
-SSSSN                   | PUSH 0 (ptr)
+@ Increment heap[15] if continuing.
+SSSTTTTN                | PUSH 15 (ptr)
 SNS                     | DUP
 TTT                     | LOAD
 SSSTN                   | PUSH 1

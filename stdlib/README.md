@@ -19,6 +19,9 @@ following reservations:
 ## Heap and Pointers ##
 
 The first 16 heap addresses (`0-15`) are reserved when using the stdlib.
+Within that reservation, heap[0] is used by `random` and heap[15] is used
+by `spewreg`. The remaining 14 locations, heap[1]-heap[14] are used as
+general-purpose registers.
 
 By convention, functions which return a pointer will use the address `0` to
 represent a `NULL` pointer.
@@ -66,13 +69,3 @@ private label space associated with it, formed as follows:
     00001000 xxxxxxxx - for use by 1000
     00001001 xxxxxxxx - for use by 1001
     ...etc
-
-# Slurp and Spew #
-
-The stdlib uses heap[1] to heap[15] as registers.
-
-The `slurpreg` and `spewreg` functions facilitate this by `spew`ing the stack
-onto the heap's pseudo-registers or `slurp`ing the pseudo-registers back to the
-stack.  The functions preserve order in complementary fashion.
-
-The `spewreg` function uses `heap[0]` for storage.
