@@ -35,7 +35,11 @@ parse_ascii_string(FILE * input, FILE * output)
 {
     uint8_t temp_byte;
     fread(&temp_byte, 1, 1, input);
-    if (temp_byte != '"') fprintf(stderr, "WARNING: Expected double-quote to begin string.\n");
+    if (temp_byte != '"') {
+        /* Die here since we walk the string backward and look for '"' as a terminator. */
+        fprintf(stderr, "ERROR: Expected double-quote to begin string.\n");
+        exit(EXIT_FAILURE);
+    }
 
     /* Put the letters on the stack in reverse. Don't forget to put a null-terminator first. */
     for (fread(&temp_byte,1,1,input); temp_byte != '"'; fread(&temp_byte,1,1,input)) continue;
@@ -45,7 +49,7 @@ parse_ascii_string(FILE * input, FILE * output)
         /* First, push three spaces to start a PUSH_IMMEDIATE command for a positive number. */
         uint8_t temp_output = ' ';
         for(int i=0;i<3;i++) fwrite(&temp_output, 1, 1, output);
-        /* Second, push the ASCII character, 7 bits total, most signficant bit first. */
+        /* Second, push the ASCII character, 7 bits total, most significant bit first. */
         /* Remember, [Tab]=1 and [Space]=0. */
         uint8_t index = 7; /* 7 bits needed per ASCII character. */
         while (index) {
