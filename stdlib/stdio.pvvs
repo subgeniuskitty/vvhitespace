@@ -123,7 +123,7 @@ NSNSTSSSSTTSSSSSSSSN    | JMP > 01000011 00000000
 @ Print the string we have built on the stack.
 NSSVSTSSSSTTSSSSSSSTN   | Mark: 01000011 00000001
 SNN                     | DROP
-NSTTSSSN                | JSR > 1000 (print string from stack)
+NSTTSSSTSSN             | JSR > 1000100 (print string from stack)
 NTN                     | RTS
 
 #endif
