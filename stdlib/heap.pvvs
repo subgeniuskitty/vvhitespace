@@ -291,6 +291,10 @@ NTN                     | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTSSSSSTN            | Mark: 1000001 (spewreg)
 
+@ To simplify other functions, sprewreg shall accept 0 as a valid count value.
+SNS                     | DUP
+NTSSTSSSSSTSSSSSSSTN    | BRZ > 01000001 00000001
+
 @ Create a counter in heap[15] that doubles as a destination pointer generator.
 SSSTTTTN                | PUSH 15 (ptr)
 SSSTN                   | PUSH 1
@@ -340,30 +344,30 @@ NTN                     | RTS
 @   heap[address]  <-- TOS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTTTTSN              | Mark: 11110 (slurp)
-SSSTSN                  | PUSH 2
-NSTTSSSSSTN             | JSR > 1000001 (spewreg)
 
 @ Load one word from heap on each pass.
-NSSVSSSTTTTSSSSSSSSSN   | Mark: 00011110 00000000
-SSSTN                   | PUSH 1 (ptr)
-TTT                     | LOAD
-SSSTSN                  | PUSH 2 (ptr)
-TTT                     | LOAD
+SNS                     | DUP
+SSSTTN                  | PUSH 3
+NSTTSTSN                | JSR > 1010 (stackrotate)
+SNT                     | SWAP
+SNS                     | DUP
+SSSTTN                  | PUSH 3
+NSTTSTSN                | JSR > 1010 (stackrotate)
 TSSS                    | ADD
 TTT                     | LOAD
+SSSTTN                  | PUSH 3
+NSTTSTSN                | JSR > 1010 (stackrotate)
+SNT                     | SWAP
 
 @ Check for loop completion.
-@ As a side effect, prepare the next address.
-SSSTN                   | PUSH 1 (ptr)
 SNS                     | DUP
-TTT                     | LOAD
-SNS                     | DUP
-NTSSSSTTTTSSSSSSSSTN    | BRZ > 00011110 00000001
+NTSSSSTTTTSSSSSSSSSN    | BRZ > 00011110 00000000
 SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
-TTS                     | STORE
-NSNSSSTTTTSSSSSSSSSN    | JMP > 00011110 00000000
-NSSVSSSTTTTSSSSSSSSTN   | Mark: 00011110 00000001
+NSNTTTTSN               | JMP > 11110 (slurp)
+
+@ Clean up and return.
+NSSVSSSTTTTSSSSSSSSSN   | Mark: 00011110 00000000
 SNN                     | DROP
 SNN                     | DROP
 NTN                     | RTS

@@ -32,10 +32,10 @@ The following labels are entry points to stdlib functions. Read the
 header comment for each function to learn the call and return stack.
 
          000xxx - reserved
-         001xxx - print functions
-           1000 ----- print string from stack       (stdio.pvvs)
-           1001 ----- print string from heap        (stdio.pvvs)
-           1010 ----- print number from stack       (stdio.pvvs)
+         001xxx - core functions
+           1000 ----- printf                        (stdio.pvvs)
+           1001 ----- print number from stack       (stdio.pvvs)
+           1010 ----- stackrotate                   (stack.pvvs)
          010xxx - math functions
           10000 ----- random                        (math.pvvs)
           10001 ----- absolute value                (math.pvvs)

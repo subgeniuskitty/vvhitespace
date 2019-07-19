@@ -27,7 +27,7 @@ SSSTTTSTSN               | PUSH ASCII ':'
 SSSTSSTN                 | PUSH ASCII '\t'
 TNSS                     | PUTC
 TNSS                     | PUTC
-NSTTSTSN                 | JSR>1010 (print number from stack)
+NSTTSSTN                 | JSR>1001 (print number from stack)
 SSSTSTSN                 | PUSH ASCII '\n'
 TNSS                     | PUTC
 
@@ -72,7 +72,7 @@ SSSTSSTN                 | PUSH ASCII '\t'
 TNSS                     | PUTC
 TNSS                     | PUTC
 SNT                      | SWAP
-NSTTSTSN                 | JSR>1010 (print number from stack)
+NSTTSSTN                 | JSR>1001 (print number from stack)
 SSSTSTSN                 | PUSH ASCII '\n'
 TNSS                     | PUTC
 

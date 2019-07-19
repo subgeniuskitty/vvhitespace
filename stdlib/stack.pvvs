@@ -1,0 +1,108 @@
+#ifndef VVS_STDLIB_STACK
+#define VVS_STDLIB_STACK
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   stackrotate
+@ Description:
+@   Maximum rotation depth is five. Stomps on heap[9]-heap[14].
+@   Assumes rotation depth greater than two, otherwise use SWAP.
+@ Call Stack:
+@   stack word n
+@   ...
+@   stack word 1
+@   rotation depth (rd)  <-- TOS
+@ Return Stack (n>rd=3):
+@   stack word n
+@   ...
+@   stack word 1
+@   stack word 3
+@   stack word 2   <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSTSN               | Mark: 1010 (stackrotate)
+
+@ For the convenience of other functions, modulo the
+@ rotation depth by the available registers.
+SSSTSTN                 | PUSH 5
+TSTT                    | MODULO
+
+@ Use heap[14] for generating register addresses.
+SSSTTTSN                | PUSH 14 (ptr)
+SSSSN                   | PUSH 0
+TTS                     | STORE
+
+@ Dump one word from stack to heap each pass through the loop.
+NSSVSSSSTSTSSSSSSSSSN   | Mark: 00001010 00000000
+SNT                     | SWAP
+SSSTSSTN                | PUSH 9 (starting register)
+SSSTTTSN                | PUSH 14 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+SNT                     | SWAP
+TTS                     | STORE
+
+@ See if the loop is complete.
+SNS                     | DUP
+SSSTTTSN                | PUSH 14 (ptr)
+TTT                     | LOAD
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+TSST                    | SUBTRACT
+NTSSSSSTSTSSSSSSSSTN    | BRZ > 00001010 00000001
+
+@ Increment the loop counter
+SSSTTTSN                | PUSH 14 (ptr)
+TTT                     | LOAD
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+SSSTTTSN                | PUSH 14 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+NSNSSSSTSTSSSSSSSSSN    | JMP > 00001010 00000000
+
+@ The correct number of words have been stored to registers.
+@ Time to read them back in rotated order.
+
+@ First, prepare the counter in heap[14] again.
+@ This consumes 'rd' from the stack.
+NSSVSSSSTSTSSSSSSSSTN   | Mark: 00001010 00000001
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+SSSTTTSN                | PUSH 14 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+
+@ Second, read in the old TOS manually.
+SSSTSSTN                | PUSH 9 (starting register)
+TTT                     | LOAD
+
+@ Read one word per pass through this loop.
+NSSVSSSSTSTSSSSSSSTSN   | Mark: 00001010 00000010
+SSSTSSTN                | PUSH 9 (starting register)
+SSSTTTSN                | PUSH 14 (ptr)
+TTT                     | LOAD
+TSSS                    | ADD
+TTT                     | LOAD
+
+@ See if the loop is complete.
+SSSTTTSN                | PUSH 14 (ptr)
+TTT                     | LOAD
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+NTSSSSSTSTSSSSSSSTTN    | BRZ > 00001010 00000011
+
+@ Decrement the loop counter and loop again.
+SSSTTTSN                | PUSH 14 (ptr)
+TTT                     | LOAD
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+SSSTTTSN                | PUSH 14 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+NSNSSSSTSTSSSSSSSTSN    | JMP > 00001010 00000010
+
+@ Return
+NSSVSSSSTSTSSSSSSSTTN   | Mark: 00001010 00000011
+NTN                     | RTS
+
+#endif

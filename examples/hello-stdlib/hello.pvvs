@@ -1,8 +1,8 @@
 @@ This program outputs "Hello, world!"
 
 A"Hello, world!\n"
-@TODO: Change this to printf call
-NSTTSSSTSSN     | FC: JSR>1000100 (print string from stack; see stdlib)
+SSSSN           | ST: PUSH 0
+NSTTSSSN        | FC: JSR>1000 (printf; see stdlib)
 NNN             | FC: Terminate program
 
 #include "stdio.pvvs"

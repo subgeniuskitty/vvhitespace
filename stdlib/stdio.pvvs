@@ -50,7 +50,7 @@ NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
-@   printstacknumber (1010)
+@   printstacknumber (1001)
 @ Description:
 @   Prints 'number' from the stack in sign-magnitude format.
 @   Leading zeros are suppressed.
@@ -59,7 +59,7 @@ NTN                     | RTS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-NSSVTSTSN               | Mark: 1010 (print number from stack)
+NSSVTSSTN               | Mark: 1001 (print number from stack)
 SNS                     | DUP
 NSTTSSSSTSN             | JSR > 1000010
 NSTTSSSSTTN             | JSR > 1000011
@@ -124,6 +124,267 @@ NSNSTSSSSTTSSSSSSSSN    | JMP > 01000011 00000000
 NSSVSTSSSSTTSSSSSSSTN   | Mark: 01000011 00000001
 SNN                     | DROP
 NSTTSSSTSSN             | JSR > 1000100 (print string from stack)
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   printf
+@ Description:
+@   If printing a static string (i.e. no substitutions), pass
+@     'number of substitutions' as 0, immediately followed by 'string word 1'.
+@   If printing a string from the heap instead of stack, pass an empty string
+@     on the stack followed by a pointer to the first word of the
+@     null-terminated string on the heap.
+@     For example:
+@         pointer
+@         ASCII '\0'
+@         substitution n
+@         <remainder of call stack is unchanged>
+@   Maximum of 7 substitutions.
+@ Call Stack:
+@   ACSII '\0'
+@   string word n
+@   ...
+@   string word 1
+@   substitution n
+@   ...
+@   substitution 1
+@   number of substitutions  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <heap.pvvs>
+#include <string.pvvs>
+NSSVTSSSN               | Mark: 1000 (printf)
+
+@ Copy any substitution words into heap registers.
+NSTTSSSSSTN             | JSR > 1000001 (spewreg)
+
+@ heap[8] will track the current substitution register.
+SSSTSSSN                | PUSH 8 (ptr)
+SSSTN                   | PUSH 1
+TTS                     | STORE
+
+@ If the stack contains an empty string (i.e. just an ASCII '\0'), the next
+@ word is a pointer we must use to load the string from the heap.
+@ Do the test this way so we can keep the code inline.
+SNS                     | DUP
+SSTTN                   | PUSH -1
+TSSN                    | MULTIPLY
+NTTSSSSTSSSSSSSSSSTN    | BMI > 00001000 00000001
+SNN                     | DROP
+SNS                     | DUP
+NSTTSSSSSN              | JSR > 100000 (strlen)
+NSTTTTTSN               | JSR > 11110 (slurp)
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Initialization is now complete.
+@ Stack contains a printf-compatible, null-terminated string.
+@ heap[1]-heap[7] contain the substitutions, if any.
+@ heap[8] tracks which substitution is next.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ The rest of printf parses a string according to the following information.
+@   ASCII '\ ':
+@       ASCII '\ ': putchar '\ '
+@       ASCII '%': putchar '%'
+@       ASCII 'n': putchar '\n'
+@       ASCII 't': putchar '\t'
+@   ASCII '%':
+@       ASCII 'c': (print character)
+@       ASCII 's': (print string)
+@       ASCII 'd': (print decimal digit)
+@       ASCII 'u': (print abs(integer), w/o sign)
+@       ASCII 'i': (print integer w/sign)
+@   ASCII '\0':
+@       cleanup and exit
+@   default:
+@       putchar
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@@@@@@@@@@@@@
+@ The next block tests the TOS against all possible level 1 branches (see above).
+@ If there is a match, execution jumps to the appropriate level 2 branch label.
+@ If no match is found, print the character and move on.
+@@@@@@@@@@@@@@@@@@@@
+NSSVSSSSTSSSSSSSSSSTN   | Mark: 00001000 00000001
+@ TOS is an ASCII '\ '. Jump to process the possible level 2 branches.
+SNS                     | DUP
+SSSTSTTTSSN             | PUSH ASCII slash
+TSST                    | SUBTRACT
+NTSSSSSTSSSSSSSSSTSN    | BRZ > 00001000 00000010
+@ TOS is an ASCII '%'. Jump to process the possible level 2 branches.
+SNS                     | DUP
+SSSTSSTSTN              | PUSH ASCII '%'
+TSST                    | SUBTRACT
+NTSSSSSTSSSSSSSSSTTN    | BRZ > 00001000 00000011
+@ TOS is an ASCII "\0". Jump to clean-up-and-exit.
+SNS                     | DUP
+NTSSSSSTSSSSSSSSSSSN    | BRZ > 00001000 00000000
+@ TOS is a normal character. Print it and loop again.
+TNSS                    | PUTC
+NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Level 2 - ASCII '\ ' - Escapes
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@@@@@@@@@@@@@
+@ The level 1 match was an ASCII '\ '.
+@ Now look for level 2 matches that trigger a character substitution (n -> newline, etc).
+@ If no matches are found, print the character directly (e.g. "\%" -> '%')
+@ When finished, loop back to testing level 1 branches.
+@@@@@@@@@@@@@@@@@@@@
+NSSVSSSSTSSSSSSSSSTSN   | Mark: 00001000 00000010
+SNN                     | DROP
+@ Check for ASCII '\n'
+SNS                     | DUP
+SSSTTSTTTSN             | PUSH ASCII 'n'
+TSST                    | SUBTRACT
+NTSSSSSTSSSSSSSSTSSN    | BRZ > 00001000 00000100
+@ Check for ASCII '\t'
+SNS                     | DUP
+SSSTSSTN                | PUSH ASCII '\t'
+TSST                    | SUBTRACT
+NTSSSSSTSSSSSSSSTSTN    | BRZ > 00001000 00000101
+@ No substitution necessary. Print literally.
+TNSS                    | PUTC
+NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
+
+@@@@@@@@@@@@@@@@@@@@
+@ These are utility labels to output the appropriate non-printable ASCII character.
+@ After output, they loop back to testing level 1 branches.
+@@@@@@@@@@@@@@@@@@@@
+
+@ Print a newline and loop for the next character.
+NSSVSSSSTSSSSSSSSTSSN   | Mark: 00001000 00000100
+SNN                     | DROP
+SSSTSTSN                | PUSH ASCII '\n'
+TNSS                    | PUTC
+NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
+
+@ Print a horizontal tab and loop for the next character.
+NSSVSSSSTSSSSSSSSTSTN   | Mark: 00001000 00000101
+SNN                     | DROP
+SSSTSSTN                | PUSH ASCII '\t'
+TNSS                    | PUTC
+NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Level 2 - ASCII '%' - Substitutions
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@@@@@@@@@@@@@
+@ The level 1 match was an ASCII '%'.
+@ Now look for level 2 matches that trigger a substitution.
+@ When finished, loop back to testing level 1 branches.
+@@@@@@@@@@@@@@@@@@@@
+NSSVSSSSTSSSSSSSSSTTN   | Mark: 00001000 00000011
+SNN                     | DROP
+@ Check for ASCII 'c' - Print character
+SNS                     | DUP
+SSSTTSSSTTN             | PUSH ASCII 'c'
+TSST                    | SUBTRACT
+NTSSSSSTSSSSSSSSTTSN    | BRZ > 00001000 00000110
+@ Check for ASCII 's' - Print string
+SNS                     | DUP
+SSSTTTSSTTN             | PUSH ASCII 's'
+TSST                    | SUBTRACT
+NTSSSSSTSSSSSSSSTTTN    | BRZ > 00001000 00000111
+@ Check for ASCII 'd' - Print decimal digit
+SNS                     | DUP
+SSSTTSSTSSN             | PUSH ASCII 'd'
+TSST                    | SUBTRACT
+NTSSSSSTSSSSSSSTSSSN    | BRZ > 00001000 00001000
+@ Check for ASCII 'u' - Print unsigned number
+SNS                     | DUP
+SSSTTTSTSTN             | PUSH ASCII 'u'
+TSST                    | SUBTRACT
+NTSSSSSTSSSSSSSTSSTN    | BRZ > 00001000 00001001
+@ Check for ASCII 'i' - Print signed number
+SNS                     | DUP
+SSSTTSTSSTN             | PUSH ASCII 'i'
+TSST                    | SUBTRACT
+NTSSSSSTSSSSSSSTSTSN    | BRZ > 00001000 00001010
+@ Unrecognized substitution specifier.
+@ For now, silently consume it and continue.
+@ Do not increment the substitution counter.
+@ TODO: Is this really what I want to do here?
+SNN                     | DROP
+NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
+
+
+@@@@@@@@@@@@@@@@@@@@
+@ These are utility labels to call the appropriate type of output subroutine.
+@ After output, they increment the substition counter (heap[8])
+@ and loop back to testing level 1 branches.
+@@@@@@@@@@@@@@@@@@@@
+
+@ Print a character
+NSSVSSSSTSSSSSSSSTTSN   | Mark: 00001000 00000110
+SNN                     | DROP
+SSSTSSSN                | PUSH 8 (ptr)
+TTT                     | LOAD
+TTT                     | LOAD
+TNSS                    | PUTC
+NSTSSSSTSSSTSSSSSSSN    | JSR > 00001000 10000000 (increment heap[8])
+NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
+@ Print a string
+NSSVSSSSTSSSSSSSSTTTN   | Mark: 00001000 00000111
+SNN                     | DROP
+SSSTSSSN                | PUSH 8 (ptr)
+TTT                     | LOAD
+TTT                     | LOAD
+NSTTSSSTSTN             | JSR > 1000101 (print string from heap)
+NSTSSSSTSSSTSSSSSSSN    | JSR > 00001000 10000000 (increment heap[8])
+NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
+@ Print a decimal digit
+NSSVSSSSTSSSSSSSTSSSN   | Mark: 00001000 00001000
+SNN                     | DROP
+SSSTSSSN                | PUSH 8 (ptr)
+TTT                     | LOAD
+TTT                     | LOAD
+TNST                    | PUTDIGIT
+NSTSSSSTSSSTSSSSSSSN    | JSR > 00001000 10000000 (increment heap[8])
+NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
+@ Print an unsigned integer
+NSSVSSSSTSSSSSSSTSSTN   | Mark: 00001000 00001001
+SNN                     | DROP
+SSSTSSSN                | PUSH 8 (ptr)
+TTT                     | LOAD
+TTT                     | LOAD
+NSTTSSSSTTN             | JSR > 1000011 (print magnitude of number from stack)
+NSTSSSSTSSSTSSSSSSSN    | JSR > 00001000 10000000 (increment heap[8])
+NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
+@ Print a signed integer
+NSSVSSSSTSSSSSSSTSTSN   | Mark: 00001000 00001010
+SNN                     | DROP
+SSSTSSSN                | PUSH 8 (ptr)
+TTT                     | LOAD
+TTT                     | LOAD
+NSTTSSTN                | JSR > 1001 (print number from stack)
+NSTSSSSTSSSTSSSSSSSN    | JSR > 00001000 10000000 (increment heap[8])
+NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ These are misc labels associated with the printf function.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@ Increments heap[8]. Used after a substitution is complete.
+NSSVSSSSTSSSTSSSSSSSN   | Mark: 00001000 10000000 (increment heap[8])
+SSSTSSSN                | PUSH 8 (ptr)
+TTT                     | LOAD
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+SSSTSSSN                | PUSH 8 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+NTN                     | RTS
+
+@ Found an ASCII "\0" when processing the format string. Clean up and exit.
+NSSVSSSSTSSSSSSSSSSSN   | Mark: 00001000 00000000
+SNN                     | DROP
 NTN                     | RTS
 
 #endif
