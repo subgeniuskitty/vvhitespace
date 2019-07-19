@@ -126,7 +126,10 @@ parse_label(uint8_t * code, size_t * pc)
 uint16_t
 check_label(size_t * labels, uint16_t label, size_t * pc)
 {
-    if(!labels[label]) ws_die(pc, "uninitialized label (forgot an include?)");
+    if (!labels[label]) {
+        fprintf(stderr, "Trying to process label 0x%X.\n", label);
+        ws_die(pc, "uninitialized label (forgot an include?)");
+    }
     return label;
 }
 
