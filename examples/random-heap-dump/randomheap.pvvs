@@ -14,5 +14,5 @@ SSSTSSSSN  | PUSH 16
 NSTTTTSSSN | JSR > 111000 (dump heap)
 NNN        | DIE
 
-#include "debug.pvvs"
-#include "heap.pvvs"
+#include <debug.pvvs>
+#include <heap.pvvs>

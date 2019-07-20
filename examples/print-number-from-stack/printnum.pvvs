@@ -6,4 +6,4 @@ SSSTSTSN        		| ST: Push +10 (ASCII '\n')
 TNSS            		| IO: Putchar
 NNN             		| FC: Terminate program
 
-#include "stdio.pvvs"
+#include <stdio.pvvs>
