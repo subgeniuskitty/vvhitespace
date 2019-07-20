@@ -36,6 +36,7 @@ header comment for each function to learn the call and return stack.
            1000 ----- printf                        (stdio.pvvs)
            1001 ----- print number from stack       (stdio.pvvs)
            1010 ----- stackrotate                   (stack.pvvs)
+           1011 ----- stackrotatereverse            (stack.pvvs)
          010xxx - math functions
           10000 ----- random                        (math.pvvs)
           10001 ----- absolute value                (math.pvvs)
