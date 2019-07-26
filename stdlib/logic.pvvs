@@ -20,7 +20,7 @@ NSSVTSTSSSN             | Mark: 101000 (not)
 @ In twos-complement, NOT(X) = (-X)-1
 SSTTN                   | PUSH -1
 TSSN                    | MULTIPLY
-SSTTN                   | PUSH -1
+SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
 NTN                     | RTS
 
@@ -43,13 +43,13 @@ SSSTTTTTTN              | PUSH 63 (shift counter)
 
 @ Loop through the bits one at a time.
 NSSVSSTSTSSTSSSSSSSSN   | Mark: 00101001 00000000
-@ Prepare X for the AND
+@ Prepare copy of X for the AND
 SNS                     | DUP
 SSSTSTN                 | PUSH 5
 NSTTTSSN                | JSR > 1100 (deepdup)
 SNT                     | SWAP
 NSTTSTTSSN              | JSR > 101100 (rshift)
-@ Prepare Y for the AND
+@ Prepare copy of Y for the AND
 SSSTSSN                 | PUSH 4
 NSTTTSSN                | JSR > 1100 (deepdup)
 SSSTTN                  | PUSH 3
@@ -79,6 +79,49 @@ SNT                     | SWAP
 SNN                     | DROP
 SNT                     | SWAP
 SNN                     | DROP
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   or (101010)
+@ Description:
+@   Performs a bitwise OR on the TOS word.
+@ Call Stack:
+@   X
+@   Y
+@ Return Stack:
+@   X v Y
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSTSTSN             | Mark: 101010 (or)
+NSTTSTSSSN              | JSR > 101000 (not)
+SNT                     | SWAP
+NSTTSTSSSN              | JSR > 101000 (not)
+NSTTSTSSTN              | JSR > 101001 (and)
+NSTTSTSSSN              | JSR > 101000 (not)
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   xor (101011)
+@ Description:
+@   Performs a bitwise XOR on the TOS word.
+@ Call Stack:
+@   X
+@   Y
+@ Return Stack:
+@   X xor Y
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSTSTTN             | Mark: 101011 (xor)
+SNS                     | DUP
+SSSTTN                  | PUSH 3
+NSTTTSSN                | JSR > 1100 (deepdup)
+NSTTSTSTSN              | JSR > 101010 (or)
+SNT                     | SWAP
+SSSTTN                  | PUSH 3
+NSTTSTTN                | JSR > 1011 (stackrotatereverse)
+NSTTSTSSTN              | JSR > 101001 (and)
+NSTTSTSSSN              | JSR > 101000 (not)
+NSTTSTSSTN              | JSR > 101001 (and)
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
