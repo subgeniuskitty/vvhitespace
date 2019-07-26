@@ -2,6 +2,11 @@
 #define VVS_STDLIB_DEBUG
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Some of the subroutines in this file duplicate other stdlib subroutines.
+@ This is to avoid outside dependencies and allow debugging of stdlib code.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
 @   dumpheap (111000)
 @ Description:
@@ -13,13 +18,12 @@
 @           At the moment, the ability to continue is too useful to me.
 @           If it's useful to me, it's probably useful to other people.
 @           For now, leave dumpheap as-is.
-@ Call Stack:
+@ Call Stack: 
 @   endaddr
 @   startaddr  <-- TOS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#include <stdio.pvvs>
 NSSVTTTSSSN              | Mark: 111000 (dump heap)
 
 @ Prepare a numeric address and value on the stack
@@ -29,12 +33,14 @@ TTT                      | LOAD
 SNT                      | SWAP
 
 @ Print output line for this memory location
-NSTTSSSSTTN              | JSR>1000011 (print absolute value of number)
+NSTTTTSTTN               | JSR > 111011 (debug:printmagnitude)
 SSSTTTSTSN               | PUSH ASCII ':'
 SSSTSSTN                 | PUSH ASCII '\t'
 TNSS                     | PUTC
 TNSS                     | PUTC
-NSTTSSTN                 | JSR>1001 (print number from stack)
+SNS                      | DUP
+NSTTTTSTSN               | JSR > 111010 (debug:printsign)
+NSTTTTSTTN               | JSR > 111011 (debug:printmagnitude)
 SSSTSTSN                 | PUSH ASCII '\n'
 TNSS                     | PUTC
 
@@ -51,7 +57,7 @@ SSSTN                    | PUSH 1 (ptr)
 TTT                      | LOAD
 SSSTN                    | PUSH 1
 TSSS                     | ADD
-NSNTTTSSSN               | JMP>111000 (dump heap)
+NSNTTTSSSN               | JMP > 111000 (dump heap)
 
 @ Clean up and return
 NSSVSSTTTSSSSSSSSSSSN    | Mark: 00111000 00000000
@@ -68,18 +74,29 @@ NTN                      | RTS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#include <stdio.pvvs>
 NSSVTTTSSTN              | Mark: 111001 (dump stack)
 
+@ Orient the user
+SSSSSSSSSN               | PUSH ASCII '\0'
+SSSSSSTSTSN              | PUSH ASCII '\n'
+SSSSTTTSTSN              | PUSH ASCII ':'
+SSSTSTSSTTN              | PUSH ASCII 'S'
+SSSTSSTTTTN              | PUSH ASCII 'O'
+SSSTSTSTSSN              | PUSH ASCII 'T'
+NSTTTTTSSN               | JSR > 111100 (debug:printstring)
+
 @ Print output line for the current TOS.
+NSSVSSTTTSSTSSSSSSSTN    | Mark: 00111001 00000001
 SNS                      | DUP
-NSTTSSSSTTN              | JSR>1000011 (print absolute value of number)
+NSTTTTSTTN               | JSR > 111011 (debug:printmagnitude)
 SSSTTTSTSN               | PUSH ASCII ':'
 SSSTSSTN                 | PUSH ASCII '\t'
 TNSS                     | PUTC
 TNSS                     | PUTC
 SNT                      | SWAP
-NSTTSSTN                 | JSR>1001 (print number from stack)
+SNS                      | DUP
+NSTTTTSTSN               | JSR > 111010 (debug:printsign)
+NSTTTTSTTN               | JSR > 111011 (debug:printmagnitude)
 SSSTSTSN                 | PUSH ASCII '\n'
 TNSS                     | PUTC
 
@@ -88,11 +105,103 @@ SNS                      | DUP
 NTSSSTTTSSTSSSSSSSSN     | BRZ > 00111001 00000000
 SSSTN                    | PUSH 1
 TSST                     | SUBTRACT
-NSNTTTSSTN               | JMP>111001 (dump stack)
+NSNSSTTTSSTSSSSSSSTN     | JMP > 00111001 00000001
 
 @ Clean up and return
 NSSVSSTTTSSTSSSSSSSSN    | Mark: 00111001 00000000
 SNN                      | DROP
 NTN                      | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   printsign (111010)
+@ Description:
+@   Prints the sign of 'number'.
+@ Call Stack:
+@   number <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTTSTSN             | Mark: 111010 (debug:printsign)
+NTTSSTTTSTSSSSSSSSTN    | BMI > 00111010 00000001
+SSSTSTSTTN              | PUSH ASCII '+'
+NSNSSTTTSTSSSSSSSTSN    | JMP > 00111010 00000010
+NSSVSSTTTSTSSSSSSSSTN   | Mark: 00111010 00000001
+SSSTSTTSTN              | PUSH ASCII '-'
+NSSVSSTTTSTSSSSSSSTSN   | Mark: 00111010 00000010
+TNSS                    | PUTC
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   printmagnitude (111011)
+@ Description:
+@   Prints the magnitude of 'number'.
+@ Call Stack:
+@   number <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTTSTTN             | Mark: 111011 (debug:printmagnitude)
+
+@ Extract the magnitude of the number.
+SNS                     | DUP
+NTTSSTTTSTTSSSSSSSSN    | BMI > 00111011 00000000
+NSNSSTTTSTTSSSSSSSTN    | JMP > 00111011 00000001
+NSSVSSTTTSTTSSSSSSSSN   | Mark: 00111011 00000000
+SSTTN                   | PUSH -1
+TSSN                    | MULTIPLY
+NSSVSSTTTSTTSSSSSSSTN   | Mark: 00111011 00000001
+
+@ Prepare for building a string on the stack.
+SSSSN                   | PUSH ASCII '\0'
+SNT                     | SWAP
+
+@ Pick off one digit on each pass through this loop.
+NSSVSSTTTSTTSSSSSSTSN   | Mark: 00111011 00000010
+SNS                     | DUP
+
+@ Mod-off a digit, convert to ASCII, store on stack as part of the string.
+SSSTSTSN                | PUSH +10
+TSTT                    | MODULO
+SSSTTSSSSN              | PUSH ASCII '0'
+TSSS                    | ADD
+SNT                     | SWAP
+
+@ Divide down to next digit and keep looping if number != 0 yet.
+SSSTSTSN                | PUSH +10
+TSTS                    | DIVIDE
+SNS                     | DUP
+NTSSSTTTSTTSSSSSSTTN    | BRZ > 00111011 00000011
+NSNSSTTTSTTSSSSSSTSN    | JMP > 00111011 00000010
+
+@ Print the string we have built on the stack.
+NSSVSSTTTSTTSSSSSSTTN   | Mark: 00111011 00000011
+SNN                     | DROP
+NSTTTTTSSN              | JSR > 111100 (debug:printstring)
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   printstring (111100)
+@ Description:
+@   Prints a null-terminated string from the stack.
+@ Call Stack:
+@   null-terminator (ASCII '\0')
+@   char n
+@   ...
+@   char 2
+@   char 1 <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTTTSSN             | Mark: 111100 (debug:printstring)
+SNS                     | DUP
+NTSSSTTTTSSSSSSSSSTN    | BRZ > 00111100 00000001
+TNSS                    | Print character
+NSNTTTTSSN              | JMP > 111100
+NSSVSSTTTTSSSSSSSSSTN   | Mark: 00111100 00000001
+SNN                     | DROP
+NTN                     | RTS
 
 #endif

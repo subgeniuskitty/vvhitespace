@@ -1,6 +1,0 @@
-A"Hello, world!\n"
-SSSSN           | PUSH 0
-NSTTSSSN        | JSR > 1000 (printf)
-NNN             | DIE
-
-#include <stdio.pvvs>

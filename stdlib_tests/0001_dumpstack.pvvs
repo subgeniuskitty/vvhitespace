@@ -1,0 +1,7 @@
+SSSTTTTTTTTN    | PUSH 255
+SSSTSTSTSN      | PUSH 42
+SSSTN           | PUSH 1 (count)
+NSTTTTSSTN      | JSR > 111001 (dumpstack)
+NNN             | DIE
+
+#include <debug.pvvs>

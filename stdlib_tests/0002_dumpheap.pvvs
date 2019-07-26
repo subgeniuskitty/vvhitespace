@@ -1,0 +1,12 @@
+SSSTSSSSSN      | PUSH 32 (ptr)
+SSSTTTTTTTTN    | PUSH 255
+TTS             | STORE
+SSSTSSSSTN      | PUSH 33 (ptr)
+SSSTSTSTSN      | PUSH 42
+TTS             | STORE
+SSSTSSSSTN      | PUSH 33 (ptr)
+SSSTSSSSSN      | PUSH 32 (ptr)
+NSTTTTSSSN      | JSR > 111000 (dumpheap)
+NNN             | DIE
+
+#include <debug.pvvs>

@@ -63,6 +63,9 @@ header comment for each function to learn the call and return stack.
          111xxx - debug functions
          111000 ----- dump heap                     (debug.pvvs)
          111001 ----- dump stack                    (debug.pvvs)
+         111010 ----- print sign                    (debug.pvvs)
+         111011 ----- print magnitude               (debug.pvvs)
+         111100 ----- print string                  (debug.pvvs)
         1xxxxxx - reserved for less common entry points
         1000000 ----- lowbitand                     (logic.pvvs)
         1000001 ----- isnegative                    (math.pvvs)

@@ -18,7 +18,8 @@ src_extension = '.pvvs'
 
 tests = [
         # Format: ['filename_without_extension', 'string for stdin', 'string for expected stdout']
-        ['0001_hello_world', '', 'Hello, world!\n'],
+        ['0001_dumpstack', '', 'TOS:\n1\t:+42\n0\t:+255\n'],
+        ['0002_dumpheap', '', '32\t:+255\n33\t:+42\n'],
         ] 
 
 for test in tests:
@@ -29,6 +30,7 @@ for test in tests:
         print('\n' + test[0])
     else:
         print('.', end='', flush=True)
+    os.remove(cpp_temp_file)
     os.remove(temp_file)
 
 print("")
