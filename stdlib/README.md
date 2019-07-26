@@ -51,7 +51,13 @@ header comment for each function to learn the call and return stack.
           11111 ----- spew                          (heap.pvvs)
          100xxx - string functions
          100000 ----- strlen                        (string.pvvs)
-         101xxx - unassigned
+         101xxx - logic functions
+         101000 ----- not                           (logic.pvvs)
+         101001 ----- and                           (logic.pvvs)
+         101010 ----- or                            (logic.pvvs)
+         101011 ----- xor                           (logic.pvvs)
+         101100 ----- rshift                        (logic.pvvs)
+         101101 ----- lshift                        (logic.pvvs)
          110xxx - conversion functions
          111xxx - debug functions
          111000 ----- dump heap                     (debug.pvvs)

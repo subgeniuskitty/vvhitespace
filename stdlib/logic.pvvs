@@ -1,0 +1,93 @@
+#ifndef VVS_STDLIB_LOGIC
+#define VVS_STDLIB_LOGIC
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ These subroutines assume they are running on the official VVS interpreter
+@ which internally uses a twos-complement representation.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   not (101000)
+@ Description:
+@   Performs a bitwise NOT on the TOS word.
+@ Call Stack:
+@   X
+@ Return Stack:
+@   NOT(X)
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSTSSSN             | Mark: 101000 (not)
+@ In twos-complement, NOT(X) = (-X)-1
+SSTTN                   | PUSH -1
+TSSN                    | MULTIPLY
+SSTTN                   | PUSH -1
+TSST                    | SUBTRACT
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   rshift (101100)
+@ Description:
+@   Shifts 'X' right by 'shiftcount' bits with sign extension.
+@ Call Stack:
+@   X
+@   shiftcount
+@ Return Stack:
+@   X >> shiftcount
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSTTSSN             | Mark: 101100 (rshift)
+
+@ Test for loop completion first since it's allowable to shift by zero.
+NSSVSSTSTTSSSSSSSSSTN   | Mark: 00101100 00000001
+SNS                     | DUP
+NTSSSTSTTSSSSSSSSSSN    | BRZ > 00101100 00000000
+@ Shift by one bit on each pass.
+SNT                     | SWAP
+SSSTSN                  | PUSH 2
+TSTS                    | DIVIDE
+@ Decrement the counter.
+SNT                     | SWAP
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+@ Loop again.
+NSNSSTSTTSSSSSSSSSTN    | JMP > 00101100 00000001
+
+@ Clean up and return.
+NSSVSSTSTTSSSSSSSSSSN   | Mark: 00101100 00000000
+SNN                     | DROP
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   lshift (101101)
+@ Description:
+@   Shifts 'X' left by 'shiftcount' bits with zero filling.
+@ Call Stack:
+@   X
+@   shiftcount
+@ Return Stack:
+@   X << shiftcount
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSTTSTN             | Mark: 101101 (lshift)
+
+@ Test for loop completion first since it's allowable to shift by zero.
+NSSVSSTSTTSTSSSSSSSTN   | Mark: 00101101 00000001
+SNS                     | DUP
+NTSSSTSTTSTSSSSSSSSN    | BRZ > 00101101 00000000
+@ Shift by one bit on each pass.
+SNT                     | SWAP
+SSSTSN                  | PUSH 2
+TSSN                    | MULTIPLY
+@ Decrement the counter.
+SNT                     | SWAP
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+@ Loop again.
+NSNSSTSTTSTSSSSSSSTN    | JMP > 00101101 00000001
+
+@ Clean up and return.
+NSSVSSTSTTSTSSSSSSSSN   | Mark: 00101101 00000000
+SNN                     | DROP
+NTN                     | RTS
+
+#endif
