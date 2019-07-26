@@ -1,0 +1,34 @@
+@ Imported from:
+@ $NetBSD: wump.c,v 1.17 2005/02/15 12:56:20 jsm Exp $
+@ Copyright (c) 1989, 1993
+@ The Regents of the University of California.  All rights reserved.
+
+@ TODO: Import the license properly.
+
+NSSVTTTTTTTTSSSSSSSSN | Mark: 11111111 00000000 (wump_kill)
+A"\n*ROAR* *chomp* *snurfle* *chomp*!\nMuch to the delight of the Wumpus, you walked right into his mouth,\nmaking you one of the easiest dinners he's ever had!  For you, however,\nit's a rather unpleasant death.  The only good thing is that it's been\nso long since the evil Wumpus cleaned his teeth that you immediately\npassed out from the stench!\n"
+NTN                   | RTS
+
+NSSVTTTTTTTTSSSSSSSTN | Mark: 11111111 00000001 (kill_wump)
+A"\n*thwock!* *groan* *crash*\nA horrible roar fills the cave, and you realize, with a smile, that you\nhave slain the evil Wumpus and won the game!  You don't want to tarry for\nlong, however, because not only is the Wumpus famous, but the stench of\ndead Wumpus is also quite well known, a stench plenty enough to slay the\nmightiest adventurer at a single whiff!!\n"
+NTN                   | RTS
+
+NSSVTTTTTTTTSSSSSSTSN | Mark: 11111111 00000010 (no_arrows)
+A"\nYou turn and look at your quiver, and realize with a sinking feeling\nthat you've just shot your last arrow (figuratively, too).  Sensing this\nwith its psychic powers, the evil Wumpus rampagees through the cave, finds\nyou, and with a mighty *ROAR* eats you alive!\n"
+NTN                   | RTS
+
+NSSVTTTTTTTTSSSSSSTTN | Mark: 11111111 00000011 (shoot_self)
+A"\n*Thwack!*  A sudden piercing feeling informs you that the ricochet\nof your wild arrow has resulted in it wedging in your side, causing\nextreme agony.  The evil Wumpus, with its psychic powers, realizes this\nand immediately rushes to your side, not to help, alas, but to EAT YOU!\n(*CHOMP*)\n"
+NTN                   | RTS
+
+NSSVTTTTTTTTSSSSSTSSN | Mark: 11111111 00000100 (jump)
+A"\nWith a jaunty step you enter the magic tunnel.  As you do, you\nnotice that the walls are shimmering and glowing.  Suddenly you feel\na very curious, warm sensation and find yourself in room %u!!\n"
+NTN                   | RTS
+
+NSSVTTTTTTTTSSSSSTSTN | Mark: 11111111 00000101 (pit_kill)
+A"*AAAUUUUGGGGGHHHHHhhhhhhhhhh...*\nThe whistling sound and updraft as you walked into this room of the\ncave apparently wasn't enough to clue you in to the presence of the\nbottomless pit.  You have a lot of time to reflect on this error as\nyou fall many miles to the core of the earth.  Look on the bright side;\nyou can at least find out if Jules Verne was right...\n"
+NTN                   | RTS
+
+NSSVTTTTTTTTSSSSSTTSN | Mark: 11111111 00000110 (pit_survive)
+A"Without conscious thought you grab for the side of the cave and manage\nto grasp onto a rocky outcrop.  Beneath your feet stretches the limitless\ndepths of a bottomless pit!  Rock crumbles beneath your feet!\n"
+NTN                   | RTS
