@@ -5,14 +5,34 @@
 @ Name:
 @   random (10000)
 @ Description:
-@   Returns a random IEEE-vetted number per RFC 1149.5.
+@   Returns a kinda-random number.
+@   Before using for the first time, seed heap[0] with a value.
 @ Call Stack:
 @   empty
 @ Return Stack:
 @   random number  <-- TOS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTSSSSN              | Mark: 10000 (random)
-SSSTSSN                 | PUSH +4
+
+@ Generate the next seed value
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+SSSTSSSSSTTTSSSTTSSTSSTTTSSTTSTTSTN | PUSH 1103515245
+TSSN                    | MULTIPLY
+SSSTTSSSSSSTTTSSTN      | PUSH 12345
+TSSS                    | ADD
+
+@ Store the next seed value but keep a copy on the stack.
+SNS                     | DUP
+SSSSN                   | PUSH 0 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+
+@ Calculate the random number and return.
+SSSTSSSSSSSSSSSSSSSSN   | PUSH 65536
+TSTS                    | DIVIDE
+SSSTSSSSSSSSSSSSSSSN    | PUSH 32768
+TSTT                    | MODULO
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
