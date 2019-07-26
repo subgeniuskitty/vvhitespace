@@ -5,8 +5,7 @@
 @ Name:
 @   stackrotate
 @ Description:
-@   Maximum rotation depth is five. Stomps on heap[9]-heap[14].
-@   Assumes rotation depth greater than two, otherwise use SWAP.
+@   Maximum rotation depth is 14. Stomps on heap[1]-heap[15].
 @ Call Stack:
 @   stack word n
 @   ...
@@ -23,19 +22,19 @@ NSSVTSTSN               | Mark: 1010 (stackrotate)
 
 @ For the convenience of other functions, modulo the
 @ rotation depth by the available registers.
-SSSTSTN                 | PUSH 5
+SSSTTTSN                | PUSH 14
 TSTT                    | MODULO
 
-@ Use heap[14] for generating register addresses.
-SSSTTTSN                | PUSH 14 (ptr)
+@ Use heap[15] for generating register addresses.
+SSSTTTTN                | PUSH 15 (ptr)
 SSSSN                   | PUSH 0
 TTS                     | STORE
 
 @ Dump one word from stack to heap each pass through the loop.
 NSSVSSSSTSTSSSSSSSSSN   | Mark: 00001010 00000000
 SNT                     | SWAP
-SSSTSSTN                | PUSH 9 (starting register)
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTN                   | PUSH 1 (starting register)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 TSSS                    | ADD
 SNT                     | SWAP
@@ -43,7 +42,7 @@ TTS                     | STORE
 
 @ See if the loop is complete.
 SNS                     | DUP
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 SSSTN                   | PUSH 1
 TSSS                    | ADD
@@ -51,11 +50,11 @@ TSST                    | SUBTRACT
 NTSSSSSTSTSSSSSSSSTN    | BRZ > 00001010 00000001
 
 @ Increment the loop counter
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 SSSTN                   | PUSH 1
 TSSS                    | ADD
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 SNT                     | SWAP
 TTS                     | STORE
 NSNSSSSTSTSSSSSSSSSN    | JMP > 00001010 00000000
@@ -63,40 +62,40 @@ NSNSSSSTSTSSSSSSSSSN    | JMP > 00001010 00000000
 @ The correct number of words have been stored to registers.
 @ Time to read them back in rotated order.
 
-@ First, prepare the counter in heap[14] again.
+@ First, prepare the counter in heap[15] again.
 @ This consumes 'rd' from the stack.
 NSSVSSSSTSTSSSSSSSSTN   | Mark: 00001010 00000001
 SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 SNT                     | SWAP
 TTS                     | STORE
 
 @ Second, read in the old TOS manually.
-SSSTSSTN                | PUSH 9 (starting register)
+SSSTN                   | PUSH 1 (starting register)
 TTT                     | LOAD
 
 @ Read one word per pass through this loop.
 NSSVSSSSTSTSSSSSSSTSN   | Mark: 00001010 00000010
-SSSTSSTN                | PUSH 9 (starting register)
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTN                   | PUSH 1 (starting register)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 TSSS                    | ADD
 TTT                     | LOAD
 
 @ See if the loop is complete.
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
 NTSSSSSTSTSSSSSSSTTN    | BRZ > 00001010 00000011
 
 @ Decrement the loop counter and loop again.
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 SNT                     | SWAP
 TTS                     | STORE
 NSNSSSSTSTSSSSSSSTSN    | JMP > 00001010 00000010
@@ -109,8 +108,7 @@ NTN                     | RTS
 @ Name:
 @   stackrotatereverse
 @ Description:
-@   Maximum rotation depth is five. Stomps on heap[9]-heap[14].
-@   Assumes rotation depth greater than two, otherwise use SWAP.
+@   Maximum rotation depth is 14. Stomps on heap[1]-heap[15].
 @ Call Stack:
 @   stack word n
 @   ...
@@ -127,19 +125,19 @@ NSSVTSTTN               | Mark: 1011 (stackrotatereverse)
 
 @ For the convenience of other functions, modulo the
 @ rotation depth by the available registers.
-SSSTSTN                 | PUSH 5
+SSSTTTSN                | PUSH 14
 TSTT                    | MODULO
 
-@ Use heap[14] for generating register addresses.
-SSSTTTSN                | PUSH 14 (ptr)
+@ Use heap[15] for generating register addresses.
+SSSTTTTN                | PUSH 15 (ptr)
 SSSSN                   | PUSH 0
 TTS                     | STORE
 
 @ Dump one word from stack to heap each pass through the loop.
 NSSVSSSSTSTTSSSSSSSSN   | Mark: 00001011 00000000
 SNT                     | SWAP
-SSSTSSTN                | PUSH 9 (starting register)
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTN                   | PUSH 1 (starting register)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 TSSS                    | ADD
 SNT                     | SWAP
@@ -147,7 +145,7 @@ TTS                     | STORE
 
 @ See if the loop is complete.
 SNS                     | DUP
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 SSSTN                   | PUSH 1
 TSSS                    | ADD
@@ -155,11 +153,11 @@ TSST                    | SUBTRACT
 NTSSSSSTSTTSSSSSSSTN    | BRZ > 00001011 00000001
 
 @ Increment the loop counter
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 SSSTN                   | PUSH 1
 TSSS                    | ADD
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 SNT                     | SWAP
 TTS                     | STORE
 NSNSSSSTSTTSSSSSSSSN    | JMP > 00001011 00000000
@@ -167,45 +165,45 @@ NSNSSSSTSTTSSSSSSSSN    | JMP > 00001011 00000000
 @ The correct number of words have been stored to registers.
 @ Time to read them back in rotated order.
 
-@ First, prepare the counter in heap[14] again.
+@ First, prepare the counter in heap[15] again.
 NSSVSSSSTSTTSSSSSSSTN   | Mark: 00001011 00000001
 SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
 SNS                     | DUP
 SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 SNT                     | SWAP
 TTS                     | STORE
 
 @ Read one word per pass through this loop.
 @ Store it behind 'rd' on the stack.
 NSSVSSSSTSTTSSSSSSTSN   | Mark: 00001011 00000010
-SSSTSSTN                | PUSH 9 (starting register)
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTN                   | PUSH 1 (starting register)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 TSSS                    | ADD
 TTT                     | LOAD
 SNT                     | SWAP
 
 @ See if the loop is complete.
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 NTSSSSSTSTTSSSSSSTTN    | BRZ > 00001011 00000011
 
 @ Decrement the loop counter and loop again.
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 TTT                     | LOAD
 SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
-SSSTTTSN                | PUSH 14 (ptr)
+SSSTTTTN                | PUSH 15 (ptr)
 SNT                     | SWAP
 TTS                     | STORE
 NSNSSSSTSTTSSSSSSTSN    | JMP > 00001011 00000010
 
 @ Read in the final value manually and return.
 NSSVSSSSTSTTSSSSSSTTN   | Mark: 00001011 00000011
-SSSTSSTN                | PUSH 9 (starting register)
+SSSTN                   | PUSH 1 (starting register)
 TSSS                    | ADD
 TTT                     | LOAD
 NTN                     | RTS

@@ -140,7 +140,8 @@ NTN                     | RTS
 @         ASCII '\0'
 @         substitution n
 @         <remainder of call stack is unchanged>
-@   Maximum of 7 substitutions.
+@   Maximum substitutions determined by upper heap limit in stackrotate and
+@     stackrotatereverse subroutines.
 @ Call Stack:
 @   ACSII '\0'
 @   string word n
@@ -157,32 +158,27 @@ NTN                     | RTS
 #include <string.pvvs>
 NSSVTSSSN               | Mark: 1000 (printf)
 
-@ Copy any substitution words into heap registers.
-NSTTSSSSSTN             | JSR > 1000001 (spewreg)
-
-@ heap[8] will track the current substitution register.
-SSSTSSSN                | PUSH 8 (ptr)
-SSSTN                   | PUSH 1
-TTS                     | STORE
-
 @ If the stack contains an empty string (i.e. just an ASCII '\0'), the next
 @ word is a pointer we must use to load the string from the heap.
+@ This will leave the stack looking exactly like the example call stack above.
 @ Do the test this way so we can keep the code inline.
 SNS                     | DUP
+SSSTSN                  | PUSH 2
+TSSS                    | ADD
+NSTTTSSN                | JSR > 1100 (deepdup)
 SSTTN                   | PUSH -1
 TSSN                    | MULTIPLY
 NTTSSSSTSSSSSSSSSSTN    | BMI > 00001000 00000001
+SNS                     | DUP
+SSSTSN                  | PUSH 2
+TSSS                    | ADD
+NSTTSTTN                | JSR > 1011 (stackrotatereverse)
 SNN                     | DROP
 SNS                     | DUP
-NSTTSSSSSN              | JSR > 100000 (strlen)
-NSTTTTTSN               | JSR > 11110 (slurp)
-
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ Initialization is now complete.
-@ Stack contains a printf-compatible, null-terminated string.
-@ heap[1]-heap[7] contain the substitutions, if any.
-@ heap[8] tracks which substitution is next.
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+SSSTSN                  | PUSH 2
+TSSS                    | ADD
+NSTTSTTN                | JSR > 1011 (stackrotatereverse)
+NSTSSSSTSSSTSSSTTSSN    | JSR > 00001000 10001100 (printf_deepslurp)
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ The rest of printf parses a string according to the following information.
@@ -204,11 +200,13 @@ NSTTTTTSN               | JSR > 11110 (slurp)
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 @@@@@@@@@@@@@@@@@@@@
-@ The next block tests the TOS against all possible level 1 branches (see above).
+@ The next block tests the char against all possible level 1 branches (see above).
 @ If there is a match, execution jumps to the appropriate level 2 branch label.
 @ If no match is found, print the character and move on.
 @@@@@@@@@@@@@@@@@@@@
 NSSVSSSSTSSSSSSSSSSTN   | Mark: 00001000 00000001
+@ Move the next character of the string to TOS.
+NSTSSSSTSSSTSSSTSTTN    | JSR > 00001000 10001011 (next char to TOS)
 @ TOS is an ASCII '\ '. Jump to process the possible level 2 branches.
 SNS                     | DUP
 SSSTSTTTSSN             | PUSH ASCII slash
@@ -238,6 +236,8 @@ NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
 @@@@@@@@@@@@@@@@@@@@
 NSSVSSSSTSSSSSSSSSTSN   | Mark: 00001000 00000010
 SNN                     | DROP
+@ Move the next character of the string to TOS.
+NSTSSSSTSSSTSSSTSTTN    | JSR > 00001000 10001011 (next char to TOS)
 @ Check for ASCII '\n'
 SNS                     | DUP
 SSSTTSTTTSN             | PUSH ASCII 'n'
@@ -282,6 +282,8 @@ NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
 @@@@@@@@@@@@@@@@@@@@
 NSSVSSSSTSSSSSSSSSTTN   | Mark: 00001000 00000011
 SNN                     | DROP
+@ Move the next character of the string to TOS.
+NSTSSSSTSSSTSSSTSTTN    | JSR > 00001000 10001011 (next char to TOS)
 @ Check for ASCII 'c' - Print character
 SNS                     | DUP
 SSSTTSSSTTN             | PUSH ASCII 'c'
@@ -317,73 +319,118 @@ NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
 
 @@@@@@@@@@@@@@@@@@@@
 @ These are utility labels to call the appropriate type of output subroutine.
-@ After output, they increment the substition counter (heap[8])
-@ and loop back to testing level 1 branches.
+@ After output, they decrement the substition counter and loop back to testing
+@ level 1 branches.
 @@@@@@@@@@@@@@@@@@@@
 
 @ Print a character
 NSSVSSSSTSSSSSSSSTTSN   | Mark: 00001000 00000110
 SNN                     | DROP
-SSSTSSSN                | PUSH 8 (ptr)
-TTT                     | LOAD
-TTT                     | LOAD
+SNT                     | SWAP
 TNSS                    | PUTC
-NSTSSSSTSSSTSSSSSSSN    | JSR > 00001000 10000000 (increment heap[8])
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
 NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
 @ Print a string
 NSSVSSSSTSSSSSSSSTTTN   | Mark: 00001000 00000111
 SNN                     | DROP
-SSSTSSSN                | PUSH 8 (ptr)
-TTT                     | LOAD
-TTT                     | LOAD
+SNT                     | SWAP
 NSTTSSSTSTN             | JSR > 1000101 (print string from heap)
-NSTSSSSTSSSTSSSSSSSN    | JSR > 00001000 10000000 (increment heap[8])
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
 NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
 @ Print a decimal digit
 NSSVSSSSTSSSSSSSTSSSN   | Mark: 00001000 00001000
 SNN                     | DROP
-SSSTSSSN                | PUSH 8 (ptr)
-TTT                     | LOAD
-TTT                     | LOAD
+SNT                     | SWAP
 TNST                    | PUTDIGIT
-NSTSSSSTSSSTSSSSSSSN    | JSR > 00001000 10000000 (increment heap[8])
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
 NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
 @ Print an unsigned integer
 NSSVSSSSTSSSSSSSTSSTN   | Mark: 00001000 00001001
 SNN                     | DROP
-SSSTSSSN                | PUSH 8 (ptr)
-TTT                     | LOAD
-TTT                     | LOAD
+SNT                     | SWAP
 NSTTSSSSTTN             | JSR > 1000011 (print magnitude of number from stack)
-NSTSSSSTSSSTSSSSSSSN    | JSR > 00001000 10000000 (increment heap[8])
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
 NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
 @ Print a signed integer
 NSSVSSSSTSSSSSSSTSTSN   | Mark: 00001000 00001010
 SNN                     | DROP
-SSSTSSSN                | PUSH 8 (ptr)
-TTT                     | LOAD
-TTT                     | LOAD
+SNT                     | SWAP
 NSTTSSTN                | JSR > 1001 (print number from stack)
-NSTSSSSTSSSTSSSSSSSN    | JSR > 00001000 10000000 (increment heap[8])
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
 NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ These are misc labels associated with the printf function.
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-@ Increments heap[8]. Used after a substitution is complete.
-NSSVSSSSTSSSTSSSSSSSN   | Mark: 00001000 10000000 (increment heap[8])
-SSSTSSSN                | PUSH 8 (ptr)
-TTT                     | LOAD
-SSSTN                   | PUSH 1
-TSSS                    | ADD
-SSSTSSSN                | PUSH 8 (ptr)
-SNT                     | SWAP
-TTS                     | STORE
-NTN                     | RTS
-
 @ Found an ASCII "\0" when processing the format string. Clean up and exit.
 NSSVSSSSTSSSSSSSSSSSN   | Mark: 00001000 00000000
+SNN                     | DROP
+NTN                     | RTS
+
+@ Move the next string character to TOS.
+@ Stack should look like the printf call stack, with num-of-subs at TOS.
+NSSVSSSSTSSSTSSSTSTTN   | Mark: 00001000 10001011 (next char to TOS)
+SNS                     | DUP
+SSSTSN                  | PUSH 2
+TSSS                    | ADD
+NSTTSTTN                | JSR > 1011 (stackrotatereverse)
+NTN                     | RTS
+
+@ Slurps a string from the heap to the stack, storing it behind the substitutions.
+@ Call Stack:
+@   substitution n
+@   ...
+@   substitution 1
+@   number of substitutions  <-- TOS
+@   pointer to string
+@ Return Stack:
+@   ACSII '\0'
+@   string word n
+@   ...
+@   string word 1
+@   substitution n
+@   ...
+@   substitution 1
+@   number of substitutions  <-- TOS
+@ TODO: This, along with a deepspew, should probably be stdlib routines.
+NSSVSSSSTSSSTSSSTTSSN   | Mark: 00001000 10001100 (printf_deepslurp)
+SNS                     | DUP
+@ Advance a duplicate copy of the pointer until it points to the null-terminator.
+NSSVSSSSTSSSTSSSTTSTN   | Mark: 00001000 10001101
+SNS                     | DUP
+TTT                     | LOAD
+NTSSSSSTSSSTSSSTTTSN    | BRZ > 00001000 10001110
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+NSNSSSSTSSSTSSSTTSTN    | JMP > 00001000 10001101
+@ Load a character to the stack on each pass through this loop.
+NSSVSSSSTSSSTSSSTTTSN   | Mark: 00001000 10001110
+SNS                     | DUP
+TTT                     | LOAD
+SSSTSSN                 | PUSH 4
+NSTTTSSN                | JSR > 1100 (deepdup)
+SSSTSSN                 | PUSH 4
+TSSS                    | ADD
+NSTTSTSN                | JSR > 1010 (stackrotate)
+@ Test for end of loop.
+SNS                     | DUP
+SSSTTN                  | PUSH 3
+NSTTTSSN                | JSR > 1100 (deepdup)
+TSST                    | SUBTRACT
+NTSSSSSTSSSTSSSTTTTN    | BRZ > 00001000 10001111
+@ Decrement pointer to end of string, loop again.
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+NSNSSSSTSSSTSSSTTTSN    | JMP > 00001000 10001110
+@ Clean up and return.
+NSSVSSSSTSSSTSSSTTTTN   | Mark: 00001000 10001111
+SNN                     | DROP
 SNN                     | DROP
 NTN                     | RTS
 

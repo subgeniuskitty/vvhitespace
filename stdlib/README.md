@@ -19,9 +19,9 @@ following reservations:
 ## Heap and Pointers ##
 
 The first 16 heap addresses (`0-15`) are reserved when using the stdlib.
-Within that reservation, heap[0] is used by `random` and heap[15] is used
-by `spewreg`. The remaining 14 locations, heap[1]-heap[14] are used as
-general-purpose registers.
+Within that reservation, heap[0] is used by `random` and the block
+heap[2]-heap[15] by the stack rotation subroutines which time-share these
+pseudo-registers between the various stdlib subroutines.
 
 By convention, functions which return a pointer will use the address `0` to
 represent a `NULL` pointer.

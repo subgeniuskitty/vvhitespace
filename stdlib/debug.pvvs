@@ -6,6 +6,13 @@
 @   dumpheap (111000)
 @ Description:
 @   Dumps the heap from 'startaddr' to 'endaddr'.
+@   This subroutine stomps on heap[1] after printing the first heap location.
+@     If you dump starting from heap[0], then heap[1] will print inaccurately.
+@     Starting the dump from any other location will work without error.
+@     TODO: Should I use heap[0] and DIE rather than RTS?
+@           At the moment, the ability to continue is too useful to me.
+@           If it's useful to me, it's probably useful to other people.
+@           For now, leave dumpheap as-is.
 @ Call Stack:
 @   endaddr
 @   startaddr  <-- TOS
