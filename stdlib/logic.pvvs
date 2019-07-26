@@ -26,6 +26,63 @@ NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
+@   and (101001)
+@ Description:
+@   Performs a bitwise AND on the TOS word.
+@ Call Stack:
+@   X
+@   Y
+@ Return Stack:
+@   X ^ Y
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSTSSTN             | Mark: 101001 (and)
+
+@ Prepare the stack for computation.
+SSSSN                   | PUSH 0 (result)
+SSSTTTTTTN              | PUSH 63 (shift counter)
+
+@ Loop through the bits one at a time.
+NSSVSSTSTSSTSSSSSSSSN   | Mark: 00101001 00000000
+@ Prepare X for the AND
+SNS                     | DUP
+SSSTSTN                 | PUSH 5
+NSTTTSSN                | JSR > 1100 (deepdup)
+SNT                     | SWAP
+NSTTSTTSSN              | JSR > 101100 (rshift)
+@ Prepare Y for the AND
+SSSTSSN                 | PUSH 4
+NSTTTSSN                | JSR > 1100 (deepdup)
+SSSTTN                  | PUSH 3
+NSTTTSSN                | JSR > 1100 (deepdup)
+NSTTSTTSSN              | JSR > 101100 (rshift)
+@ Do the AND and store in result.
+NSTTSSSSSSN             | JSR > 1000000 (lowbitand)
+SSSTTN                  | PUSH 3
+NSTTSTTN                | JSR > 1011 (stackrotatereverse)
+SSSTN                   | PUSH 1
+NSTTSTTSTN              | JSR > 101101 (lshift)
+TSSS                    | ADD
+SSSTSN                  | PUSH 2
+NSTTSTSN                | JSR > 1010 (stackrotate)
+@ Test for end of loop.
+SNS                     | DUP
+NTSSSTSTSSTSSSSSSSTN    | BRZ > 00101001 00000001
+@ Decrement the counter and loop again.
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+NSNSSTSTSSTSSSSSSSSN    | JMP > 00101001 00000000
+
+@ Clean up and return.
+NSSVSSTSTSSTSSSSSSSTN   | Mark: 00101001 00000001
+SNN                     | DROP
+SNT                     | SWAP
+SNN                     | DROP
+SNT                     | SWAP
+SNN                     | DROP
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
 @   rshift (101100)
 @ Description:
 @   Shifts 'X' right by 'shiftcount' bits with sign extension.
@@ -37,7 +94,7 @@ NTN                     | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTSTTSSN             | Mark: 101100 (rshift)
 
-@ Test for loop completion first since it's allowable to shift by zero.
+@ Test for loop completion first since it is allowable to shift by zero.
 NSSVSSTSTTSSSSSSSSSTN   | Mark: 00101100 00000001
 SNS                     | DUP
 NTSSSTSTTSSSSSSSSSSN    | BRZ > 00101100 00000000
@@ -70,7 +127,7 @@ NTN                     | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTSTTSTN             | Mark: 101101 (lshift)
 
-@ Test for loop completion first since it's allowable to shift by zero.
+@ Test for loop completion first since it is allowable to shift by zero.
 NSSVSSTSTTSTSSSSSSSTN   | Mark: 00101101 00000001
 SNS                     | DUP
 NTSSSTSTTSTSSSSSSSSN    | BRZ > 00101101 00000000
