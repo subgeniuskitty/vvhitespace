@@ -210,5 +210,40 @@ TSSS                    | ADD
 TTT                     | LOAD
 NTN                     | RTS
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   deepdup
+@ Description:
+@   Duplicates an item deep on the stack, placing the duplicate on TOS.
+@   By default, maximum depth is 11.
+@   True maximum depth is (max depth of stackrotate & stackrotatereverse)-3.
+@ Call Stack:
+@   stack word n
+@   ...
+@   stack word 1
+@   dupdepth  <-- TOS
+@ Return Stack:
+@   stack word n
+@   ...
+@   stack word 1
+@   copy of stack word 3   <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTSSN               | Mark: 1100 (deepdup)
+
+@ Copy 'dupdepth' and use it to bring forth the desired stack word.
+SNS                     | DUP
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+NSTTSTTN                | JSR > 1011 (stackrotatereverse)
+
+@ Copy the desired stack word and return it back into the stack.
+SNS                     | DUP
+SSSTTN                  | PUSH 3
+NSTTSTTN                | JSR > 1011 (stackrotatereverse)
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+NSTTSTSN                | JSR > 1010 (stackrotate)
+NTN                     | RTS
+
 #endif
 

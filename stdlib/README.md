@@ -37,6 +37,7 @@ header comment for each function to learn the call and return stack.
            1001 ----- print number from stack       (stdio.pvvs)
            1010 ----- stackrotate                   (stack.pvvs)
            1011 ----- stackrotatereverse            (stack.pvvs)
+           1100 ----- deepdup                       (stack.pvvs)
          010xxx - math functions
           10000 ----- random                        (math.pvvs)
           10001 ----- absolute value                (math.pvvs)
@@ -63,8 +64,8 @@ header comment for each function to learn the call and return stack.
          111000 ----- dump heap                     (debug.pvvs)
          111001 ----- dump stack                    (debug.pvvs)
         1xxxxxx - reserved for less common entry points
-        1000000 ----- slurp registers               (heap.pvvs)
-        1000001 ----- spew registers                (heap.pvvs)
+        1000000 ----- <empty>
+        1000001 ----- <empty>
         1000010 ----- print sign of number          (stdio.pvvs)
         1000011 ----- print magnitude of number     (stdio.pvvs)
         1000100 ----- print string from stack       (stdio.pvvs)
