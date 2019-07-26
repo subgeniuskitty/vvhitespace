@@ -55,4 +55,22 @@ TSSN                    | MULTIPLY
 NSSVSSSTSSSTSSSSSSSTN   | Mark: 00010001 00000001
 NTN                     | RTS
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   isnegative (1000001)
+@ Description:
+@   Returns 1 if 'number' is negative, 0 if positive.
+@ Call Stack:
+@   number  <-- TOS
+@ Return Stack:
+@   1 or 0  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSSSTN            | Mark: 1000001 (isnegative)
+NTTSTSSSSSTSSSSSSSSN    | BMI > 01000001 00000000
+SSSSN                   | PUSH 0
+NTN                     | RTS
+NSSVSTSSSSSTSSSSSSSSN   | Mark: 01000001 00000000
+SSSTN                   | PUSH 1
+NTN                     | RTS
+
 #endif

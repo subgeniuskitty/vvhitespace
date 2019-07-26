@@ -90,4 +90,27 @@ NSSVSSTSTTSTSSSSSSSSN   | Mark: 00101101 00000000
 SNN                     | DROP
 NTN                     | RTS
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   lowbitand (1000000)
+@ Description:
+@   Performs logical AND on the least-significant bit of 'X' and 'Y'.
+@   Returns either 1 or 0, no other values.
+@ Call Stack:
+@   X
+@   Y
+@ Return Stack:
+@   lsb(X) AND lsb(Y)
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSSSSN            | Mark: 1000000 (lowbitand)
+SSSTSN                  | PUSH 2
+TSTT                    | MODULO
+SNT                     | SWAP
+SSSTSN                  | PUSH 2
+TSTT                    | MODULO
+TSSS                    | ADD
+SSSTSN                  | PUSH 2
+TSTS                    | DIVIDE
+NTN                     | RTS
+
 #endif
