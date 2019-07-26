@@ -34,8 +34,8 @@ SNT                      | SWAP
 
 @ Print output line for this memory location
 NSTTTTSTTN               | JSR > 111011 (debug:printmagnitude)
-SSSTTTSTSN               | PUSH ASCII ':'
 SSSTSSTN                 | PUSH ASCII '\t'
+SSSTTTSTSN               | PUSH ASCII ':'
 TNSS                     | PUTC
 TNSS                     | PUTC
 SNS                      | DUP
@@ -89,8 +89,8 @@ NSTTTTTSSN               | JSR > 111100 (debug:printstring)
 NSSVSSTTTSSTSSSSSSSTN    | Mark: 00111001 00000001
 SNS                      | DUP
 NSTTTTSTTN               | JSR > 111011 (debug:printmagnitude)
-SSSTTTSTSN               | PUSH ASCII ':'
 SSSTSSTN                 | PUSH ASCII '\t'
+SSSTTTSTSN               | PUSH ASCII ':'
 TNSS                     | PUTC
 TNSS                     | PUTC
 SNT                      | SWAP

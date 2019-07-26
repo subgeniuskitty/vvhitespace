@@ -18,8 +18,8 @@ src_extension = '.pvvs'
 
 tests = [
         # Format: ['filename_without_extension', 'string for stdin', 'string for expected stdout']
-        ['0001_dumpstack', '', 'TOS:\n1\t:+42\n0\t:+255\n'],
-        ['0002_dumpheap', '', '32\t:+255\n33\t:+42\n'],
+        ['0001_dumpstack', '', 'TOS:\n1:\t+42\n0:\t+255\n'],
+        ['0002_dumpheap', '', '32:\t+255\n33:\t+42\n'],
         ] 
 
 for test in tests:
