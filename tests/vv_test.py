@@ -7,10 +7,10 @@
 
 import os, subprocess
 
-compiler_path = './vvc'
-interpreter_path = './vvi'
+compiler_path = '../vvc'
+interpreter_path = '../vvi'
 temp_file = './test.vvs'
-path_to_tests = './tests/'
+path_to_tests = './'
 src_extension = '.pvvs'
 
 tests = [
@@ -40,7 +40,6 @@ tests = [
         ] 
 
 for test in tests:
-    # TODO: Catch stderr
     subprocess.run([compiler_path, '-i', path_to_tests + test[0] + src_extension, '-o', temp_file])
     result = subprocess.run([interpreter_path, '-i', temp_file], stdout=subprocess.PIPE, input=test[1].encode('utf-8'))
     if result.stdout.decode('utf-8') != test[2]:

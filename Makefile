@@ -18,9 +18,17 @@ vvi:
 vvc:
 	$(CC) $(CC_FLAGS) -o $@ vv_compiler.c
 
-test: all
-	@echo "Starting test suite:"
-	@./vv_test.py
-
 clean:
 	@rm -f vvc vvc.core vvi vvi.core
+
+test: testvvi teststdlib
+
+testvvi: all
+	@cd tests; make test
+
+teststdlib: all
+	@cd stdlib_tests; make test
+
+testclean:
+	@cd tests; make clean
+	@cd stdlib_tests; make clean
