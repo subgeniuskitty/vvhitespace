@@ -1,0 +1,26 @@
+SSSTTTTSTSSN    | PUSH 244
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+
+@SSSTTTSN        | PUSH 14
+SSSTTSTN        | PUSH 13
+NSTTTSSN        | JSR > 1100 (deepdup)
+SSSTSN          | PUSH 2
+NSTTTSSN        | JSR > 1100 (deepdup)
+
+SSSTTTSN        | PUSH 14
+NSTTTTSSTN      | JSR > 111001 (dumpstack)
+NNN             | DIE
+
+#include <stack.pvvs>
+#include <debug.pvvs>

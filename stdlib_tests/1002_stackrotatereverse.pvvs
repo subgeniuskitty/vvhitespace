@@ -1,0 +1,26 @@
+SSSTTTTSTSSN    | PUSH 244
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+SSSTN           | PUSH 1
+
+SSSTTTSN        | PUSH 14
+NSTTSTTN        | JSR > 1011 (stackrotatereverse)
+SSSTSN          | PUSH 2
+NSTTSTTN        | JSR > 1011 (stackrotatereverse)
+
+SSSTTSTN        | PUSH 13
+NSTTTTSSTN      | JSR > 111001 (dumpstack)
+NNN             | DIE
+
+#include <stack.pvvs>
+#include <debug.pvvs>
