@@ -1,0 +1,16 @@
+SSSTTTTSTSSN    | PUSH 244
+SSSTTTTSSTTN    | PUSH 243
+SSSTTTTSSTSN    | PUSH 242
+
+SSSTSSSSSN      | PUSH 32 (address)
+SSSTSN          | PUSH 2 (count)
+NSTTTTTTN       | JSR > 11111 (spew)
+
+SSSTSSSTSN      | PUSH 34 (end address)
+SSSTSSSSSN      | PUSH 32 (start address)
+NSTTTTSSSN      | JSR > 111000 (dumpheap)
+
+NNN             | DIE
+
+#include <heap.pvvs>
+#include <debug.pvvs>

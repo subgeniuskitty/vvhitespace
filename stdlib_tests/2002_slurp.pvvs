@@ -1,0 +1,19 @@
+SSSTTTTSTSSN    | PUSH 244
+SSSTTTTSSTTN    | PUSH 243
+SSSTTTTSSTSN    | PUSH 242
+
+SSSTSSSSSN      | PUSH 32 (address)
+SSSTSN          | PUSH 2 (count)
+NSTTTTTTN       | JSR > 11111 (spew)
+
+SSSTSSSSSN      | PUSH 32 (address)
+SSSTSN          | PUSH 2 (count)
+NSTTTTTSN       | JSR > 11110 (slurp)
+
+SSSTTN          | PUSH 3 (count)
+NSTTTTSSTN      | JSR > 111001 (dumpstack)
+
+NNN             | DIE
+
+#include <heap.pvvs>
+#include <debug.pvvs>
