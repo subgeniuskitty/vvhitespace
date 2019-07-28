@@ -20,7 +20,7 @@ NSTTSTSN        | JSR > 1010 (stackrotate)
 SSSTSN          | PUSH 2
 NSTTSTSN        | JSR > 1010 (stackrotate)
 
-SSSTTSTN        | PUSH 13
+SSSTTTSN        | PUSH 14
 NSTTTTSSTN      | JSR > 111001 (dumpstack)
 NNN             | DIE
 

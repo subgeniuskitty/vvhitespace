@@ -18,11 +18,11 @@ src_extension = '.pvvs'
 
 tests = [
         # Format: ['filename_without_extension', 'string for stdin', 'string for expected stdout']
-        ['0001_dumpstack', '', 'TOS:\n1:\t+42\n0:\t+255\n'],
+        ['0001_dumpstack', '', 'TOS:\n2:\t+42\n1:\t+255\n'],
         ['0002_dumpheap', '', '32:\t+255\n33:\t+42\n'],
-        ['1001_stackrotate', '', 'TOS:\n13:\t+1\n12:\t+244\n11:\t+1\n10:\t+1\n9:\t+1\n8:\t+1\n7:\t+1\n6:\t+243\n5:\t+1\n4:\t+1\n3:\t+1\n2:\t+1\n1:\t+1\n0:\t+242\n'],
-        ['1002_stackrotatereverse', '', 'TOS:\n13:\t+1\n12:\t+244\n11:\t+1\n10:\t+1\n9:\t+1\n8:\t+1\n7:\t+1\n6:\t+1\n5:\t+1\n4:\t+1\n3:\t+1\n2:\t+1\n1:\t+1\n0:\t+1\n'],
-        ['1003_deepdup', '', 'TOS:\n14:\t+1\n13:\t+244\n12:\t+1\n11:\t+1\n10:\t+1\n9:\t+1\n8:\t+1\n7:\t+1\n6:\t+1\n5:\t+1\n4:\t+1\n3:\t+1\n2:\t+1\n1:\t+1\n0:\t+244\n'],
+        ['1001_stackrotate', '', 'TOS:\n14:\t+1\n13:\t+244\n12:\t+1\n11:\t+1\n10:\t+1\n9:\t+1\n8:\t+1\n7:\t+243\n6:\t+1\n5:\t+1\n4:\t+1\n3:\t+1\n2:\t+1\n1:\t+242\n'],
+        ['1002_stackrotatereverse', '', 'TOS:\n14:\t+1\n13:\t+244\n12:\t+1\n11:\t+1\n10:\t+1\n9:\t+1\n8:\t+1\n7:\t+1\n6:\t+1\n5:\t+1\n4:\t+1\n3:\t+1\n2:\t+1\n1:\t+1\n'],
+        ['1003_deepdup', '', 'TOS:\n15:\t+1\n14:\t+244\n13:\t+1\n12:\t+1\n11:\t+1\n10:\t+1\n9:\t+1\n8:\t+1\n7:\t+1\n6:\t+1\n5:\t+1\n4:\t+1\n3:\t+1\n2:\t+1\n1:\t+244\n'],
         ] 
 
 for test in tests:

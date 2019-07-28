@@ -101,10 +101,10 @@ SSSTSTSN                 | PUSH ASCII '\n'
 TNSS                     | PUTC
 
 @ Figure out if the loop is complete.
-SNS                      | DUP
-NTSSSTTTSSTSSSSSSSSN     | BRZ > 00111001 00000000
 SSSTN                    | PUSH 1
 TSST                     | SUBTRACT
+SNS                      | DUP
+NTSSSTTTSSTSSSSSSSSN     | BRZ > 00111001 00000000
 NSNSSTTTSSTSSSSSSSTN     | JMP > 00111001 00000001
 
 @ Clean up and return

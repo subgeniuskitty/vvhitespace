@@ -1,6 +1,6 @@
 SSSTTTTTTTTN    | PUSH 255
 SSSTSTSTSN      | PUSH 42
-SSSTN           | PUSH 1 (count)
+SSSTSN          | PUSH 2 (count)
 NSTTTTSSTN      | JSR > 111001 (dumpstack)
 NNN             | DIE
 

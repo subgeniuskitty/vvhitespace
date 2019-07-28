@@ -17,7 +17,7 @@ NSTTTSSN        | JSR > 1100 (deepdup)
 SSSTSN          | PUSH 2
 NSTTTSSN        | JSR > 1100 (deepdup)
 
-SSSTTTSN        | PUSH 14
+SSSTTTTN        | PUSH 15
 NSTTTTSSTN      | JSR > 111001 (dumpstack)
 NNN             | DIE
 
