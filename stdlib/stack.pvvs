@@ -217,8 +217,8 @@ NTN                     | RTS
 @   deepdup
 @ Description:
 @   Duplicates an item deep on the stack, placing the duplicate on TOS.
-@   By default, maximum depth is 11.
-@   True maximum depth is (max depth of stackrotate & stackrotatereverse)-3.
+@   By default, maximum depth is 13.
+@   True maximum depth is (max depth of stackrotate & stackrotatereverse)-1.
 @ Call Stack:
 @   stack word n
 @   ...

@@ -12,7 +12,6 @@ SSSTN           | PUSH 1
 SSSTN           | PUSH 1
 SSSTN           | PUSH 1
 
-@SSSTTTSN        | PUSH 14
 SSSTTSTN        | PUSH 13
 NSTTTSSN        | JSR > 1100 (deepdup)
 SSSTSN          | PUSH 2
