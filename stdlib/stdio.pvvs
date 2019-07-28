@@ -61,8 +61,8 @@ NTN                     | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTSSTN               | Mark: 1001 (print number from stack)
 SNS                     | DUP
-NSTTSSSSTSN             | JSR > 1000010
-NSTTSSSSTTN             | JSR > 1000011
+NSTTSSSSTSN             | JSR > 1000010 (printstacknumbersign)
+NSTTSSSSTTN             | JSR > 1000011 (printstacknumbermagnitude)
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -154,8 +154,7 @@ NTN                     | RTS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#include <heap.pvvs>
-#include <string.pvvs>
+#include <stack.pvvs>
 NSSVTSSSN               | Mark: 1000 (printf)
 
 @ If the stack contains an empty string (i.e. just an ASCII '\0'), the next

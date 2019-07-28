@@ -35,6 +35,7 @@ NTN                     | RTS
 @ Return Stack:
 @   X ^ Y
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
 NSSVTSTSSTN             | Mark: 101001 (and)
 
 @ Prepare the stack for computation.
@@ -111,6 +112,7 @@ NTN                     | RTS
 @ Return Stack:
 @   X xor Y
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
 NSSVTSTSTTN             | Mark: 101011 (xor)
 SNS                     | DUP
 SSSTTN                  | PUSH 3

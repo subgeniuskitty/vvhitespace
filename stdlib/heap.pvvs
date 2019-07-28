@@ -13,6 +13,7 @@
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
 NSSVTTSSSN              | Mark: 11000 (memset)
 
 @ Store 'pattern' into one memory location on each pass through this loop.
@@ -52,6 +53,7 @@ NTN                     | RTS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
 NSSVTTSSTN              | Mark: 11001 (memcpy)
 
 @ Copy one word on each pass through this loop.
@@ -94,6 +96,7 @@ NTN                     | RTS
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #include <math.pvvs>
+#include <stack.pvvs>
 NSSVTTSTSN              | Mark: 11010 (memrand)
 
 @ Store random word into one memory location on each pass through this loop.
@@ -136,6 +139,7 @@ NTN                     | RTS
 @ Return Stack:
 @   retvalue <-- TOS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
 NSSVTTSTTN              | Mark: 11011 (memcmp)
 
 @ Compare one word on each pass through this loop.
@@ -202,6 +206,7 @@ NTN                     | RTS
 @ Return Stack:
 @   pointer <-- TOS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
 NSSVTTTSSN              | Mark: 11100 (memsrch)
 
 @ Setup an 'offset counter' on the stack.
