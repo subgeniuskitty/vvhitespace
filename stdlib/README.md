@@ -2,7 +2,8 @@
 
 This folder contains a library of useful functions written in VVhitespace.
 Standard include guards are used with `cpp` to include the stdlib in user
-programs. For an example, see `examples/hello-stdlib`.
+programs. For an example, see `examples/hello-stdlib`. This also means
+`cpp` syntax must be respected.
 
 # Reservations #
 
@@ -12,7 +13,7 @@ following reservations:
 ## Label ##
 
     00000000 0xxxxxxx - reserved for stdlib function entry points
-    00000000 1xxxxxxx - unassigned
+    00000000 1xxxxxxx - available for use in user programs
     0xxxxxxx xxxxxxxx - reserved for private use by stdlib
     1xxxxxxx xxxxxxxx - available for use in user programs
 
@@ -20,7 +21,7 @@ following reservations:
 
 The first 16 heap addresses (`0-15`) are reserved when using the stdlib.
 Within that reservation, heap[0] is used by `random` and the block
-heap[2]-heap[15] by the stack rotation subroutines which time-share these
+heap[1]-heap[15] by the stack rotation subroutines which time-share
 pseudo-registers between the various stdlib subroutines.
 
 By convention, functions which return a pointer will use the address `0` to
@@ -76,9 +77,21 @@ header comment for each function to learn the call and return stack.
 
 # Misc #
 
-By convention, each public stdlib label will have 8 bits of
-private label space associated with it, formed as follows:
+## Private Label Space ##
+
+By convention, each public stdlib label will have 8 bits of private label space
+associated with it, formed as follows:
 
     00001000 xxxxxxxx - for use by 1000
     00001001 xxxxxxxx - for use by 1001
     ...etc
+
+## Extending Heap Reservation ##
+
+By default, the stdlib uses the first 16 heap addresses. All heap access (other
+than heap[0] as a seed) occurs through `stackrotate` and `stackrotatereverse`.
+Edit these functions to increase the stdlib's heap reservation.
+
+The remainder of the stdlib is written to automatically use the new allocation.
+Functions like `printf`, for example, allow more substitutions when the heap
+allocation is increased.
