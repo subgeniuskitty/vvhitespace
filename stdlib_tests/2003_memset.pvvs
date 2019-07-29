@@ -1,0 +1,15 @@
+@ Push '42' onto heap[32]-heap[33].
+SSSTSTSTSN      | PUSH 42 (pattern)
+SSSTSSSSSN      | PUSH 32 (address)
+SSSTN           | PUSH 1 (count)
+NSTTTSSSN       | JSR > 11000 (memset)
+
+@ Print heap[32]-heap[33]
+SSSTSSSSTN      | PUSH 33 (end address)
+SSSTSSSSSN      | PUSH 32 (start address)
+NSTTTTSSSN      | JSR > 111000 (dump heap)
+
+NNN             | DIE
+
+#include <heap.pvvs>
+#include <debug.pvvs>
