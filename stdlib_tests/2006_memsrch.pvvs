@@ -1,0 +1,18 @@
+@ Push '42' onto heap[32]-heap[33].
+SSSTSTSTSN      | PUSH 42 (pattern)
+SSSTSSSSSN      | PUSH 32 (address)
+SSSTN           | PUSH 1 (count)
+NSTTTSSSN       | JSR > 11000 (memset)
+
+@ This comparison should return true.
+SSSTSTSTSN      | PUSH 42 (pattern)
+SSSTSSSN        | PUSH 8 (count)
+SSSSTTTSSN      | PUSH 28 (address)
+NSTTTTSSN       | JSR > 11100 (memsrch)
+
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+NNN             | DIE
+
+#include <heap.pvvs>
+#include <stdio.pvvs>

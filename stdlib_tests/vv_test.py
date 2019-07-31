@@ -28,6 +28,7 @@ tests = [
         ['2003_memset', '', '32:\t+42\n33:\t+42\n'],
         ['2004_memcpy', '', '34:\t+42\n35:\t+42\n'],
         ['2005_memcmp', '', '+1'],
+        ['2006_memsrch', '', '+32'],
         ] 
 
 for test in tests:
