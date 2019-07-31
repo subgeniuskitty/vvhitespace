@@ -1,0 +1,28 @@
+@ All zeros to all ones
+SSSSN           | PUSH 0
+NSTTSTSSSN      | JSR > 101000 (not)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ All ones to all zeros
+SSTTN           | PUSH -1
+NSTTSTSSSN      | JSR > 101000 (not)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ Test alternating bits, leading zero.
+@ Note that 6148914691236517205 = 0101...0101
+SSSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTN  | PUSH +6148914691236517205
+NSTTSTSSSN      | JSR > 101000 (not)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ Test alternating bits, leading one.
+@ Note that -6148914691236517206 = 1010...1010 in twos-complement but we 
+@ enter it in sign magnitude format so the bit pattern appears different.
+SSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTTSN | PUSH -6148914691236517206
+NSTTSTSSSN      | JSR > 101000 (not)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ All done.
+NNN             | DIE
+
+#include <logic.pvvs>
+#include <stdio.pvvs>
