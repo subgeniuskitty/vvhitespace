@@ -1,0 +1,29 @@
+@ Shift by zero.
+SSSTN           | PUSH +1
+SSSSN           | PUSH 0
+NSTTSTTSTN      | JSR > 101101 (lshift)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ Shift by one.
+SSSTN           | PUSH +1
+SSSTN           | PUSH +1
+NSTTSTTSTN      | JSR > 101101 (lshift)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ Shift by 62.
+SSSTN           | PUSH +1
+SSSTTTTTSN      | PUSH +62
+NSTTSTTSTN      | JSR > 101101 (lshift)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ Shift by 63.
+SSSTN           | PUSH +1
+SSSTTTTTTN      | PUSH +63
+NSTTSTTSTN      | JSR > 101101 (lshift)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ All done.
+NNN             | DIE
+
+#include <logic.pvvs>
+#include <stdio.pvvs>
