@@ -97,8 +97,17 @@ NTN                     | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #include <math.pvvs>
 NSSVTSSSSTTN            | Mark: 1000011 (print magnitude of number from stack)
-NSTTSSSTN               | JSR > 10001 (absolute value)
 
+@ Catch -(2^63) as a special case since its absolute value will overflow
+@ a twos-complement 64-bit word.
+SNS                     | DUP
+SSTTSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSN | -(2^63)
+TSST                    | SUBTRACT
+NTSSTSSSSTTSSSSSSTSN    | BRZ > 01000011 00000010
+
+@ No special case applies. Prepare for computation by converting the number
+@ to absolute value and preparing a string on the stack.
+NSTTSSSTN               | JSR > 10001 (absolute value)
 SSSSN                   | PUSH ASCII '\0'
 SNT                     | SWAP
 
@@ -125,6 +134,12 @@ NSSVSTSSSSTTSSSSSSSTN   | Mark: 01000011 00000001
 SNN                     | DROP
 NSTTSSSTSSN             | JSR > 1000100 (print string from stack)
 NTN                     | RTS
+
+@ Replace the number on the stack with its decimal ASCII representation.
+NSSVSTSSSSTTSSSSSSTSN   | BRZ > 01000011 00000010
+SNN                     | DROP
+A"-9223372036854775808"
+NSNSTSSSSTTSSSSSSSTN    | JMP > 01000011 00000001
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
