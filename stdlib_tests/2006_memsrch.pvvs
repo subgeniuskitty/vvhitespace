@@ -4,7 +4,7 @@ SSSTSSSSSN      | PUSH 32 (address)
 SSSTN           | PUSH 1 (count)
 NSTTTSSSN       | JSR > 11000 (memset)
 
-@ This comparison should return true.
+@ This search should locate the word at address 32.
 SSSTSTSTSN      | PUSH 42 (pattern)
 SSSTSSSN        | PUSH 8 (count)
 SSSSTTTSSN      | PUSH 28 (address)
