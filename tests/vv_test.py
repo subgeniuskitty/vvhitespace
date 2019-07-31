@@ -37,6 +37,7 @@ tests = [
         ['5002_io_output_digit', '', '2'],
         ['5003_io_input_character', 'A', 'A'],
         ['5004_io_input_digit', '1', '1'],
+        ['6001_push_intmin', '', '1'],
         ] 
 
 for test in tests:

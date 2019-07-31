@@ -162,14 +162,26 @@ process_imp_stack(uint8_t * code, size_t * pc, int64_t ** sp)
 
                 /* Now, construct the number and push to TOS. */
                 /* I'm assuming the numbers are read MSb first. */
-                int64_t number = 0;
+                uint64_t number = 0; /* Unsigned to accomodate magnitude of most negative number. */
                 uint8_t temp;
                 while ((temp = next_code_byte(code,pc)) != '\n') {
                     if (temp == '\v') ws_die(pc, "non-binary digit in number");
                     number <<= 1;
                     if (temp == '\t') number++;
                 }
-                stack_push(sp, number*sign);
+                /* Without temporarily casting to something >64-bit, the most negative */
+                /* number will overflow when performing 'number*sign'. Instead, we     */
+                /* pick off the most negative number as a special case.                */
+                if (number == (1ULL << 63) && sign == -1) {
+                    /* C parses negative integer literals first as signed positive */
+                    /* integer literals, then applying a unary negation operator.  */
+                    /* Thus, the most negative value is unreachable directly.      */
+                    int64_t number_temp = -9223372036854775807LL; /* First store -((2^63)-1)  */
+                    number_temp--;                                /* Now turn it into -(2^63) */
+                    stack_push(sp, number_temp);
+                } else {
+                    stack_push(sp, number*sign);
+                }
             }
             break;
         case '\n':

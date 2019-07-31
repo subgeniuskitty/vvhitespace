@@ -1,0 +1,22 @@
+@ This tests the interpreters ability to push the
+@ most negative number directly to the stack.
+
+@ Construct the number -(2^63) on the stack indirectly.
+SSTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTN  | -((2^63)-1)
+SSSTN                                                                | PUSH 1
+TSST                                                                 | SUBTRACT
+
+@ Now push -(2^63) directly onto the stack.
+SSTTSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSN | -(2^63)
+
+@ See if the interpreter thinks -((2^63)-1) - 1 == -(2^63)
+@ Print 1 for true and 0 for false.
+TSST   | SUBTRACT
+NTSTN  | BRZ > 1
+SSSSN  | PUSH 0
+TNST   | PUTDIGIT
+NNN    | DIE
+NSSVTN | Mark: 1
+SSSTN  | PUSH 1
+TNST   | PUTDIGIT
+NNN    | DIE
