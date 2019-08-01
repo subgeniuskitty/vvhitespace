@@ -22,6 +22,18 @@ SSSTTTTTTN      | PUSH +63
 NSTTSTTSTN      | JSR > 101101 (lshift)
 NSTTSSTN        | JSR > 1001 (print number from stack)
 
+@ Shift all ones until a single one remains.
+SSTTN           | PUSH -1
+SSSTTTTTTN      | PUSH +63
+NSTTSTTSTN      | JSR > 101101 (lshift)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ Shift all ones to all zeros.
+SSTTN           | PUSH -1
+SSSTSSSSSSN     | PUSH +64
+NSTTSTTSTN      | JSR > 101101 (lshift)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
 @ All done.
 NNN             | DIE
 
