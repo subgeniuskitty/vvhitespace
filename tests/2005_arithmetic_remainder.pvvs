@@ -1,7 +1,31 @@
 # This test verifies arithmetic IMP remainder.
 
+# First, verify basic function with two positive numbers.
 SSSTTSSSSTSN    | ST: Push +194
 SSSTSSSSSSTN    | ST: Push +128
 TSTT            | MA: Remainder
 TNSS            | IO: Output character
+
+# The VVS modulo function should always return a positive value.
+# C-derived languages (among others) do not share this convention.
+
+# This test verifies that -3 mod 2 = 1.
+SSTTTN          | ST: Push -3
+SSSTSN          | ST: Push +2
+TSTT            | MA: Remainder
+TNST            | IO: Output digit
+
+# This test verifies that -3 mod -2 = 1.
+SSTTTN          | ST: Push -3
+SSTTSN          | ST: Push -2
+TSTT            | MA: Remainder
+TNST            | IO: Output digit
+
+# This test verifies that -3 mod -(2^63) = 3.
+SSTTTN          | ST: Push -3
+SSTTSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSN | PUSH -(2^63)
+TSTT            | MA: Remainder
+TNST            | IO: Output digit
+
+# All done
 NNN             | FC: Terminate program

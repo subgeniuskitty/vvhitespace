@@ -253,7 +253,7 @@ process_imp_arithmetic(uint8_t * code, size_t * pc, int64_t ** sp)
                     case '\t':
                         /* Modulo */
                         temp = stack_pop(sp);
-                        stack_push(sp, stack_pop(sp)%temp);
+                        stack_push(sp, llabs(stack_pop(sp) % llabs(temp)));
                         break;
                     default: ws_die(pc, "malformed arithmetic IMP"); break;
                 }

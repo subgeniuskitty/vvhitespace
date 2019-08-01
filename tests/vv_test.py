@@ -24,7 +24,7 @@ tests = [
         ['2002_arithmetic_subtraction', '', 'A'],
         ['2003_arithmetic_multiplication', '', 'B'],
         ['2004_arithmetic_division', '', 'A'],
-        ['2005_arithmetic_remainder', '', 'A'],
+        ['2005_arithmetic_remainder', '', 'A113'],
         ['3001_heap', '', 'BCA'],
         ['4001_flowcontrol_exit', '', ''],
         ['4002_flowcontrol_unconditional_jump_to_label', '', 'A'],

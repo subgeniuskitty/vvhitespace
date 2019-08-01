@@ -66,7 +66,7 @@ the IMP [Space]. There are four stack instructions.
 
 Arithmetic commands operate on the top two items on the stack, and replace them
 with the result of the operation. The first item pushed is considered to be
-left of the operator.
+left of the operator. The modulo command will always return a positive result.
 
 | Command        | Params | Meaning          |
 | :------------- | :----- | :--------------- |
