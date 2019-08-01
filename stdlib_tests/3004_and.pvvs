@@ -1,0 +1,37 @@
+@ Test 0 ^ 0 = 0
+SSSSN           | PUSH 0
+SSSSN           | PUSH 0
+NSTTSTSSTN      | JSR > 101001 (and)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ Test 0 ^ 1 = 0
+SSSSN           | PUSH 0
+SSSTN           | PUSH +1
+NSTTSTSSTN      | JSR > 101001 (and)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ Test 1 ^ 1 = 1
+SSSTN           | PUSH +1
+SSSTN           | PUSH +1
+NSTTSTSSTN      | JSR > 101001 (and)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ Test 1 ^ 1...1 = 1
+SSSTN           | PUSH +1
+SSTTN           | PUSH -1
+NSTTSTSSTN      | JSR > 101001 (and)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ Test 1010...1010 ^ 111111 = 101010
+@ Note that -6148914691236517206 = 1010...1010 in twos-complement but we 
+@ enter it in sign magnitude format so the bit pattern appears different.
+SSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTTSN | PUSH -6148914691236517206
+SSSTTTTTTN      | PUSH +63
+NSTTSTSSTN      | JSR > 101001 (and)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ All done.
+NNN             | DIE
+
+#include <logic.pvvs>
+#include <stdio.pvvs>
