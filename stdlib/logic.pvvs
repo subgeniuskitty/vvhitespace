@@ -138,13 +138,17 @@ NTN                     | RTS
 @   X >> shiftcount
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTSTTSSN             | Mark: 101100 (rshift)
-
 @ Test for loop completion first since it is allowable to shift by zero.
-NSSVSSTSTTSSSSSSSSSTN   | Mark: 00101100 00000001
 SNS                     | DUP
 NTSSSTSTTSSSSSSSSSSN    | BRZ > 00101100 00000000
-@ Shift by one bit on each pass.
+
+@ Negative numbers need special handling.
 SNT                     | SWAP
+SNS                     | DUP
+NTTSSTSTTSSSSSSSTSTN    | BMI > 00101100 00000101
+
+@ Shift by one bit on each pass.
+NSSVSSTSTTSSSSSSSTSSN   | Mark: 00101100 00000100
 SSSTSN                  | PUSH 2
 TSTS                    | DIVIDE
 @ Decrement the counter.
@@ -152,12 +156,22 @@ SNT                     | SWAP
 SSSTN                   | PUSH 1
 TSST                    | SUBTRACT
 @ Loop again.
-NSNSSTSTTSSSSSSSSSTN    | JMP > 00101100 00000001
+NSNTSTTSSN              | JMP > 101100 (rshift)
 
-@ Clean up and return.
+@ Clean up
 NSSVSSTSTTSSSSSSSSSSN   | Mark: 00101100 00000000
 SNN                     | DROP
 NTN                     | RTS
+
+@ Found a negative number. Subtract one before proceeding if odd.
+NSSVSSTSTTSSSSSSSTSTN   | Mark: 00101100 00000101
+SNS                     | DUP
+SSSTSN                  | PUSH 2
+TSTT                    | MODULO
+NTSSSTSTTSSSSSSSTSSN    | BRZ > 00101100 00000100
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+NSNSSTSTTSSSSSSSTSSN    | JMP > 00101100 00000100
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
