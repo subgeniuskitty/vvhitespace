@@ -26,8 +26,8 @@ print_usage(char ** argv)
 }
 
 /* Builds an ASCII string on the stack using VVS PUSH_IMMEDIATE commands.    */
-/* The syntax: A"test" results in six PUSH_IMMEDIATE commands for the four   */
-/*   letters, newline, and null-terminator.                                  */
+/* The syntax: A"test" results in five PUSH_IMMEDIATE commands for the four  */
+/*   letters, and null-terminator.                                           */
 /* Expects 'input' to present a double-quoted ('"') ASCII string.            */
 /* The 'A' has already been chomped.                                         */
 void
@@ -65,6 +65,9 @@ parse_ascii_string(FILE * input, FILE * output)
         fseek(input, -2, SEEK_CUR);
         fread(&temp_byte, 1, 1, input);
     }
+
+    /* Advance the stream pointer to the end of the string before returning. */
+    for (fread(&temp_byte,1,1,input); temp_byte != '"'; fread(&temp_byte,1,1,input)) continue;
 }
 
 int
