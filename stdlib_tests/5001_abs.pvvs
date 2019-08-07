@@ -1,0 +1,26 @@
+@ +1 should remain +1
+SSSTN           | PUSH +1
+NSTTSSSTN       | JSR > 10001 (abs)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ -1 should become +1
+SSTTN           | PUSH -1
+NSTTSSSTN       | JSR > 10001 (abs)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ 0 should remain 0
+SSSSN           | PUSH 0
+NSTTSSSTN       | JSR > 10001 (abs)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+@ Test the most negative number.
+@ It is impossible to return the true absolute value but should return zero.
+SSSTN           | PUSH +1
+SSSTTTTTTN      | PUSH +63
+NSTTSTTSTN      | JSR > 101101 (lshift)
+NSTTSSSTN       | JSR > 10001 (abs)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+NNN             | DIE
+
+#include <logic.pvvs>
+#include <stdio.pvvs>

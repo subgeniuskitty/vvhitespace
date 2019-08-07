@@ -46,6 +46,17 @@ NTN                     | RTS
 @   abs(signed number)  <-- TOS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 NSSVTSSSTN              | Mark: 10001 (absolute value)
+
+@ Catch -(2^63) as a special case since its absolute value will overflow
+@ a twos-complement 64-bit word. Return zero as though the absolute value
+@ overflowed to the bottom of the non-negative integers rather than
+@ overflowing back to the most negative integer.
+SNS                     | DUP
+SSTTSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSN | -(2^63)
+TSST                    | SUBTRACT
+NTSSSSTSSSTSSSSSSTSN    | BRZ > 00010001 00000010
+
+@ Handle all the other numbers.
 SNS                     | DUP
 NTTSSSTSSSTSSSSSSSSN    | BMI > 00010001 00000000
 NSNSSSTSSSTSSSSSSSTN    | JMP > 00010001 00000001
@@ -53,6 +64,12 @@ NSSVSSSTSSSTSSSSSSSSN   | Mark: 00010001 00000000
 SSTTN                   | PUSH -1
 TSSN                    | MULTIPLY
 NSSVSSSTSSSTSSSSSSSTN   | Mark: 00010001 00000001
+NTN                     | RTS
+
+@ Special case: Push 0 and return.
+NSSVSSSTSSSTSSSSSSTSN   | Mark: 00010001 00000010
+SNN                     | DROP
+SSSSN                   | PUSH 0
 NTN                     | RTS
 
 #endif
