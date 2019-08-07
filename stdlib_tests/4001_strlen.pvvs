@@ -1,0 +1,14 @@
+A"Hello World"
+SSSTSSSSSN      | PUSH 32 (address)
+SSSTSTTN        | PUSH 11 (count)
+NSTTTTTTN       | JSR > 11111 (spew)
+
+SSSTSSSSSN      | PUSH 32 (address)
+NSTTSSSSSN      | JSR > 100000 (strlen)
+NSTTSSTN        | JSR > 1001 (print number from stack)
+
+NNN             | DIE
+
+#include <stdio.pvvs>
+#include <heap.pvvs>
+#include <string.pvvs>
