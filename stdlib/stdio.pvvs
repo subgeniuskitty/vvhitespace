@@ -259,7 +259,7 @@ TSST                    | SUBTRACT
 NTSSSSSTSSSSSSSSTSSN    | BRZ > 00001000 00000100
 @ Check for ASCII '\t'
 SNS                     | DUP
-SSSTSSTN                | PUSH ASCII '\t'
+SSSTTTSTSSN             | PUSH ASCII 't'
 TSST                    | SUBTRACT
 NTSSSSSTSSSSSSSSTSTN    | BRZ > 00001000 00000101
 @ No substitution necessary. Print literally.

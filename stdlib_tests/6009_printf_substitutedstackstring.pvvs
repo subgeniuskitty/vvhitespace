@@ -1,0 +1,20 @@
+@ First setup a string on the heap for use as a substitution.
+A"test"
+SSSTSSSSSN      | PUSH 32 (address)
+SSSTSSN         | PUSH 4 (count)
+NSTTTTTTN       | JSR > 11111 (spew)
+
+@ Now prepare arguments and call printf.
+A"%c%s%d%u%i"
+SSSTSTSTSN      | PUSH +42
+SSSTSTSTSN      | PUSH +42
+SSSTN           | PUSH +1
+SSSTSSSSSN      | PUSH +32 (address)
+SSSTSSSSSTN     | PUSH ASCII 'A'
+SSSTSTN         | PUSH 5 (number of substitutions)
+NSTTSSSN        | JSR > 1000 (printf)
+
+NNN             | DIE
+
+#include <heap.pvvs>
+#include <stdio.pvvs>

@@ -39,6 +39,15 @@ tests = [
         ['4001_strlen', '', '+11'],
         ['5001_abs', '', '+1+1+0+0'],
         ['5002_random', '', ''],
+        ['6001_printstackstring', '', 'test'],
+        ['6002_printheapstring', '', 'test'],
+        ['6003_printnumbersign', '', '+-'],
+        ['6004_printnumbermagnitude', '', '323209223372036854775808'],
+        ['6005_printstacknumber', '', '+32-32+0-9223372036854775808'],
+        ['6006_printf_staticstackstring', '', 'test'],
+        ['6007_printf_staticheapstring', '', 'test'],
+        ['6008_printf_escapedstackstring', '', '\\%\t\n'],
+        ['6009_printf_substitutedstackstring', '', 'Atest142+42'],
         ] 
 
 for test in tests:

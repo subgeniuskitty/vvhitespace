@@ -1,0 +1,7 @@
+A"\\\%\t\n"
+SSSSN           | PUSH 0 (number of substitutions)
+NSTTSSSN        | JSR > 1000 (printf)
+
+NNN             | DIE
+
+#include <stdio.pvvs>

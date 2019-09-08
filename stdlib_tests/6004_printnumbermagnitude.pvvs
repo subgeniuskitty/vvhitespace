@@ -1,0 +1,15 @@
+SSSTSSSSSN      | PUSH +32
+NSTTSSSSTTN     | JSR > 1000011 (printnumbermagnitude)
+
+SSTTSSSSSN      | PUSH -32
+NSTTSSSSTTN     | JSR > 1000011 (printnumbermagnitude)
+
+SSTSN           | PUSH -0
+NSTTSSSSTTN     | JSR > 1000011 (printnumbermagnitude)
+
+SSTTSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSN | -(2^63)
+NSTTSSSSTTN     | JSR > 1000011 (printnumbermagnitude)
+
+NNN             | DIE
+
+#include <stdio.pvvs>

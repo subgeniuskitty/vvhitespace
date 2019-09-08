@@ -1,0 +1,9 @@
+SSSTSSSSSN      | PUSH +32
+NSTTSSSSTSN     | JSR > 1000010 (printnumbersign)
+
+SSTTSSSSSN      | PUSH -32
+NSTTSSSSTSN     | JSR > 1000010 (printnumbersign)
+
+NNN             | DIE
+
+#include <stdio.pvvs>

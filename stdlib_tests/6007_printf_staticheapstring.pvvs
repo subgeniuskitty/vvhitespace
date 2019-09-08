@@ -1,0 +1,14 @@
+A"test"
+SSSTSSSSSN      | PUSH 32 (address)
+SSSTSSN         | PUSH 4 (count)
+NSTTTTTTN       | JSR > 11111 (spew)
+
+SSSTSSSSSN      | PUSH 32 (address)
+SSSSN           | PUSH 0 (string terminator)
+SSSSN           | PUSH 0 (number of substitutions)
+NSTTSSSN        | JSR > 1000 (printf)
+
+NNN             | DIE
+
+#include <heap.pvvs>
+#include <stdio.pvvs>

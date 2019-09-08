@@ -1,0 +1,5 @@
+A"test"
+NSTTSSSTSSN     | JSR > 1000100 (printstackstring)
+NNN             | DIE
+
+#include <stdio.pvvs>

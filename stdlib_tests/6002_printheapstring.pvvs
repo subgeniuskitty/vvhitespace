@@ -1,0 +1,12 @@
+A"test"
+SSSTSSSSSN      | PUSH 32 (address)
+SSSTSSN         | PUSH 4 (count)
+NSTTTTTTN       | JSR > 11111 (spew)
+
+SSSTSSSSSN      | PUSH 32 (address)
+NSTTSSSTSTN     | JSR > 1000101 (printheapstring)
+
+NNN             | DIE
+
+#include <heap.pvvs>
+#include <stdio.pvvs>

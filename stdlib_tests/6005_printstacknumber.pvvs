@@ -1,0 +1,15 @@
+SSSTSSSSSN      | PUSH +32
+NSTTSSTN        | JSR > 1001 (printstacknumber)
+
+SSTTSSSSSN      | PUSH -32
+NSTTSSTN        | JSR > 1001 (printstacknumber)
+
+SSTSN           | PUSH -0
+NSTTSSTN        | JSR > 1001 (printstacknumber)
+
+SSTTSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSN | -(2^63)
+NSTTSSTN        | JSR > 1001 (printstacknumber)
+
+NNN             | DIE
+
+#include <stdio.pvvs>
