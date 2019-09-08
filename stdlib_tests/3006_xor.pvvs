@@ -2,25 +2,25 @@
 SSSSN           | PUSH 0
 SSSSN           | PUSH 0
 NSTTSTSTTN      | JSR > 101110 (xor)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Test 0 xor 1 = 1
 SSSSN           | PUSH 0
 SSSTN           | PUSH +1
 NSTTSTSTTN      | JSR > 101110 (xor)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Test 1 xor 1 = 0
 SSSTN           | PUSH +1
 SSSTN           | PUSH +1
 NSTTSTSTTN      | JSR > 101110 (xor)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Test 1 xor 1...1 = 1...10
 SSSTN           | PUSH +1
 SSTTN           | PUSH -1
 NSTTSTSTTN      | JSR > 101110 (xor)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Test 1010...1010 xor 0101...0101 = 1...1
 @ Note that -6148914691236517206 = 1010...1010 in twos-complement but we 
@@ -28,10 +28,10 @@ NSTTSSTN        | JSR > 1001 (print number from stack)
 SSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTTSN | PUSH -6148914691236517206
 SSSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTSTN  | PUSH +6148914691236517205
 NSTTSTSTTN      | JSR > 101110 (xor)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ All done.
 NNN             | DIE
 
 #include <logic.pvvs>
-#include <stdio.pvvs>
+#include <debug.pvvs>

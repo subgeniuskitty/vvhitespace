@@ -2,19 +2,19 @@
 SSSTN           | PUSH +1
 SSSSN           | PUSH 0
 NSTTSTTSSN      | JSR > 101100 (rshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Shift by one, positive sign extension.
 SSSTSN          | PUSH +2
 SSSTN           | PUSH +1
 NSTTSTTSSN      | JSR > 101100 (rshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Shift by four, positive sign extension.
 SSSTSSSSN       | PUSH +16
 SSSTSSN         | PUSH +4
 NSTTSTTSSN      | JSR > 101100 (rshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Shift by one, negative sign extension.
 @ -9223372036854775805 = 1000000000000000000000000000000000000000000000000000000000000011
@@ -22,7 +22,7 @@ NSTTSSTN        | JSR > 1001 (print number from stack)
 SSTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTSTN | PUSH -9223372036854775805
 SSSTN           | PUSH +1
 NSTTSTTSSN      | JSR > 101100 (rshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Shift by four, negative sign extension
 @ -9223372036854775638 = 1000000000000000000000000000000000000000000000000000000010101010
@@ -30,22 +30,22 @@ NSTTSSTN        | JSR > 1001 (print number from stack)
 SSTSTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTSTSTSTTSN | PUSH -9223372036854775638
 SSSTSSN         | PUSH +4
 NSTTSTTSSN      | JSR > 101100 (rshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Test for special case: rshift(-1) = -1
 SSTTN           | PUSH -1
 SSSTN           | PUSH +1
 NSTTSTTSSN      | JSR > 101100 (rshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Shift a single 1 in the MSb into all ones
 SSTTSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSN | PUSH -(2^63)
 SSSTTTTTTN      | PUSH +63
 NSTTSTTSSN      | JSR > 101100 (rshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ All done.
 NNN             | DIE
 
 #include <logic.pvvs>
-#include <stdio.pvvs>
+#include <debug.pvvs>

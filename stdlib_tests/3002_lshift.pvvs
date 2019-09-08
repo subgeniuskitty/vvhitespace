@@ -2,40 +2,40 @@
 SSSTN           | PUSH +1
 SSSSN           | PUSH 0
 NSTTSTTSTN      | JSR > 101101 (lshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Shift by one.
 SSSTN           | PUSH +1
 SSSTN           | PUSH +1
 NSTTSTTSTN      | JSR > 101101 (lshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Shift by 62.
 SSSTN           | PUSH +1
 SSSTTTTTSN      | PUSH +62
 NSTTSTTSTN      | JSR > 101101 (lshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Shift by 63.
 SSSTN           | PUSH +1
 SSSTTTTTTN      | PUSH +63
 NSTTSTTSTN      | JSR > 101101 (lshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Shift all ones until a single one remains.
 SSTTN           | PUSH -1
 SSSTTTTTTN      | PUSH +63
 NSTTSTTSTN      | JSR > 101101 (lshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ Shift all ones to all zeros.
 SSTTN           | PUSH -1
 SSSTSSSSSSN     | PUSH +64
 NSTTSTTSTN      | JSR > 101101 (lshift)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 @ All done.
 NNN             | DIE
 
 #include <logic.pvvs>
-#include <stdio.pvvs>
+#include <debug.pvvs>

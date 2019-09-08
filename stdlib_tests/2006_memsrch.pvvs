@@ -10,9 +10,9 @@ SSSTSSSN        | PUSH 8 (count)
 SSSSTTTSSN      | PUSH 28 (address)
 NSTTTTSSN       | JSR > 11100 (memsrch)
 
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 NNN             | DIE
 
 #include <heap.pvvs>
-#include <stdio.pvvs>
+#include <debug.pvvs>

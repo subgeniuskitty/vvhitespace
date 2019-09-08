@@ -24,7 +24,7 @@
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-NSSVTTTSSSN              | Mark: 111000 (dump heap)
+NSSVTTTSSSN              | Mark: 111000 (debug:dumpheap)
 
 @ Prepare a numeric address and value on the stack
 SNS                      | DUP
@@ -74,7 +74,7 @@ NTN                      | RTS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-NSSVTTTSSTN              | Mark: 111001 (dump stack)
+NSSVTTTSSTN              | Mark: 111001 (debug:dumpstack)
 
 @ Orient the user
 SSSSSSSSSN               | PUSH ASCII '\0'
@@ -202,6 +202,23 @@ TNSS                    | Print character
 NSNTTTTSSN              | JMP > 111100
 NSSVSSTTTTSSSSSSSSSTN   | Mark: 00111100 00000001
 SNN                     | DROP
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   printsignednumber (111101)
+@ Description:
+@   Prints 'number' from the stack in sign-magnitude format.
+@   Leading zeros are suppressed.
+@ Call Stack:
+@   number  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTTTSTN             | Mark: 111101 (debug:printsignednumber)
+SNS                     | DUP
+NSTTTTSTSN              | JSR > 111010 (debug:printsign)
+NSTTTTSTTN              | JSR > 111011 (debug:printmagnitude)
 NTN                     | RTS
 
 #endif

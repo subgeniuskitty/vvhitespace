@@ -5,10 +5,10 @@ NSTTTTTTN       | JSR > 11111 (spew)
 
 SSSTSSSSSN      | PUSH 32 (address)
 NSTTSSSSSN      | JSR > 100000 (strlen)
-NSTTSSTN        | JSR > 1001 (print number from stack)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
 
 NNN             | DIE
 
-#include <stdio.pvvs>
+#include <debug.pvvs>
 #include <heap.pvvs>
 #include <string.pvvs>
