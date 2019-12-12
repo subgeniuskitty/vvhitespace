@@ -223,8 +223,8 @@ NTN                     | RTS
 @   stack word n
 @   ...
 @   stack word 1
-@   dupdepth  <-- TOS
-@ Return Stack:
+@   dupdepth   <-- TOS
+@ Return Stack: (dupdepth=3)
 @   stack word n
 @   ...
 @   stack word 1
