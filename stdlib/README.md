@@ -42,6 +42,7 @@ header comment for each function to learn the call and return stack.
          010xxx - math functions
           10000 ----- random                        (math.pvvs)
           10001 ----- absolute value                (math.pvvs)
+          10010 ----- greatest common divisor       (math.pvvs)
          011xxx - heap functions
           11000 ----- memset                        (heap.pvvs)
           11001 ----- memcpy                        (heap.pvvs)

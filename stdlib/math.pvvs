@@ -72,4 +72,64 @@ SNN                     | DROP
 SSSSN                   | PUSH 0
 NTN                     | RTS
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   gcd (10010)
+@ Description:
+@   Returns greatest common divisor of X and Y.
+@ Call Stack:
+@   Y
+@   X  <-- TOS
+@ Return Stack:
+@   gcd(X,Y)  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
+NSSVTSSTSN              | Mark: 10010 (gcd)
+
+@ Since 1 > -1, transform problem into gcd(abs(X),abs(Y)).
+SNT                     | SWAP
+NSTTSSSTN               | JSR > 10001 (abs)
+SNT                     | SWAP
+NSTTSSSTN               | JSR > 10001 (abs)
+
+@ Verify neither operand is zero.
+SNT                     | SWAP
+SNS                     | DUP
+NTSSSSTSSTSSSSSSSSSN    | BRZ > 00010010 00000000 (gcd:zero input)
+SNT                     | SWAP
+SNS                     | DUP
+NTSSSSTSSTSSSSSSSSSN    | BRZ > 00010010 00000000 (gcd:zero input)
+
+@ Verify X != Y and sort X,Y so the smaller is TOS.
+SNS                     | DUP
+SSSTTN                  | PUSH 3
+NSTTTSSN                | JSR > 1100 (deepdup)
+SNT                     | SWAP
+TSST                    | SUBTRACT
+@ TOS> Y-X, X, Y
+NTTSSSTSSTSSSSSSSSTN    | BMI > 00010010 00000001 (gcd:swap inputs)
+NSNSSSTSSTSSSSSSSTSN    | JMP > 00010010 00000010 (gcd:main loop)
+NSSVSSSTSSTSSSSSSSSTN   | MARK: 00010010 00000001 (gcd:swap inputs)
+SNT                     | SWAP
+
+@ Main gcd loop.
+@ Euclidean algorithm.
+NSSVSSSTSSTSSSSSSSTSN   | MARK: 00010010 00000010 (gcd:main loop)
+SNS                     | DUP
+SSSTTN                  | PUSH 3
+NSTTSTSN                | JSR > 1010 (stackrotate)
+TSTT                    | MODULO
+SNS                     | DUP
+NTSSSSTSSTSSSSSSSTTN    | BRZ > 00010010 00000011 (gcd:loop termination)
+NSNSSSTSSTSSSSSSSTSN    | JMP > 00010010 00000010 (gcd:main loop)
+NSSVSSSTSSTSSSSSSSTTN   | MARK: 00010010 00000011 (gcd:loop termination)
+SNN                     | DROP
+NTN                     | RTS
+
+@ At least one operand was zero.
+@ Since we define gcd(a,0) = a, return the other operand.
+NSSVSSSTSSTSSSSSSSSSN   | MARK: 00010010 00000000 (gcd:zero input)
+SNN                     | DROP
+NTN                     | RTS
+
 #endif

@@ -1,0 +1,41 @@
+@ Verify gcd(0,0) = 0
+SSSSN           | PUSH 0
+SSSSN           | PUSH 0
+NSTTSSTSN       | JSR > 10010 (math:gcd)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
+
+@ Verify gcd(4,0) = 4
+SSSSN           | PUSH 0
+SSSTSSN         | PUSH 4
+NSTTSSTSN       | JSR > 10010 (math:gcd)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
+
+@ Verify gcd(0,4) = 4
+SSSTSSN         | PUSH 4
+SSSSN           | PUSH 0
+NSTTSSTSN       | JSR > 10010 (math:gcd)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
+
+@ Verify gcd(6,9) = 3
+SSSTSSTN        | PUSH 9
+SSSTTSN         | PUSH 6
+NSTTSSTSN       | JSR > 10010 (math:gcd)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
+
+@ Verify gcd(-6,9) = 3 
+SSSTSSTN        | PUSH 9
+SSTTTSN         | PUSH -6
+NSTTSSTSN       | JSR > 10010 (math:gcd)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
+
+@ Verify gcd(-9,6) = 3
+SSTTSSTN        | PUSH -9
+SSSTTSN         | PUSH 6
+NSTTSSTSN       | JSR > 10010 (math:gcd)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
+
+
+NNN             | DIE
+
+#include <math.pvvs>
+#include <debug.pvvs>
