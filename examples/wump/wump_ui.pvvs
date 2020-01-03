@@ -1,0 +1,255 @@
+#ifndef WUMP_UI
+#define WUMP_UI
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ This files contains user interface functions for Hunt the Wumpus.
+@ (c) 2019 Aaron Taylor <ataylor at subgeniuskitty dot com>
+@ See LICENSE.txt file for copyright and license details.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   seed_rng
+@ Description:
+@   Generate seed from keyboard input.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <logic.pvvs>
+NSSVTSSSSSTTN         | MARK: 10000011 (seed_rng)
+
+SSSTSSSSN             | PUSH 16 (loop counter)
+SSSSN                 | PUSH 0 (rng seed)
+
+NSSVTSSSSSTTSSSSSSSSN | MARK: 10000011 00000000 (seed_rng:main loop)
+@ Get character from user and print ASCII '.' as feedback.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TNTS                  | GETCHAR
+SSSTSTTTSN            | PUSH ASCII '.'
+TNSS                  | PUTCHAR
+@ Left shift the seed by 4 bits.
+SSSTSSN               | PUSH 4 (shift count)
+NSTTSTTSTN            | JSR > 101101 (lshift)
+@ XOR seed with character from user.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TTT                   | LOAD
+NSTTSTSTTN            | JSR > 101011 (xor)
+@ Decrement counter
+SNT                   | SWAP
+SSSTN                 | PUSH +1
+TSST                  | SUBTRACT
+@ Test for loop completion
+SNS                   | DUP
+NTSTSSSSSTTSSSSSSSTN  | BRZ > 10000011 00000001 (seed_rng:cleanup and return)
+SNT                   | SWAP
+NSNTSSSSSTTSSSSSSSSN  | JMP > 10000011 00000000 (seed_rng:main loop)
+
+@ Store seed, clean up and return.
+NSSVTSSSSSTTSSSSSSSTN | MARK: 10000011 00000001 (seed_rng:cleanup and return)
+SNN                   | DROP
+SSSSN                 | PUSH 0 (seed address)
+SNT                   | SWAP
+TTS                   | STORE
+SSSTSTSN              | PUSH ASCII '\n'
+SSSTSTSN              | PUSH ASCII '\n'
+TNSS                  | PUTCHAR
+TNSS                  | PUTCHAR
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   get_answer
+@ Description:
+@   Parse user input, returning 0 if user string started with 'n' or 1 if 'y'.
+@   This function does not perform any boundary checks/limits.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   (1 or 0 for True/False)   <--- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stdio.pvvs>
+NSSVTSSTTSSSN         | MARK: 10011000 (get_answer)
+
+@ TODO: Consider extending the GETCHAR instruction in VVS to indicate an empty
+@       buffer instead of blocking. This would allow a character by character
+@       check without printing a slew of retry messages if the buffer is
+@       non-empty.
+NSTTSSTTSSTN          | JSR > 10011001 (get_line)
+
+@ Examine the first character of the user input buffer for 'y' or 'n'.
+@ If character is something else, prompt user to try again.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TTT                   | LOAD
+SSSSTTTTSSTN          | PUSH 121 (ASCII 'y')
+TSST                  | SUBTRACT
+NTSTSSTTSSSSSSSSSSSN  | BRZ > 10011000 00000000 (answer: yes)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TTT                   | LOAD
+SSSSTTSTTTSN          | PUSH 110 (ASCII 'n')
+TSST                  | SUBTRACT
+NTSTSSTTSSSSSSSSSSTN  | BRZ > 10011000 00000001 (answer: no)
+NSTTTTTTTTTSSSSTSSSN  | JSR > 11111111 00001000 (problem_with_yes_no_answer)
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSNTSSTTSSSN          | JMP > 10011000 (get_answer)
+
+@ User typed 'y'
+NSSVTSSTTSSSSSSSSSSSN | MARK: 10011000 00000000 (answer: yes)
+SSSTN                 | PUSH 1
+NTN                   | RTS
+
+@ User typed 'n'
+NSSVTSSTTSSSSSSSSSSTN | MARK: 10011000 00000001 (answer: no)
+SSSSN                 | PUSH 0
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   get_line
+@ Description:
+@   Read one line of user input and store in buffer.
+@   Appends null terminator to end of string.
+@   This function does not perform any boundary checks/limits.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSTTSSTN         | MARK: 10011001 (get_line)
+
+@ Get one character from user on each pass through this loop.
+@ Terminate loop when line break character is received.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+NSSVTSSTTSSTSSSSSSSSN | MARK: 10011001 00000000 (input loop)
+SNS                   | DUP
+SNS                   | DUP
+TNTS                  | GETCHAR
+TTT                   | LOAD
+SNS                   | DUP
+TNSS                  | PUTCHAR
+SSSTSTSN              | PUSH 10 (ASCII '\n')
+TSST                  | SUBTRACT
+NTSTSSTTSSTSSSSSSSTN  | BRZ > 10011001 00000001 (input loop:terminate)
+@ Character was not ENTER. Increment buffer pointer and loop again.
+SSSTN                 | PUSH 1
+TSSS                  | ADD
+NSNTSSTTSSTSSSSSSSSN  | JMP > 10011001 00000000 (input loop)
+@ Character was ENTER. Overwrite the line feed with a null term and return.
+NSSVTSSTTSSTSSSSSSSTN | MARK: 10011001 00000001 (input loop:terminate)
+SSSSN                 | PUSH 0 (ASCII '\0')
+TTS                   | STORE
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   print_cave_description
+@ Description:
+@   Prints information about the cave (number of rooms, etc).
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stdio.pvvs>
+NSSVTSSTTSTTN         | MARK: 10011011 (print_cave_description)
+NSTTTTTTTTTSSSSTSTSN  | JSR > 11111111 00001010 (cave_description)
+SSSTSSSSSSSSSTSTN     | PUSH 0x1005 (number_of_arrows address)
+TTT                   | LOAD
+SSSTSSSSSSSSSSSTN     | PUSH 0x1001 (number_of_pits address)
+TTT                   | LOAD
+SSSTSSSSSSSSSSTSN     | PUSH 0x1002 (number_of_bats address)
+TTT                   | LOAD
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (number_of_tunnels address)
+TTT                   | LOAD
+SSSTSSSSSSSSSSSSN     | PUSH 0x1000 (number_of_rooms address)
+TTT                   | LOAD
+SSSTSTN               | PUSH 5 (number of substitions)
+NSTTSSSN              | JSR > 1000 (printf)
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   print_room_stats
+@ Description:
+@   Prints information about current room and hints about nearby rooms.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <wump_game.pvvs>
+#include <stdio.pvvs>
+#include <stack.pvvs>
+NSSVTSTSSSSTN         | MARK: 10100001 (print_room_stats)
+
+@ Print location and arrow quantity remaining.
+A"You are in room %u of the cave and have %u arrows remaining.\n"
+SSSTSSSSSSSSSTSTN     | PUSH 0x1005 (number_of_arrows address)
+TTT                   | LOAD
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (player_location address)
+TTT                   | LOAD
+SSSTSN                | PUSH 2 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+
+@ Print if bats/pits/wumpus nearby.
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (player_location address)
+TTT                   | LOAD
+SNS                   | DUP
+NSTTSSTTTSSN          | JSR > 10011100 (are_bats_near)
+NTSTSTSSSSTSSSSSSSSN  | BRZ > 10100001 00000000 (no_bats)
+A"*rustle* (Bats must be nearby.)\n"
+SSSSN                 | PUSH 0 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSSVTSTSSSSTSSSSSSSSN | MARK: 10100001 00000000 (no_bats)
+SNS                   | DUP
+NSTTSSTTTSTN          | JSR > 10011101 (are_pits_near)
+NTSTSTSSSSTSSSSSSSTN  | BRZ > 10100001 00000001 (no_pits)
+A"*whoosh* (You feel a draft from nearby pits.)\n"
+SSSSN                 | PUSH 0 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSSVTSTSSSSTSSSSSSSTN | MARK: 10100001 00000001 (no_pits)
+NSTTSSTTTTSN          | JSR > 10011110 (is_wumpus_near)
+NTSTSTSSSSTSSSSSSTSN  | BRZ > 10100001 00000010 (no_wumpus)
+A"*sniff* (You smell the evil Wumpus nearby!)\n"
+SSSSN                 | PUSH 0 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSSVTSTSSSSTSSSSSSTSN | MARK: 10100001 00000010 (no_wumpus)
+
+@ Print a list of nearby rooms.
+A"This room contains tunnels to the following rooms:"
+SSSSN                 | PUSH 0 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (player_location address)
+TTT                   | LOAD
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (number_of_links_per_room address)
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+@ Print one room on each pass through this loop.
+@ TOS> tunnel_index, room_number
+NSSVTSTSSSSTSSSSSSTTN | MARK: 10100001 00000011 (print_room_list_loop)
+A" %u"
+SSSTSTN               | PUSH 5
+NSTTTSSN              | JSR > 1100 (deepdup)
+SSSTTTN               | PUSH 7
+NSTTTSSN              | JSR > 1100 (deepdup)
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+SSSTN                 | PUSH 1 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+@ Test for end of loop
+SNS                   | DUP
+NTSTSTSSSSTSSSSSTSSN  | BRZ > 10100001 00000100 (print_room_list_loop_end)
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NSNTSTSSSSTSSSSSSTTN  | JMP > 10100001 00000011 (print_room_list_loop)
+@ Clean up and return.
+NSSVTSTSSSSTSSSSSTSSN | MARK: 10100001 00000100 (print_room_list_loop_end)
+SSSTSTSN              | PUSH 10 (ASCII '\n')
+TNSS                  | PUTCHAR
+SNN                   | DROP
+SNN                   | DROP
+NTN                   | RTS
+
+#endif

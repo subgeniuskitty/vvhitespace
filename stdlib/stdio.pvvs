@@ -385,6 +385,7 @@ NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
 @ Found an ASCII "\0" when processing the format string. Clean up and exit.
 NSSVSSSSTSSSSSSSSSSSN   | Mark: 00001000 00000000
 SNN                     | DROP
+SNN                     | DROP
 NTN                     | RTS
 
 @ Move the next string character to TOS.

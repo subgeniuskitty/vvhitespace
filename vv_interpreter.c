@@ -15,9 +15,9 @@
 
 #define VERSION 1
 
-#define HEAPSIZE        1024    /* Size of heap in words        */
-#define DATASTACKSIZE   1024    /* Size of stack in words       */
-#define RETURNSTACKSIZE 1024    /* Max subroutine call depth    */
+#define HEAPSIZE        65536   /* Size of heap in words        */
+#define DATASTACKSIZE   65536   /* Size of stack in words       */
+#define RETURNSTACKSIZE 65536   /* Max subroutine call depth    */
 
 void
 print_usage(char ** argv)
@@ -455,8 +455,8 @@ main(int argc, char ** argv)
         if (pc >= ws_code_size) {
             fprintf(stderr, "SIM_ERROR: PC Overrun\n    Requested PC: %lu\n    Max Address: %lu\n",
                 pc, ws_code_size-1);
-            exit(EXIT_FAILURE);
             unset_terminal_mode();
+            exit(EXIT_FAILURE);
         }
 
         /* Decode the IMPs */

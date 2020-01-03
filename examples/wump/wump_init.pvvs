@@ -1,0 +1,757 @@
+#ifndef WUMP_INIT
+#define WUMP_INIT
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ (c) 2019 Aaron Taylor <ataylor at subgeniuskitty dot com>
+@ See LICENSE.txt file for copyright and license details.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   wump_init
+@ Description:
+@   Master function that creates a new cave, links the rooms, and populates them
+@   according to the options set by the user in wump_conf.pvvs.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stdio.pvvs>
+#include <wump_conf.pvvs>
+#include <wump_strings.pvvs>
+#include <wump_ui.pvvs>
+NSSVTSSSSSTSN         | MARK: 10000010 (wump_init)
+
+@ Load the user-configurable options.
+NSTTSSSSSSTN          | JSR > 10000001 (set_config_values)
+
+@ Seed the RNG.
+NSTTTTTTTTTSSSSSTTTN  | JSR > 11111111 00000111 (please_seed_rng)
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSTTSSSSSTTN          | JSR > 10000011 (seed_rng)
+
+@ Build the cave.
+NSTTSSSSTSSN          | JSR > 10000100 (build_cave)
+
+@ Populate the cave.
+NSTTSSSSTSTN          | JSR > 10000101 (populate_cave)
+
+@ Initialization is complete.
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   build_circular_tunnels
+@ Description:
+@   Builds a set of tunnels that ensures every room in the cave is connected.
+@   Assumes that tunnel slots 0 and 1 are set to the value -1 (unconnected).
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
+#include <wump_game.pvvs>
+NSSVTSSSTTTSN         | MARK: 10001110 (build_circular_tunnels)
+
+@ Prepare TOS> current_room, hop_length
+NSTTSSSSTTTN          | JSR > 10000111 (generate_cave_hop_length)
+SSSSN                 | PUSH 0 (current room)
+
+@ Have we already built a tunnel from this room?
+@ If so, tunnel slot 0 will not be -1.
+NSSVTSSSTTTSSSSSSSSSN | MARK: 10001110 00000000 (tunnel_loop)
+SNS                   | DUP
+SSSSN                 | PUSH 0 (first tunnel slot)
+SNT                   | SWAP
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+NTTTSSSTTTSSSSSSSTSN  | BMI > 10001110 00000010
+NSNTSSSTTTSSSSSSSSTN  | JMP > 10001110 00000001 (loop_complete)
+NSSVTSSSTTTSSSSSSSTSN | MARK: 10001110 00000010
+@ No tunnel yet, so start building a tunnel.
+@ TOS> current_room, hop_length
+SNS                   | DUP
+SNS                   | DUP
+SSSTSSN               | PUSH 4
+NSTTTSSN              | JSR > 1100 (deepdup)
+TSSS                  | ADD
+SSSTSSSSSSSSSSSSN     | PUSH 0x1000 (GAME_DATA_BASE+0 = num_rooms address)
+TTT                   | LOAD
+TSTT                  | MODULO
+SNT                   | SWAP
+SSSSN                 | PUSH 0 (slot number)
+SNT                   | SWAP
+NSTTSSSTSSTN          | JSR > 10001001 (set_tunnel_destination)
+@ One direction of the tunnel is built. Now build the other direction.
+SNS                   | DUP
+SSSSN                 | PUSH 0 (slot number)
+SNT                   | SWAP
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+SNT                   | SWAP
+SSSTSN                | PUSH 2
+NSTTTSSN              | JSR > 1100 (deepdup)
+SSSTN                 | PUSH 1
+SNT                   | SWAP
+NSTTSSSTSSTN          | JSR > 10001001 (set_tunnel_destination)
+@ Loop again to build the next tunnel.
+NSNTSSSTTTSSSSSSSSSN  | JMP > 10001110 00000000 (tunnel_loop)
+
+@ Clean up and return
+NSSVTSSSTTTSSSSSSSSTN | MARK: 10001110 00000001 (loop_complete)
+SNN                   | DROP
+SNN                   | DROP
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   get_next_tunnel_slot
+@ Description:
+@   Returns the index of next available tunnel slot for room_num, or -1 if full.
+@ Call Stack:
+@   room_num  <-- TOS
+@ Return Stack:
+@   tunnel_index  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <wump_game.pvvs>
+NSSVTSSTSTTTN         | MARK: 10010111 (get_next_tunnel_slot)
+
+@ Build the pointer: (room_num * size_of_room_struct) + 2 + ROOM_DATA_BASE
+@ Where the '+2' skips over the 'pits' and 'bats' booleans for this room.
+NSTTSSSTSTTN          | JSR > 10001011 (get_room_struct_size)
+TSSN                  | MULTIPLY
+SSSTSN                | PUSH 2
+TSSS                  | ADD
+SSSTSSSSSSSSSSSSSN    | PUSH 0x2000 (ROOM_DATA_BASE address)
+TSSS                  | ADD
+
+@ Save a copy of this pointer for later use when recovering the tunnel index.
+SNS                   | DUP
+
+@ Push a loop counter onto the stack.
+SSSSN                 | PUSH 0 (counter)
+SNT                   | SWAP
+
+@ Main loop - Search for an available tunnel slot.
+@ TOS> ptr_to_tunnel_slot, loop_counter, ptr_to_first_tunnel_slot
+NSSVTSSTSTTTSSSSSSSSN | MARK: 10010111 00000000 (main_loop)
+SNS                   | DUP
+TTT                   | LOAD
+NTTTSSTSTTTSSSSSSSTN  | BMI > 10010111 00000001 (found_open_slot)
+@ No match.
+@ Increment the pointer.
+SSSTN                 | PUSH 1
+TSSS                  | ADD
+@ Increment the loop counter.
+SNT                   | SWAP
+SSSTN                 | PUSH 1
+TSSS                  | ADD
+@ See if we have run out of possible tunnel slots.
+SNS                   | DUP
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (GAME_DATA_BASE+3 = links_per_room address)
+TTT                   | LOAD
+TSST                  | SUBTRACT
+NTSTSSTSTTTSSSSSSTSN  | BRZ > 10010111 00000010 (no_open_slots)
+@ There are still more slots to check. Prepare to loop again.
+SNT                   | SWAP
+NSNTSSTSTTTSSSSSSSSN  | JMP > 10010111 00000000 (main_loop)
+
+@ No available tunnel slots for this room.
+NSSVTSSTSTTTSSSSSSTSN | MARK: 10010111 00000010 (no_open_slots)
+SNN                   | DROP
+SNN                   | DROP
+SNN                   | DROP
+SSTTN                 | PUSH -1
+NTN                   | RTS
+
+@ Found an open tunnel slot.
+NSSVTSSTSTTTSSSSSSSTN | MARK: 10010111 00000001 (found_open_slot)
+@ Drop the loop counter.
+SNT                   | SWAP
+SNN                   | DROP
+@ Recover the tunnel slot index from the tunnel slot pointer.
+SNT                   | SWAP
+TSST                  | SUBTRACT
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   build_random_tunnels
+@ Description:
+@   Randomly builds tunnels between rooms until all tunnels slots are used.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <heap.pvvs>
+#include <math.pvvs>
+#include <stack.pvvs>
+NSSVTSSTSTTSN         | MARK: 10010110 (build_random_tunnels)
+
+@ Build a temporary data structure in the buffer residing at 0x3000.
+@
+@ 0x3000 contains the number of elements in an array that starts at 0x3001.
+@ Each array element is one word long and contains the index of a room
+@ with open tunnel slots.
+@
+@ This init code is here rather than a subroutine since the structure it builds
+@ is private to this function.
+@ Before looping, push the number of elements in the array (=num_rooms).
+@ Keep a copy of this number to use as a loop counter.
+SSSTSSSSSSSSSSSSN     | PUSH 0x1000 (GAME_DATA_BASE = num_rooms address)
+TTT                   | LOAD
+SNS                   | DUP
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+SNT                   | SWAP
+TTS                   | STORE
+@ Init loop - Populates the 'rooms with available tunnel slots' array.
+@ TOS> loop_counter
+NSSVTSSTSTTSSSSSSSTSN | MARK: 10010110 00000010 (init_loop)
+@ Populate one of the array entries.
+SNS                   | DUP
+SNS                   | DUP
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TSSS                  | ADD
+SNT                   | SWAP
+SSSTN                 | PUSH +1
+TSST                  | SUBTRACT
+TTS                   | STORE
+@ Decrement the loop counter and test for end of loop.
+SSSTN                 | PUSH +1
+TSST                  | SUBTRACT
+SNS                   | DUP
+NTSTSSTSTTSSSSSSSTTN  | BRZ > 10010110 00000011 (init_loop_end)
+NSNTSSTSTTSSSSSSSTSN  | JMP > 10010110 00000010 (init_loop)
+NSSVTSSTSTTSSSSSSSTTN | MARK: 10010110 00000011 (init_loop_end)
+SNN                   | DROP
+NSNTSSTSTTSSSSSSSSTN  | JMP > 10010110 00000001 (main_loop)
+
+@@@@@ INIT IS COMPLETE - STACK IS EMPTY @@@@@
+
+@ Build one random tunnel connection per pass through this loop.
+NSSVTSSTSTTSSSSSSSSTN | MARK: 10010110 00000001 (main_loop)
+@ Use 'random_number mod number_of_array_entries' to select a starting room.
+NSTTSSSSN             | JSR > 10000 (random)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TTT                   | LOAD
+TSTT                  | MODULO
+SSSTN                 | PUSH 1
+TSSS                  | ADD
+SNS                   | DUP
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TSSS                  | ADD
+TTT                   | LOAD
+@ TOS> start_room_num, start_array_index
+@ Now we randomly select a room for the endpoint.
+NSSVTSSTSTTSSSSSSTSSN | MARK: 10010110 00000100 (select_random_dst_room)
+NSTTSSSSN             | JSR > 10000 (random)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TTT                   | LOAD
+TSTT                  | MODULO
+SSSTN                 | PUSH 1
+TSSS                  | ADD
+SNS                   | DUP
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TSSS                  | ADD
+TTT                   | LOAD
+@ TOS> end_room_num, end_array_index, start_room_num, start_array_index
+@ Verify the endpoint room is different from the startpoint room.
+SNS                   | DUP
+SSSTSSN               | PUSH 4
+NSTTTSSN              | JSR > 1100 (deepdup)
+TSST                  | SUBTRACT
+NTSTSSTSTTSSSSSSTSTN  | BRZ > 10010110 00000101 (rooms_matched)
+NSNTSSTSTTSSSSSSTTSN  | JMP > 10010110 00000110 (connect_rooms)
+@ The rooms matched. Drop the selected destination room and try again.
+NSSVTSSTSTTSSSSSSTSTN | MARK: 10010110 00000101 (rooms_matched)
+SNN                   | DROP
+SNN                   | DROP
+NSNTSSTSTTSSSSSSTSSN  | JMP > 10010110 00000100 (select_random_dst_room)
+@ TOS> end_room_num, end_array_index, start_room_num, start_array_index
+@ The rooms are different. Time to build a connection between them.
+NSSVTSSTSTTSSSSSSTTSN | MARK: 10010110 00000110 (connect_rooms)
+@ First build a one-way tunnel.
+SSSTTN                | PUSH 3
+NSTTTSSN              | JSR > 1100 (deepdup)
+SSSTSN                | PUSH 2
+NSTTTSSN              | JSR > 1100 (deepdup)
+SNS                   | DUP
+NSTTSSTSTTTN          | JSR > 10010111 (get_next_tunnel_slot)
+SNT                   | SWAP
+NSTTSSSTSSTN          | JSR > 10001001 (set_tunnel_destination)
+@ Then make it a two-way tunnel.
+SNS                   | DUP
+SSSTSSN               | PUSH 4
+NSTTTSSN              | JSR > 1100 (deepdup)
+SNS                   | DUP
+NSTTSSTSTTTN          | JSR > 10010111 (get_next_tunnel_slot)
+SNT                   | SWAP
+NSTTSSSTSSTN          | JSR > 10001001 (set_tunnel_destination)
+@ TOS> end_room_num, end_array_index, start_room_num, start_array_index
+@ If that was the last tunnel slot in either room, remove it
+@ from the 'rooms_with_available_tunnel_slots' array.
+NSTTSSTSTTTN          | JSR > 10010111 (get_next_tunnel_slot)
+NTTTSSTSTTSSSSSSTTTN  | BMI > 10010110 00000111 (remove_empty_room_1)
+SNN                   | DROP
+NSNTSSTSTTSSSSSTSSSN  | JMP > 10010110 00001000 (check_second_room)
+NSSVTSSTSTTSSSSSSTTTN | MARK: 10010110 00000111 (remove_empty_room_1)
+SNS                   | DUP
+NSTTSSTSTTSSSSSTTSSN  | JSR > 10010110 00001100 (remove_element_from_array)
+SSSTTN                | PUSH 3
+NSTTTSSN              | JSR > 1100 (deepdup)
+TSST                  | SUBTRACT
+NTTTSSTSTTSSSSSTTSTN  | BMI > 10010110 00001101 (update_second_room_index)
+NSNTSSTSTTSSSSSTSSSN  | JMP > 10010110 00001000 (check_second_room)
+NSSVTSSTSTTSSSSSTTSTN | MARK: 10010110 00001101 (update_second_room_index)
+SNT                   | SWAP
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+SNT                   | SWAP
+NSSVTSSTSTTSSSSSTSSSN | MARK: 10010110 00001000 (check_second_room)
+NSTTSSTSTTTN          | JSR > 10010111 (get_next_tunnel_slot)
+NTTTSSTSTTSSSSSTSSTN  | BMI > 10010110 00001001 (remove_empty_room_2)
+SNN                   | DROP
+NSNTSSTSTTSSSSSTSTSN  | JMP > 10010110 00001010 (main_loop_end_test)
+NSSVTSSTSTTSSSSSTSSTN | MARK: 10010110 00001001 (remove_empty_room_2)
+NSTTSSTSTTSSSSSTTSSN  | JSR > 10010110 00001100 (remove_element_from_array)
+@ If the array is now empty or only contains one room, return.
+@ Otherwise, loop again and build another random tunnel.
+NSSVTSSTSTTSSSSSTSTSN | MARK: 10010110 00001010 (main_loop_end_test)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TTT                   | LOAD
+SSSTSN                | PUSH 2
+TSST                  | SUBTRACT
+NTTTSSTSTTSSSSSTSTTN  | BMI > 10010110 00001011 (return)
+NSNTSSTSTTSSSSSSSSTN  | JMP > 10010110 00000001 (main_loop)
+NSSVTSSTSTTSSSSSTSTTN | MARK: 10010110 00001011 (return)
+NTN                   | RTS
+
+@ A private subroutine to remove one element from the temp array.
+@ Consumes the array index from TOS.
+NSSVTSSTSTTSSSSSTTSSN | MARK: 10010110 00001100 (remove_element_from_array)
+@ First, stash a copy of the array index immediately after the temporary array.
+@ This allows us to find it using the num_array_elements for use with spew
+@ after slurp has filled the stack with a variable number of elements.
+SNS                   | DUP
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TTT                   | LOAD
+TSSS                  | ADD
+SSSTN                 | PUSH 1
+TSSS                  | ADD
+SNT                   | SWAP
+TTS                   | STORE
+@ Now slurp and spew the array to delete the desired element.
+SSSTN                 | PUSH 1
+TSSS                  | ADD
+SNS                   | DUP
+@ TOS> index+1, index+1
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TTT                   | LOAD
+SNT                   | SWAP
+TSST                  | SUBTRACT
+@ Special case: deleting last element of array means no need to delete.
+SNS                   | DUP
+NTTTSSTSTTSSSSSTTTSN  | BMI > 10010110 00001110 (deleting_last_element)
+NSNTSSTSTTSSSSSTTTTN  | JMP > 10010110 00001111 (not_deleting_last_element)
+NSSVTSSTSTTSSSSSTTTSN | MARK: 10010110 00001110 (deleting_last_element)
+SNN                   | DROP
+SNN                   | DROP
+NSNTSSTSTTSSSSTSSSSN  | JMP > 10010110 00010000 (decrement_array_counter)
+NSSVTSSTSTTSSSSSTTTTN | MARK: 10010110 00001111 (not_deleting_last_element)
+SNT                   | SWAP
+@ TOS> index+1, count=num_array_elements-(index+1)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TSSS                  | ADD
+SNT                   | SWAP
+@ TOS> count=num_array_elements-(index+1), address=0x3000+index+1
+NSTTTTTSN             | JSR > 11110 (slurp)
+@ Recover the array index that we stashed on the heap.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TTT                   | LOAD
+TSSS                  | ADD
+SSSTN                 | PUSH 1
+TSSS                  | ADD
+TTT                   | LOAD
+@ TOS> index
+SNS                   | DUP
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TSSS                  | ADD
+SNT                   | SWAP
+@ TOS> index, address=0x3000+index
+SSSTN                 | PUSH 1
+TSSS                  | ADD
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TTT                   | LOAD
+SNT                   | SWAP
+TSST                  | SUBTRACT
+@ TOS> count = num_array_elements-(index+1), address=0x3000+index
+NSTTTTTTN             | JSR > 11111 (spew)
+@ Decrement the array element counter.
+NSSVTSSTSTTSSSSTSSSSN | MARK: 10010110 00010000 (decrement_array_counter)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
+SNT                   | SWAP
+TTS                   | STORE
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   build_cave
+@ Description:
+@   Clears the cave data structure on the heap and builds new tunnels.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSSTSSN         | MARK: 10000100 (build_cave)
+NSTTSSSSTTSN          | JSR > 10000110 (clear_cave_data)
+NSTTSSSTTTSN          | JSR > 10001110 (build_circular_tunnels)
+NSTTSSTSTTSN          | JSR > 10010110 (build_random_tunnels)
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   set_tunnel_destination
+@ Description:
+@   Sets 'slot' of 'room_number' to point to 'dst_room_number'.
+@ Call Stack:
+@   dst_room_number
+@   slot
+@   room_number  <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <wump_game.pvvs>
+NSSVTSSSTSSTN         | MARK: 10001001 (set_tunnel_destination)
+@ The pointer we seek is:
+@ (room_number * room_struct_size) + 2 + slot + ROOM_DATA_BASE
+@ Where the '+2' accounts for the pit and bat booleans.
+NSTTSSSTSTTN          | JSR > 10001011 (get_room_struct_size)
+TSSN                  | MULTIPLY
+SSSTSN                | PUSH +2
+TSSS                  | ADD
+TSSS                  | ADD
+SSSTSSSSSSSSSSSSSN    | PUSH 0x2000 (ROOM_DATA_BASE address)
+TSSS                  | ADD
+SNT                   | SWAP
+TTS                   | STORE
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   generate_cave_hop_length
+@ Description:
+@   In order to ensure cave is fully connected, generate a number, 'hop_length',
+@   that is relatively prime to the number of rooms in the cave.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   hop_length
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <math.pvvs>
+NSSVTSSSSTTTN         | MARK: 10000111 (generate_cave_hop_length)
+NSTTSSSTSTSN          | JSR > 10001010 (get_random_room)
+@ Check for gcd(hop_length,num_rooms) = 1.
+SNS                   | DUP
+SSSTSSSSSSSSSSSSN     | PUSH 0x1000 (GAME_DATA_BASE+0 = num_rooms address)
+TTT                   | LOAD
+NSTTSSTSN             | JSR > 10010 (gcd)
+SSSTN                 | PUSH +1
+TSST                  | SUBTRACT
+NTSTSSSSTTTSSSSSSSSN  | BRZ > 10000111 00000000
+SNN                   | DROP
+NSNTSSSSTTTN          | JMP > 10000111 (generate_cave_hop_length)
+NSSVTSSSSTTTSSSSSSSSN | MARK: 10000111 00000000
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   clear_cave_data
+@ Description:
+@   Writes -1 over the entire cave data array.
+@   This ensures each room starts unconnected.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <heap.pvvs>
+#include <wump_game.pvvs>
+NSSVTSSSSTTSN         | MARK: 10000110 (clear_cave_data)
+SSTTN                 | PUSH -1 (pattern)
+SSSTSSSSSSSSSSSSSN    | PUSH 0x2000 (ROOM_DATA_BASE address)
+SSSTSSSSSSSSSSSSN     | PUSH 0x1000 (GAME_DATA_BASE address)
+TTT                   | LOAD
+NSTTSSSTSTTN          | JSR > 10001011 (get_room_struct_size)
+TSSN                  | MULTIPLY
+NSTTTSSSN             | JSR > 11000 (memset)
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   get_random_room
+@ Description:
+@   Returns a valid room number
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   room_num  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <math.pvvs>
+NSSVTSSSTSTSN         | MARK: 10001010 (get_random_room)
+NSTTSSSSN             | JSR > 10000 (random)
+SSSTSSSSSSSSSSSSN     | PUSH 0x1000 (GAME_DATA_BASE+0 = num_rooms address)
+TTT                   | LOAD
+TSTT                  | MODULO
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   set_bats
+@ Description:
+@   Set the 'bats' boolean for a specific room.
+@ Call Stack:
+@   value (0 or 1)
+@   room_number
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <wump_game.pvvs>
+NSSVTSSTSSSSN         | MARK: 10010000 (set_bats)
+@ We seek the pointer:
+@   (room_number * room_struct_size) + 1 + ROOM_DATA_BASE
+@ where '+1' accounts for the offset of the bat boolean in the desired room.
+NSTTSSSTSTTN          | JSR > 10001011 (get_room_struct_size)
+TSSN                  | MULTIPLY
+SSSTN                 | PUSH +1
+TSSS                  | ADD
+SSSTSSSSSSSSSSSSSN    | PUSH 0x2000 (GAME_DATA_BASE address)
+TSSS                  | ADD
+SNT                   | SWAP
+TTS                   | STORE
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   set_pits
+@ Description:
+@   Set the 'pits' boolean for a specific room.
+@ Call Stack:
+@   value (0 or 1)
+@   room_number
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <wump_game.pvvs>
+NSSVTSSTSSSTN         | MARK: 10010001 (set_pits)
+@ We seek the pointer:
+@   (room_number * room_struct_size) + 0 + ROOM_DATA_BASE
+@ where '+0' accounts for the offset of the pit boolean in the desired room.
+NSTTSSSTSTTN          | JSR > 10001011 (get_room_struct_size)
+TSSN                  | MULTIPLY
+SSSTSSSSSSSSSSSSSN    | PUSH 0x2000 (GAME_DATA_BASE address)
+TSSS                  | ADD
+SNT                   | SWAP
+TTS                   | STORE
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   reset_cave_population
+@ Description:
+@   Remove all bats and pits from the cave.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSTSSTSN         | MARK: 10010010 (reset_cave_population)
+
+@ Clear the bat and pit booleans by setting every room to false(=0).
+@ First prepare a loop index.
+SSSTSSSSSSSSSSSSN     | PUSH 0x1000 (GAME_DATA_BASE+0 = number_of_rooms address)
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NSSVTSSTSSTSSSSSSSSSN | MARK: 10010010 00000000 (empty_cave_loop)
+@ Scare all the bats out of the room.
+SNS                   | DUP
+SSSSN                 | PUSH 0 (false)
+SNT                   | SWAP
+NSTTSSTSSSSN          | JSR > 10010000 (set_bats)
+@ Fill any pits.
+SNS                   | DUP
+SSSSN                 | PUSH 0 (false)
+SNT                   | SWAP
+NSTTSSTSSSTN          | JSR > 10010001 (set_pits)
+@ Decrement loop counter and test for end of loop.
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+SNS                   | DUP
+NTTTSSTSSTSSSSSSSSTN  | BMI > 10010010 00000001 (empty_cave_loop_end)
+NSNTSSTSSTSSSSSSSSSN  | JMP > 10010010 00000000 (empty_cave_loop)
+@ Loop is complete. Clean up and return.
+NSSVTSSTSSTSSSSSSSSTN | MARK: 10010010 00000001 (empty_cave_loop_end)
+SNN                   | DROP
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   populate_bats
+@ Description:
+@   Randomly place a user-defined number of bats in the cave.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <wump_game.pvvs>
+NSSVTSSTSSTTN         | MARK: 10010011 (populate_bats)
+
+@ First prepare a loop index.
+SSSTSSSSSSSSSSTSN     | PUSH 0x1002 (GAME_DATA_BASE+2 = number_of_bats address)
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+@ Find a random room that does not already contain bats.
+NSSVTSSTSSTTSSSSSSTSN | MARK: 10010011 00000010 (place_bats)
+NSTTSSSTSTSN          | JSR > 10001010 (get_random_room)
+SNS                   | DUP
+NSTTSSSTTSSN          | JSR > 10001100 (room_has_bats)
+NTSTSSTSSTTSSSSSSTTN  | BRZ > 10010011 00000011 (no_bats_in_room)
+SNN                   | DROP
+NSNTSSTSSTTSSSSSSTSN  | JMP > 10010011 00000010 (place_bats)
+@ Room is empty. Place bats.
+NSSVTSSTSSTTSSSSSSTTN | MARK: 10010011 00000011 (no_bats_in_room)
+SSSTN                 | PUSH 1 (true)
+SNT                   | SWAP
+NSTTSSTSSSSN          | JSR > 10010000 (set_bats)
+@ Decrement loop counter and test for loop completion.
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+SNS                   | DUP
+NTTTSSTSSTTSSSSSTSSN  | BMI > 10010011 00000100 (place_bats_loop_end)
+NSNTSSTSSTTSSSSSSTSN  | JMP > 10010011 00000010 (place_bats)
+@ Loop is complete. Clean up and return.
+NSSVTSSTSSTTSSSSSTSSN | MARK: 10010011 00000100 (place_bats_loop_end)
+SNN                   | DROP
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   populate_pits
+@ Description:
+@   Randomly place a user-defined number of pits in the cave.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <wump_game.pvvs>
+NSSVTSSTSTSSN         | MARK: 10010100 (populate_pits)
+
+@ First prepare a loop index.
+SSSTSSSSSSSSSSSTN     | PUSH 0x1001 (GAME_DATA_BASE+1 = number_of_pits address)
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+@ Find a random room that does not already contain pits.
+NSSVTSSTSTSSSSSSSSTSN | MARK: 10010100 00000010 (place_pits)
+NSTTSSSTSTSN          | JSR > 10001010 (get_random_room)
+SNS                   | DUP
+NSTTSSSTTSTN          | JSR > 10001101 (room_has_pits)
+NTSTSSTSTSSSSSSSSTTN  | BRZ > 10010100 00000011 (no_pits_in_room)
+SNN                   | DROP
+NSNTSSTSTSSSSSSSSTSN  | JMP > 10010100 00000010 (place_pits)
+@ Room is empty. Place pits.
+NSSVTSSTSTSSSSSSSSTTN | MARK: 10010100 00000011 (no_pits_in_room)
+SSSTN                 | PUSH 1 (true)
+SNT                   | SWAP
+NSTTSSTSSSTN          | JSR > 10010001 (set_pits)
+@ Decrement loop counter and test for loop completion.
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+SNS                   | DUP
+NTTTSSTSTSSSSSSSTSSN  | BMI > 10010100 00000100 (place_pits_loop_end)
+NSNTSSTSTSSSSSSSSTSN  | JMP > 10010100 00000010 (place_pits)
+@ Loop is complete. Clean up and return.
+NSSVTSSTSTSSSSSSSTSSN | MARK: 10010100 00000100 (place_pits_loop_end)
+SNN                   | DROP
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   place_player
+@ Description:
+@   Place the player in a suitable starting room.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSTSTSTN         | MARK: 10010101 (place_player)
+
+@ Find out where the wumpus is located.
+SSSTSSSSSSSSSTTTN     | PUSH 0x1007 (GAME_DATA_BASE+7 = wumpus_room address)
+TTT                   | LOAD
+@ Place the player in a different room than the wumpus.
+NSSVTSSTSTSTSSSSSSSSN | MARK: 10010101 00000000 (place_player_loop)
+NSTTSSSTSTSN          | JSR > 10001010 (get_random_room)
+SNT                   | SWAP
+SNS                   | DUP
+SSSTTN                | PUSH 3
+NSTTTSSN              | JSR > 1100 (deepdup)
+@ TOS> rand_room, wump_room, wump_room, rand_room
+TSST                  | SUBTRACT
+NTSTSSTSTSTSSSSSSSTN  | BRZ > 10010101 00000001 (same_room)
+NSNTSSTSTSTSSSSSSTSN  | JMP > 10010101 00000010 (different_rooms)
+NSSVTSSTSTSTSSSSSSSTN | MARK: 10010101 00000001 (same_room)
+SNN                   | DROP
+NSNTSSTSTSTSSSSSSSSN  | JMP > 10010101 00000000 (place_player_loop)
+NSSVTSSTSTSTSSSSSSTSN | MARK: 10010101 00000010 (different_rooms)
+SNN                   | DROP
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (GAME_DATA_BASE+6 = player_room address)
+SNT                   | SWAP
+TTS                   | STORE
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   populate_cave
+@ Description:
+@   Populate the cave with various creatures and features.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSSTSTN         | MARK: 10000101 (populate_cave)
+
+@ Initialize the cave to an unpopulated state.
+NSTTSSTSSTSN          | JSR > 10010010 (reset_cave_population)
+
+@ Place bats in the now-empty cave.
+NSTTSSTSSTTN          | JSR > 10010011 (populate_bats)
+
+@ Place pits in the now-empty cave.
+NSTTSSTSTSSN          | JSR > 10010100 (populate_pits)
+
+@ Place the wumpus.
+SSSTSSSSSSSSSTTTN     | PUSH 0x1007 (GAME_DATA_BASE+7 = wumpus_room address)
+NSTTSSSTSTSN          | JSR > 10001010 (get_random_room)
+TTS                   | STORE
+
+@ Place the player.
+NSTTSSTSTSTN          | JSR > 10010101 (place_player)
+
+NTN                   | RTS
+
+#endif

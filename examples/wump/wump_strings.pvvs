@@ -1,9 +1,14 @@
-@ Imported from:
+#ifndef WUMP_STRING
+#define WUMP_STRING
+
+@ Some text strings in this file were imported from:
 @ $NetBSD: wump.c,v 1.17 2005/02/15 12:56:20 jsm Exp $
 @ Copyright (c) 1989, 1993
 @ The Regents of the University of California.  All rights reserved.
-
-@ TODO: Import the license properly.
+@
+@ Everything else is
+@ (c) 2019 Aaron Taylor <ataylor at subgeniuskitty dot com>
+@ See LICENSE.txt file for copyright and license details.
 
 NSSVTTTTTTTTSSSSSSSSN | Mark: 11111111 00000000 (wump_kill)
 A"\n*ROAR* *chomp* *snurfle* *chomp*!\nMuch to the delight of the Wumpus, you walked right into his mouth,\nmaking you one of the easiest dinners he's ever had!  For you, however,\nit's a rather unpleasant death.  The only good thing is that it's been\nso long since the evil Wumpus cleaned his teeth that you immediately\npassed out from the stench!\n"
@@ -26,9 +31,27 @@ A"\nWith a jaunty step you enter the magic tunnel.  As you do, you\nnotice that 
 NTN                   | RTS
 
 NSSVTTTTTTTTSSSSSTSTN | Mark: 11111111 00000101 (pit_kill)
-A"*AAAUUUUGGGGGHHHHHhhhhhhhhhh...*\nThe whistling sound and updraft as you walked into this room of the\ncave apparently wasn't enough to clue you in to the presence of the\nbottomless pit.  You have a lot of time to reflect on this error as\nyou fall many miles to the core of the earth.  Look on the bright side;\nyou can at least find out if Jules Verne was right...\n"
+A"\n*AAAUUUUGGGGGHHHHHhhhhhhhhhh...*\nThe whistling sound and updraft as you walked into this room of the\ncave apparently wasn't enough to clue you in to the presence of the\nbottomless pit.  You have a lot of time to reflect on this error as\nyou fall many miles to the core of the earth.  Look on the bright side;\nyou can at least find out if Jules Verne was right...\n"
 NTN                   | RTS
 
 NSSVTTTTTTTTSSSSSTTSN | Mark: 11111111 00000110 (pit_survive)
-A"Without conscious thought you grab for the side of the cave and manage\nto grasp onto a rocky outcrop.  Beneath your feet stretches the limitless\ndepths of a bottomless pit!  Rock crumbles beneath your feet!\n"
+A"\nWithout conscious thought you grab for the side of the cave and manage\nto grasp onto a rocky outcrop.  Beneath your feet stretches the limitless\ndepths of a bottomless pit!  Rock crumbles beneath your feet!\n"
 NTN                   | RTS
+
+NSSVTTTTTTTTSSSSSTTTN | Mark: 11111111 00000111 (please_seed_rng)
+A"\n\n\n\nWelcome to Hunt the Wumpus!\n\nPlease press 16 keys to seed the RNG.\n               |\n"
+NTN                   | RTS
+
+NSSVTTTTTTTTSSSSTSSSN | Mark: 11111111 00001000 (problem_with_yes_no_answer)
+A"I don't understand your answer; please enter 'y' or 'n'!\n"
+NTN                   | RTS
+
+NSSVTTTTTTTTSSSSTSSTN | Mark: 11111111 00001001 (instructions)
+A"\n\nWelcome to the game of Hunt the Wumpus.\n\nThe Wumpus typically lives in a cave of twenty rooms, with each room having\nthree tunnels connecting it to other rooms in the cavern.  Caves may vary,\nhowever, depending on options specified when starting the game.\n\nThe game has the following hazards for intrepid adventurers to wind their\nway through:\n\n  Pits   -- If you fall into one of the bottomless pits, you find yourself\n            slung back out on the far side of the Earth and in very poor\n            shape to continue your quest since you're dead.\n\n  Bats   -- As with any other cave, the Wumpus cave has bats in residence.\n            These are a bit more potent, however, and if you stumble into\n            one of their rooms they will rush up and carry you elsewhere in\n            the cave.\n\n  Wumpus -- If you happen to walk into the room the Wumpus is in you'll find\n            that he has quite an appetite for young adventurous humans!  Not\n            recommended.\n\nThe Wumpus, by the way, is not bothered by the hazards since he has sucker\nfeet and is too big for a bat to lift.  If you try to shoot him and miss,\nthere's also a chance that he'll up and move himself into another cave,\nthough by nature the Wumpus is a sedentary creature.\n\nEach turn you may either move or shoot a crooked arrow.  Moving is done\nsimply by specifying 'm' for move and the number of the room that you'd\nlike to move down a tunnel towards.  Shooting is done similarly; indicate\nthat you'd like to shoot one of your magic arrows with an 's' for shoot,\nthen list a set of connected room numbers through which the deadly shaft\nshould fly!\n\nIf your path for the arrow is incorrect, however, it will flail about in\nthe room it can't understand and randomly pick a tunnel to continue\nthrough.  You might just end up shooting yourself in the foot if you're\nnot careful!  On the other hand, if you shoot the Wumpus you've WON!\n\nLet the hunt begin!\n"
+NTN                   | RTS
+
+NSSVTTTTTTTTSSSSTSTSN | Mark: 11111111 00001010 (cave_description)
+A"\nYou're in a cave with %u rooms and %u tunnels leading from each room.\nThere are %u bats and %u pits scattered throughout the cave, and your\nquiver holds %u custom super anti-evil Wumpus arrows. Good luck.\n\n"
+NTN                   | RTS
+
+#endif

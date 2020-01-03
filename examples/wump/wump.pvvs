@@ -1,0 +1,36 @@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Hunt the Wumpus
+@ (c) 2019 Aaron Taylor <ataylor at subgeniuskitty dot com>
+@ See LICENSE.txt file for copyright and license details.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+NSNTSSSSSSSN          | JMP > 10000000 (wump)
+
+#include <wump_init.pvvs>
+#include <wump_ui.pvvs>
+#include <wump_strings.pvvs>
+#include <stdio.pvvs>
+
+NSSVTSSSSSSSN         | MARK: 10000000 (wump)
+
+@ Initialization (build the cave, etc).
+NSTTSSSSSTSN          | JSR > 10000010 (wump_init)
+
+@ Does the user need instructions?
+A"Instructions? (y/n)\n"
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSTTSSTTSSSN          | JSR > 10011000 (get_answer)
+NTSTSSSSSSSSSSSSSSSN  | BRZ > 10000000 00000000 (skip_instructions)
+NSTTTTTTTTTSSSSTSSTN  | JSR > 11111111 00001001 (instructions)
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSSVTSSSSSSSSSSSSSSSN | MARK: 10000000 00000000 (skip_instructions)
+
+@ Print a description of the cave.
+NSTTSSTTSTTN          | JSR > 10011011 (print_cave_description)
+
+@ Main game loop
+NSSVTSSTTSTSN         | MARK: 10011010 (wump_loop)
+NSTTSTSSSSTN          | JSR > 10100001 (print_room_stats)
+NNN                   | TERMINATE

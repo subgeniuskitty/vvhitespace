@@ -1,0 +1,337 @@
+#ifndef WUMP_GAME
+#define WUMP_GAME
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ (c) 2019 Aaron Taylor <ataylor at subgeniuskitty dot com>
+@ See LICENSE.txt file for copyright and license details.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   get_tunnel_destination
+@ Description:
+@   Returns the room number corresponding to the destination of a tunnel
+@   specified by room and slot.
+@ Call Stack:
+@   slot
+@   room_number  <-- TOS
+@ Return Stack:
+@   dst_room_number  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSTSSSN         | MARK: 10001000 (get_tunnel_destination)
+@ The pointer we seek is:
+@ (room_number * room_struct_size) + 2 + slot + ROOM_DATA_BASE
+@ Where the '+2' accounts for the pit and bat booleans.
+NSTTSSSTSTTN          | JSR > 10001011 (get_room_struct_size)
+TSSN                  | MULTIPLY
+SSSTSN                | PUSH +2
+TSSS                  | ADD
+TSSS                  | ADD
+SSSTSSSSSSSSSSSSSN    | PUSH 0x2000 (ROOM_DATA_BASE address)
+TSSS                  | ADD
+TTT                   | LOAD
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   get_room_struct_size
+@ Description:
+@   Returns the size in words of the data structure for a single room.
+@   For example, with 3 links plus bat and pit booleans, the size is 5 words.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   size   <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSTSTTN         | MARK: 10001011 (get_room_struct_size)
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (GAME_DATA_BASE+3 = links_per_room address)
+TTT                   | LOAD
+SSSTSN                | PUSH +2
+TSSS                  | ADD
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   room_has_bats
+@ Description:
+@   Check if room_number contains bats.
+@   Returns 1 or 0 representing true or false.
+@ Call Stack:
+@   room_number   <-- TOS
+@ Return Stack:
+@   1 or 0   <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSTTSSN         | MARK: 10001100 (room_has_bats)
+@ We seek the pointer:
+@   (room_number * room_struct_size) + 1 + ROOM_DATA_BASE
+@ where '+1' accounts for the offset of the bat boolean in the desired room.
+NSTTSSSTSTTN          | JSR > 10001011 (get_room_struct_size)
+TSSN                  | MULTIPLY
+SSSTN                 | PUSH +1
+TSSS                  | ADD
+SSSTSSSSSSSSSSSSSN    | PUSH 0x2000 (GAME_DATA_BASE address)
+TSSS                  | ADD
+TTT                   | LOAD
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   room_has_pits
+@ Description:
+@   Check if room_number contains pits.
+@   Returns 1 or 0 representing true or false.
+@ Call Stack:
+@   room_number   <-- TOS
+@ Return Stack:
+@   1 or 0   <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSTTSTN         | MARK: 10001101 (room_has_pits)
+@ We seek the pointer:
+@   (room_number * room_struct_size) + 0 + ROOM_DATA_BASE
+@ where '+0' accounts for the offset of the pit boolean in the desired room.
+NSTTSSSTSTTN          | JSR > 10001011 (get_room_struct_size)
+TSSN                  | MULTIPLY
+SSSTSSSSSSSSSSSSSN    | PUSH 0x2000 (GAME_DATA_BASE address)
+TSSS                  | ADD
+TTT                   | LOAD
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   room_has_wumpus
+@ Description:
+@   Check if room contains wumpus.
+@   Returns 1 or 0 representing true or false.
+@ Call Stack:
+@   room_number   <-- TOS
+@ Return Stack:
+@   1 or 0   <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSTSSSSSN         | MARK: 10100000 (room_has_wumpus)
+SSSTSSSSSSSSSTTTN     | PUSH 0x1007 (wumpus_location address)
+TTT                   | LOAD
+TSST                  | SUBTRACT
+NTSTSTSSSSSSSSSSSSSN  | BRZ > 10100000 00000000 (room_has_wumpus:true)
+SSSSN                 | PUSH 0 (false)
+NTN                   | RTS
+NSSVTSTSSSSSSSSSSSSSN | MARK: 10100000 00000000 (room_has_wumpus:true)
+SSSTN                 | PUSH 1 (true)
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   are_bats_near
+@ Description:
+@   Given a room number, checks rooms within one hop for bats.
+@   Returns 1 if bats are present or 0 if no bats.
+@ Call Stack:
+@   room_number  <-- TOS
+@ Return Stack:
+@   1 or 0  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
+NSSVTSSTTTSSN         | MARK: 10011100 (are_bats_near)
+
+@ Prepare the stack by loading the number of links per room and decrementing.
+@ We will loop until this reaches 0 or we find bats.
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (number_of_links_per_room address)
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+
+@ Check one nearby room on each pass through this loop.
+@ TOS> tunnel_index, room_number
+NSSVTSSTTTSSSSSSSSSSN | MARK: 10011100 00000000 (are_bats_near:loop)
+SNS                   | DUP
+SSSTTN                | PUSH 3
+NSTTTSSN              | JSR > 1100 (deepdup)
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+NSTTSSSTTSSN          | JSR > 10001100 (room_has_bats)
+NTSTSSTTTSSSSSSSSSTN  | BRZ > 10011100 00000001 (no_bats_in_this_room)
+@ Found bats. Clean up and return.
+SNN                   | DROP
+SNN                   | DROP
+SSSTN                 | PUSH 1
+NTN                   | RTS
+NSSVTSSTTTSSSSSSSSSTN | MARK: 10011100 00000001 (no_bats_in_this_room)
+@ Test for end of loop.
+SNS                   | DUP
+NTSTSSTTTSSSSSSSSTSN  | BRZ > 10011100 00000010 (are_bats_near:loop_end)
+@ No bats found yet, but still need to check some rooms.
+@ Decrement tunnel index and loop again.
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NSNTSSTTTSSSSSSSSSSN  | JMP > 10011100 00000000 (are_bats_near:loop)
+@ No bats found in nearby rooms. Clean up and return.
+NSSVTSSTTTSSSSSSSSTSN | MARK: 10011100 00000010 (are_bats_near:loop_end)
+SNN                   | DROP
+SNN                   | DROP
+SSSSN                 | PUSH 0
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   are_pits_near
+@ Description:
+@   Given a room number, checks rooms within one hop for pits.
+@   Returns 1 if pits are present or 0 if no pits.
+@ Call Stack:
+@   room_number  <-- TOS
+@ Return Stack:
+@   1 or 0  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
+NSSVTSSTTTSTN         | MARK: 10011101 (are_pits_near)
+
+@ Prepare the stack by loading the number of links per room and decrementing.
+@ We will loop until this reaches 0 or we find pits.
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (number_of_links_per_room address)
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+
+@ Check one nearby room on each pass through this loop.
+@ TOS> tunnel_index, room_number
+NSSVTSSTTTSTSSSSSSSSN | MARK: 10011101 00000000 (are_pits_near:loop)
+SNS                   | DUP
+SSSTTN                | PUSH 3
+NSTTTSSN              | JSR > 1100 (deepdup)
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+NSTTSSSTTSTN          | JSR > 10001101 (room_has_pits)
+NTSTSSTTTSTSSSSSSSTN  | BRZ > 10011101 00000001 (no_pits_in_this_room)
+@ Found pits. Clean up and return.
+SNN                   | DROP
+SNN                   | DROP
+SSSTN                 | PUSH 1
+NTN                   | RTS
+NSSVTSSTTTSTSSSSSSSTN | MARK: 10011101 00000001 (no_pits_in_this_room)
+@ Test for end of loop.
+SNS                   | DUP
+NTSTSSTTTSTSSSSSSTSN  | BRZ > 10011101 00000010 (are_pits_near:loop_end)
+@ No pits found yet, but still need to check some rooms.
+@ Decrement tunnel index and loop again.
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NSNTSSTTTSTSSSSSSSSN  | JMP > 10011101 00000000 (are_pits_near:loop)
+@ No pits found in nearby rooms. Clean up and return.
+NSSVTSSTTTSTSSSSSSTSN | MARK: 10011101 00000010 (are_pits_near:loop_end)
+SNN                   | DROP
+SNN                   | DROP
+SSSSN                 | PUSH 0
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   is_wumpus_very_near
+@ Description:
+@   Given a room number, checks rooms within one hop for the wumpus.
+@   Returns 1 if wumpus is present, otherwise 0.
+@ Call Stack:
+@   room_number  <-- TOS
+@ Return Stack:
+@   1 or 0  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
+NSSVTSSTTTTTN         | MARK: 10011111 (is_wumpus_very_near)
+
+@ Prepare the stack by loading the number of links per room and decrementing.
+@ We will loop until this reaches 0 or we find the wumpus.
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (number_of_links_per_room address)
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+
+@ Check one nearby room on each pass through this loop.
+@ TOS> tunnel_index, room_number
+NSSVTSSTTTTTSSSSSSSSN | MARK: 10011111 00000000 (is_wumpus_very_near:loop)
+SNS                   | DUP
+SSSTTN                | PUSH 3
+NSTTTSSN              | JSR > 1100 (deepdup)
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+NSTTSTSSSSSN          | JSR > 10100000 (room_has_wumpus)
+NTSTSSTTTTTSSSSSSSTN  | BRZ > 10011111 00000001 (no_wumpus_in_this_room)
+@ Found wumpus. Clean up and return.
+SNN                   | DROP
+SNN                   | DROP
+SSSTN                 | PUSH 1
+NTN                   | RTS
+NSSVTSSTTTTTSSSSSSSTN | MARK: 10011111 00000001 (no_wumpus_in_this_room)
+@ Test for end of loop.
+SNS                   | DUP
+NTSTSSTTTTTSSSSSSTSN  | BRZ > 10011111 00000010 (is_wumpus_very_near:loop_end)
+@ No wumpus found yet, but still need to check some rooms.
+@ Decrement tunnel index and loop again.
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NSNTSSTTTTTSSSSSSSSN  | JMP > 10011111 00000000 (is_wumpus_very_near:loop)
+@ No wumpus found in nearby rooms. Clean up and return.
+NSSVTSSTTTTTSSSSSSTSN | MARK: 10011111 00000010 (is_wumpus_very_near:loop_end)
+SNN                   | DROP
+SNN                   | DROP
+SSSSN                 | PUSH 0
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   is_wumpus_near
+@ Description:
+@   Given a room number, checks rooms within two hops for the wumpus.
+@   Returns 1 if wumpus is present, otherwise 0.
+@ Call Stack:
+@   room_number  <-- TOS
+@ Return Stack:
+@   1 or 0  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
+NSSVTSSTTTTSN         | MARK: 10011110 (is_wumpus_near)
+
+@ Prepare the stack by loading the number of links per room and decrementing.
+@ We will loop until this reaches 0 or we find the wumpus.
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (number_of_links_per_room address)
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+
+@ Check one nearby room and its connecting rooms on each pass through this loop.
+@ TOS> tunnel_index, room_number
+NSSVTSSTTTTSSSSSSSSSN | MARK: 10011110 00000000 (is_wumpus_near:loop)
+SNS                   | DUP
+SSSTTN                | PUSH 3
+NSTTTSSN              | JSR > 1100 (deepdup)
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+@ TOS> tunnel_endpoint, tunnel_index, room_number
+SNS                   | DUP
+NSTTSTSSSSSN          | JSR > 10100000 (room_has_wumpus)
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NTSTSSTTTTSSSSSSSTTN  | BRZ > 10011110 00000011 (found_wumpus_one_hop)
+NSTTSSTTTTTN          | JSR > 10011111 (is_wumpus_very_near)
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NTSTSSTTTTSSSSSSTSSN  | BRZ > 10011110 00000100 (found_wumpus_two_hops)
+@ Test for end of loop.
+SNS                   | DUP
+NTSTSSTTTTSSSSSSSTSN  | BRZ > 10011110 00000010 (is_wumpus_near:loop_end)
+@ No wumpus found yet, but still need to check some rooms.
+@ Decrement tunnel index and loop again.
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NSNTSSTTTTSSSSSSSSSN  | JMP > 10011110 00000000 (is_wumpus_near:loop)
+
+@ No wumpus found in nearby rooms. Clean up and return.
+NSSVTSSTTTTSSSSSSSTSN | MARK: 10011110 00000010 (is_wumpus_near:loop_end)
+SNN                   | DROP
+SNN                   | DROP
+SSSSN                 | PUSH 0
+NTN                   | RTS
+
+@ Found wumpus. Clean up and return.
+NSSVTSSTTTTSSSSSSSTTN | MARK: 10011110 00000011 (found_wumpus_one_hop)
+SNN                   | DROP
+NSSVTSSTTTTSSSSSSTSSN | MARK: 10011110 00000100 (found_wumpus_two_hops)
+SNN                   | DROP
+SNN                   | DROP
+SSSTN                 | PUSH 1
+NTN                   | RTS
+
+#endif

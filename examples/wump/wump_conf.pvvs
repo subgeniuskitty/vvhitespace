@@ -1,0 +1,51 @@
+#ifndef WUMP_CONF
+#define WUMP_CONF
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ (c) 2019 Aaron Taylor <ataylor at subgeniuskitty dot com>
+@ See LICENSE.txt file for copyright and license details.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ All user configurable options are contained in this file.
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   set_config_values
+@ Description:
+@   Place user-configurable values for Hunt the Wumpus on the heap.
+@   The program assumes the values are sane. (e.g. #pits < #rooms, etc)
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <heap.pvvs>
+NSSVTSSSSSSTN         | MARK: 10000001 (set_config_values)
+
+@ Number of arrows
+SSSTSTN               | PUSH +5
+
+@ Maximum arrow travel distance
+SSSTSTN               | PUSH +5
+
+@ Maximum links per room (must be >2)
+SSSTTN                | PUSH +3
+
+@ Number of bats in cave
+SSSTSN                | PUSH +2
+
+@ Number of pits in cave
+SSSTSN                | PUSH +2
+
+@ Number of rooms in cave
+SSSTSTSSN             | PUSH +20
+
+@ Push config values to heap and return.
+SSSTSSSSSSSSSSSSN     | PUSH 0x1000 (GAME_DATA_BASE address)
+SSSTSTN               | PUSH +5 (word count)
+NSTTTTTTN             | JSR > 11111 (spew)
+NTN                   | RTS
+
+#endif

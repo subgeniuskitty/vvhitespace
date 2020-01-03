@@ -1,12 +1,12 @@
 # (c) 2019 Aaron Taylor <ataylor at subgeniuskitty dot com>
-# All rights reserved.
+# See LICENSE.txt file for copyright and license details.
 
 include ../config.mk
 
 all: wump
 
 wump:
-	$(CPP) $(CPP_FLAGS) -o temp.pvvs wump_strings.pvvs
+	$(CPP) $(CPP_FLAGS) -o temp.pvvs wump.pvvs
 	$(VVS_COMPILER) -i temp.pvvs -o wump.vvs
 	@rm -f temp.pvvs
 
