@@ -5,34 +5,44 @@
 @ Name:
 @   random (10000)
 @ Description:
-@   Returns a kinda-random number.
-@   Before using for the first time, seed heap[0] with a value.
+@   Returns a pseudo-random number.
+@   Before using for the first time, seed heap[0] with a non-zero value.
+@   This PRNG was taken from: https://en.wikipedia.org/wiki/Xorshift
 @ Call Stack:
 @   empty
 @ Return Stack:
 @   random number  <-- TOS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <logic.pvvs>
 NSSVTSSSSN              | Mark: 10000 (random)
 
-@ Generate the next seed value
+@ Fetch seed from heap[0].
 SSSSN                   | PUSH 0 (ptr)
 TTT                     | LOAD
-SSSTSSSSSTTTSSSTTSSTSSTTTSSTTSTTSTN | PUSH 1103515245
-TSSN                    | MULTIPLY
-SSSTTSSSSSSTTTSSTN      | PUSH 12345
-TSSS                    | ADD
 
-@ Store the next seed value but keep a copy on the stack.
+@ Set TOS ^= TOS << 13
+SNS                     | DUP
+SSSTTSTN                | PUSH +13
+NSTTSTTSTN              | JSR > 101101 (lshift)
+NSTTSTSTTN              | JSR > 101011 (xor)
+
+@ Set TOS ^= TOS >> 7
+SNS                     | DUP
+SSSTTTN                 | PUSH +7
+NSTTSTTSSN              | JSR > 101100 (rshift)
+NSTTSTSTTN              | JSR > 101011 (xor)
+ 
+@ Set TOS ^= TOS << 17
+SNS                     | DUP
+SSSTSSSTN               | PUSH +17
+NSTTSTTSTN              | JSR > 101101 (lshift)
+NSTTSTSTTN              | JSR > 101011 (xor)
+
+@ Store a copy of the new seed at heap[0] and return.
 SNS                     | DUP
 SSSSN                   | PUSH 0 (ptr)
 SNT                     | SWAP
 TTS                     | STORE
-
-@ Calculate the random number and return.
-SSSTSSSSSSSSSSSSSSSSN   | PUSH 65536
-TSTS                    | DIVIDE
-SSSTSSSSSSSSSSSSSSSN    | PUSH 32768
-TSTT                    | MODULO
 NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
