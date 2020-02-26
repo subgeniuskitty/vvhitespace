@@ -60,6 +60,49 @@ NTN                   | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
+@   move_or_shoot
+@ Description:
+@   Parse user input, branching to the appropriate subroutine to move or shoot.
+@   This function does not perform any boundary checks/limits.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stdio.pvvs>
+NSSVTSTSSSTSN         | MARK: 10100010 (move_or_shoot)
+
+NSTTSSTTSSTN          | JSR > 10011001 (get_line)
+
+@ Examine the first character of the user input buffer for 'm' or 's'.
+@ If character is something else, prompt user to try again.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TTT                   | LOAD
+SSSSTTSTTSTN          | PUSH 109 (ASCII 'm')
+TSST                  | SUBTRACT
+NTSTSTSSSTSSSSSSSSSN  | BRZ > 10100010 00000000 (move)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TTT                   | LOAD
+SSSSTTTSSTTN          | PUSH 115 (ASCII 's')
+TSST                  | SUBTRACT
+NTSTSTSSSTSSSSSSSSTN  | BRZ > 10100010 00000001 (shoot)
+NSTTTTTTTTTSSSSTSSSN  | JSR > 11111111 00001000 (problem_with_input)
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSNTSTSSSTSN          | JMP > 10100010 (move_or_shoot)
+
+@ User typed 'm'
+NSSVTSTSSSTSSSSSSSSSN | MARK: 10100010 00000000 (move)
+@ TODO: JSR move
+NTN                   | RTS
+
+@ User typed 's'
+NSSVTSTSSSTSSSSSSSSTN | MARK: 10100010 00000001 (shoot)
+@ TODO: JSR shoot
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
 @   get_answer
 @ Description:
 @   Parse user input, returning 0 if user string started with 'n' or 1 if 'y'.
@@ -90,7 +133,7 @@ TTT                   | LOAD
 SSSSTTSTTTSN          | PUSH 110 (ASCII 'n')
 TSST                  | SUBTRACT
 NTSTSSTTSSSSSSSSSSTN  | BRZ > 10011000 00000001 (answer: no)
-NSTTTTTTTTTSSSSTSSSN  | JSR > 11111111 00001000 (problem_with_yes_no_answer)
+NSTTTTTTTTTSSSSTSSSN  | JSR > 11111111 00001000 (problem_with_input)
 SSSSN                 | PUSH 0 (number of string substitutions)
 NSTTSSSN              | JSR > 1000 (printf)
 NSNTSSTTSSSN          | JMP > 10011000 (get_answer)

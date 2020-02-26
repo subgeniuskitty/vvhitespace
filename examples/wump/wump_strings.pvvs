@@ -42,8 +42,8 @@ NSSVTTTTTTTTSSSSSTTTN | Mark: 11111111 00000111 (please_seed_rng)
 A"\n\n\n\nWelcome to Hunt the Wumpus!\n\nPlease press 16 keys to seed the RNG.\n               |\n"
 NTN                   | RTS
 
-NSSVTTTTTTTTSSSSTSSSN | Mark: 11111111 00001000 (problem_with_yes_no_answer)
-A"I don't understand your answer; please enter 'y' or 'n'!\n"
+NSSVTTTTTTTTSSSSTSSSN | Mark: 11111111 00001000 (problem_with_input)
+A"I don't understand!\n"
 NTN                   | RTS
 
 NSSVTTTTTTTTSSSSTSSTN | Mark: 11111111 00001001 (instructions)
