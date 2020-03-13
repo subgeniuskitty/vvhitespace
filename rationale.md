@@ -17,7 +17,7 @@ which can be visually regrouped as
 
     SSSSNSN NSSSTSTTTSN
 
-and contains the `MARK label0` command (i.e. `NSS STSTTTS N`) used in the next
+and contains the `MARK label0` command (i.e. `NSSSTSTTTSN`) used in the next
 set of examples.
 
 Additionally, since `PUSH 0; DROP` is effectively a `NOP`, 'hijacking' the code
@@ -43,40 +43,37 @@ discovering that they broke down into two methods for locating labels.
     Examples:
     
         whitespacers/haskell: (c) 2003 Edwin Brady
-    
         whitespacers/ruby: (c) 2003 by Wayne E. Conrad
-    
         whitespacers/perl: (c) 2003 Micheal Koelbl
-    
         threeifbywhiskey/satan
 
 Both of these methods can be broken using valid Whitespace code:
 
-  * Type A: No 'standalone' label exists. This breaks Method 2.
+  * **Type A**: No 'standalone' label exists. This breaks Method 2.
 
     By programmer's intent, this should print a '!' before infinite '.' lines.
 
-  * Type B: Hidden label before 'standalone' label. This breaks Method 1.
+  * **Type B**: Hidden label before 'standalone' label. This breaks Method 1.
 
     By programmer's intent, this should print an infinite chain of '.' lines.
 
 This is the Type A program:
 
-    SSSTSSSSTN  | Push +33 (ASCII !)
-    NSNSTSTTTSN | JMP>label0
-    NSSTTTTN    | MARK label2
-    SSSSN       | PUSH +0
+    SSSTSSSSTN  | Push +33 (ASCII '!')
+    NSNSTSTTTSN | JMP > 0101110 (label0)
+    NSSTTTTN    | MARK: 1111 (label2)
+    SSSSN       | PUSH 0
     SNN         | DROP
-    SSSTSTTTSN  | Push +46 (ASCII .)
+    SSSTSTTTSN  | Push +46 (ASCII '.')
     TNSS        | Output character
-    SSSTSTSN    | Push +10 (ASCII newline)
+    SSSTSTSN    | Push +10 (ASCII '\n')
     TNSS        | Output character
-    NSNTTTTN    | JMP>label2
+    NSNTTTTN    | JMP > 1111 (label2)
 
 Append this to turn it into the Type B program:
 
-    NSSSTSTTTSN | MARK label0 (2nd time)
-    NSNTTTTN    | JMP>label2
+    NSSSTSTTTSN | MARK: 0101110 (label0) (2nd time)
+    NSNTTTTN    | JMP > 1111 (label2)
 
 VVhitespace avoids this ambiguity by marking label definitions with a vertical
 tab `[VTab]` immediately before the label.
