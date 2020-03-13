@@ -33,7 +33,7 @@ NSTTSSTTSTTN          | JSR > 10011011 (print_cave_description)
 @ Main game loop
 NSSVTSSTTSTSN         | MARK: 10011010 (wump_loop)
 NSTTSTSSSSTN          | JSR > 10100001 (print_room_stats)
-A"Move or shoot? (m-s)\n"
+A"Move or shoot? (m/s)\n"
 SSSSN                 | PUSH 0 (number of string substitutions)
 NSTTSSSN              | JSR > 1000 (printf)
 NSTTSTSSSTSN          | JSR > 10100010 (move_or_shoot)
