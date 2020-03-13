@@ -1,0 +1,20 @@
+SSSSSTSTTTTN    | PUSH 47 (ASCII '/')
+NSTTSSSSTN      | JSR > 100001 (isdigit)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
+
+SSSSSTTSSSSN    | PUSH 48 (ASCII '0')
+NSTTSSSSTN      | JSR > 100001 (isdigit)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
+
+SSSSSTTTSSTN    | PUSH 57 (ASCII '9')
+NSTTSSSSTN      | JSR > 100001 (isdigit)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
+
+SSSSSTTTSTSN    | PUSH 58 (ASCII ':')
+NSTTSSSSTN      | JSR > 100001 (isdigit)
+NSTTTTTSTN      | JSR > 111101 (debug:printsignednumber)
+
+NNN             | DIE
+
+#include <debug.pvvs>
+#include <string.pvvs>

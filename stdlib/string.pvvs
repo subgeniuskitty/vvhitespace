@@ -36,4 +36,36 @@ NSSVSSTSSSSSSSSSSSSTN   | Mark: 00100000 00000001
 SNN                     | DROP
 NTN                     | RTS
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   isdigit (100001)
+@ Description:
+@   Tests 'character' on stack. Is it an ASCII number?
+@   Returns 1 or 0 representing True/False.
+@ Call Stack:
+@   character  <-- TOS
+@ Return Stack:
+@   1 or 0  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSSSTN             | Mark: 100001 (isdigit)
+
+SSSSSTTSSSSN            | PUSH 48 (ASCII '0')
+TSST                    | SUBTRACT
+SNS                     | DUP
+NTTSSTSSSSTSSSSSSSSN    | BMI > 00100001 00000000 (not digit)
+SNS                     | DUP
+SSSTSTSN                | PUSH 10
+TSST                    | SUBTRACT
+NTTSSTSSSSTSSSSSSSTN    | BMI > 00100001 00000001 (is digit)
+
+NSSVSSTSSSSTSSSSSSSSN   | Mark: 00100001 00000000 (not digit)
+SNN                     | DROP
+SSSSN                   | PUSH 0
+NTN                     | RTS
+
+NSSVSSTSSSSTSSSSSSSTN   | Mark: 00100001 00000001 (is digit)
+SNN                     | DROP
+SSSTN                   | PUSH 1
+NTN                     | RTS
+
 #endif

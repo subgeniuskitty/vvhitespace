@@ -54,6 +54,7 @@ header comment for each function to learn the call and return stack.
           11111 ----- spew                          (heap.pvvs)
          100xxx - string functions
          100000 ----- strlen                        (string.pvvs)
+         100001 ----- isdigit                       (string.pvvs)
          101xxx - logic functions
          101000 ----- not                           (logic.pvvs)
          101001 ----- and                           (logic.pvvs)
