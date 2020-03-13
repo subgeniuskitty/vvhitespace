@@ -50,6 +50,7 @@ tests = [
         ['6007_printf_staticheapstring', '', 'test'],
         ['6008_printf_escapedstackstring', '', '\\%\t\n'],
         ['6009_printf_substitutedstackstring', '', 'Atest142+42'],
+        ['7001_atoi', '', '+42+42-42+0+0+0'],
         ] 
 
 for test in tests:

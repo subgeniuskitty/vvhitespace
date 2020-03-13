@@ -63,6 +63,7 @@ header comment for each function to learn the call and return stack.
          101100 ----- rshift                        (logic.pvvs)
          101101 ----- lshift                        (logic.pvvs)
          110xxx - conversion functions
+         110000 ----- atoi                          (convert.pvvs)
          111xxx - debug functions
          111000 ----- dump heap                     (debug.pvvs)
          111001 ----- dump stack                    (debug.pvvs)

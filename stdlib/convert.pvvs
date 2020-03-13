@@ -1,0 +1,88 @@
+#ifndef VVS_STDLIB_CONVERT
+#define VVS_STDLIB_CONVERT
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   atoi (110000)
+@ Description:
+@   Convert null-terminated ASCII string to integer.
+@   Result is negative if leading character is a hyphen ('-').
+@   Result is positive if leading character is a plus sign ('+') or number.
+@   Excluding the sign, parsing halts on the first non-numeric ASCII character.
+@   Since all possible return values are valid, this subroutine simply returns
+@   zero if no parseable number was found. Any stronger validity checks are the
+@   responsibility of the caller. Similarly, no overflow checks are performed.
+@   In addition to returning the parsed integer, also returns a pointer to the
+@   first character after the parsed integer.
+@ Call Stack:
+@   pointer to first character  <-- TOS
+@ Return Stack:
+@   integer
+@   pointer to last parsed character  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
+#include <string.pvvs>
+NSSVTTSSSSN             | Mark: 110000 (atoi)
+
+@ Check the first character and create a 'sign' flag on the stack.
+@ Update the pointer to point to the first numeric character.
+SNS                     | DUP
+TTT                     | LOAD
+SSSSSTSTTSTN            | PUSH 45 (ASCII '-')
+TSST                    | SUBTRACT
+NTSSSTTSSSSSSSSSSSSN    | BRZ > 00110000 00000000 (found_minus_sign)
+SNS                     | DUP
+TTT                     | LOAD
+SSSSSTSTSTTN            | PUSH 43 (ASCII '+')
+TSST                    | SUBTRACT
+NTSSSTTSSSSSSSSSSSTN    | BRZ > 00110000 00000001 (found_plus_sign)
+NSNSSTTSSSSSSSSSSTSN    | JMP > 00110000 00000010 (found_digit)
+NSSVSSTTSSSSSSSSSSSTN   | Mark: 00110000 00000001 (found_plus_sign)
+SSSTN                   | PUSH +1
+TSSS                    | ADD
+NSSVSSTTSSSSSSSSSSTSN   | Mark: 00110000 00000010 (found_digit)
+SSSTN                   | PUSH +1 (sign_flag)
+SNT                     | SWAP
+NSNSSTTSSSSSSSSSSTTN    | JMP > 00110000 00000011 (done_with_sign_flag)
+NSSVSSTTSSSSSSSSSSSSN   | Mark: 00110000 00000000 (found_minus_sign)
+SSSTN                   | PUSH +1
+TSSS                    | ADD
+SSTTN                   | PUSH -1 (sign_flag)
+SNT                     | SWAP
+NSSVSSTTSSSSSSSSSSTTN   | Mark: 00110000 00000011 (done_with_sign_flag)
+
+@ Create an accumulator on the TOS.
+SSSSN                   | PUSH 0 (accumulator)
+
+@ Main loop examines string one character at a time, building result in accumulator.
+@ TOS> accumulator, string_ptr, sign_flag
+NSSVSSTTSSSSSSSSSTSSN   | Mark: 00110000 00000100 (atoi:main_loop)
+SSSTSN                  | PUSH +2
+NSTTTSSN                | JSR > 1100 (deepdup)
+TTT                     | LOAD
+SNS                     | DUP
+NSTTSSSSTN              | JSR > 100001 (isdigit)
+NTSSSTTSSSSSSSSSTSTN    | BRZ > 00110000 00000101 (found_end_of_number)
+SSSSSTTSSSSN            | PUSH 48 (ASCII '0')
+TSST                    | SUBTRACT
+SNT                     | SWAP
+SSSTSTSN                | PUSH 10
+TSSN                    | MULTIPLY
+TSSS                    | ADD
+SNT                     | SWAP
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+SNT                     | SWAP
+NSNSSTTSSSSSSSSSTSSN    | JMP > 00110000 00000100 (atoi:main_loop)
+
+@ Clean up and return
+@ TOS> character, accumulator, string_ptr, sign_flag
+NSSVSSTTSSSSSSSSSTSTN   | Mark: 00110000 00000101 (found_end_of_number)
+SNN                     | DROP
+SSSTTN                  | PUSH 3
+NSTTSTTN                | JSR > 1011 (stackrotatereverse)
+TSSN                    | MULTIPLY
+SNT                     | SWAP
+NTN                     | RTS
+
+#endif
