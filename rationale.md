@@ -17,7 +17,8 @@ which can be visually regrouped as
 
     SSSSNSN NSSSTSTTTSN
 
-and contains the `MARK label0` command used in the next set of examples.
+and contains the `MARK label0` command (i.e. `NSS STSTTTS N`) used in the next
+set of examples.
 
 Additionally, since `PUSH 0; DROP` is effectively a `NOP`, 'hijacking' the code
 at this location allows one to insert their own integer on the stack in place
@@ -30,17 +31,24 @@ discovering that they broke down into two methods for locating labels.
   * **Method 1** Scan from the start of the file for the first occurence of the
     mark-label bytestring and jump.
     
-    Example:  whitespacers/c: (c) meth0dz
+    Examples:
+    
+        whitespacers/c: (c) meth0dz
 
   * **Method 2** Scan from the start of the file, looking for a mark-label
     bytestring, but 'parsing' one bytestring at a time, and jumping to the
     first 'standalone' mark-label bytestring. Note that this is different than
     executing the program, particularly when user-input commands are present.
     
-    Example: whitespacers/haskell: (c) 2003 Edwin Brady
-             whitespacers/ruby: (c) 2003 by Wayne E. Conrad
-             whitespacers/perl: (c) 2003 Micheal Koelbl
-             threeifbywhiskey/satan
+    Examples:
+    
+        whitespacers/haskell: (c) 2003 Edwin Brady
+    
+        whitespacers/ruby: (c) 2003 by Wayne E. Conrad
+    
+        whitespacers/perl: (c) 2003 Micheal Koelbl
+    
+        threeifbywhiskey/satan
 
 Both of these methods can be broken using valid Whitespace code:
 
