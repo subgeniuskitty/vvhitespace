@@ -51,11 +51,11 @@ Both of these methods can be broken using valid Whitespace code:
 
   * **Type A**: No 'standalone' label exists. This breaks Method 2.
 
-    By programmer's intent, this should print a '!' before infinite '.' lines.
+    By programmer's intent, this should print a `!` before infinite `.` lines.
 
   * **Type B**: Hidden label before 'standalone' label. This breaks Method 1.
 
-    By programmer's intent, this should print an infinite chain of '.' lines.
+    By programmer's intent, this should print an infinite chain of `.` lines.
 
 This is the Type A program:
 
