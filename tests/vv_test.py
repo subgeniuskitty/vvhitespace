@@ -1,20 +1,23 @@
 #!/usr/local/bin/python3.6
 
 # (c) 2019 Aaron Taylor <ataylor at subgeniuskitty dot com>
-# All rights reserved.
+# See LICENSE.txt file for copyright and license details.
 
 # Quick and dirty tests for the VVhitespace interpreter.
+# Invoke directly or see README.md in this folder for more details.
 
-import os, subprocess
-
+# Configuration Options
+# All paths are relative to the PWD environment variable of the invoked script.
 compiler_path = '../vvc'
 interpreter_path = '../vvi'
 temp_file = './test.vvs'
 path_to_tests = './'
 src_extension = '.pvvs'
 
+# List of tests to perform.
+# Tests should be ordered such that later tests rely exclusively on previously tested commands.
+# Test Entry Format: ['filename_without_extension', 'string for stdin', 'string for expected stdout']
 tests = [
-        # Format: ['filename_without_extension', 'string for stdin', 'string for expected stdout']
         ['0001_push_printchar_exit', '', 'A'],
         ['1001_stack_push', '', 'A'],
         ['1002_stack_dup', '', 'AA'],
@@ -40,11 +43,17 @@ tests = [
         ['6001_push_intmin', '', '1'],
         ] 
 
+# ------------------------------------------------------------------------------
+
+import os, subprocess
+
 for test in tests:
     subprocess.run([compiler_path, '-i', path_to_tests + test[0] + src_extension, '-o', temp_file])
     result = subprocess.run([interpreter_path, '-i', temp_file], stdout=subprocess.PIPE, input=test[1].encode('utf-8'))
     if result.stdout.decode('utf-8') != test[2]:
         print('\n' + test[0])
+        print('\tExpected: ' + test[2])
+        print('\tReceived: ' + result.stdout.decode('utf-8'))
     else:
         print('.', end='', flush=True)
     os.remove(temp_file)

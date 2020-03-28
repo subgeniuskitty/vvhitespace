@@ -1,5 +1,5 @@
 # This test verifies the flow control IMP for marking labels and
-# unconditionally jumping to them..
+# unconditionally jumping to them.
 
 SSSTSSSSSTN     | ST: Push +65 (ASCII A)
 NSNTSTSTSN      | FC: Unconditional jump -> '42'
