@@ -71,6 +71,7 @@ header comment for each function to learn the call and return stack.
          111011 ----- print magnitude               (debug.pvvs)
          111100 ----- print string                  (debug.pvvs)
          111101 ----- print signed number           (debug.pvvs)
+         111110 ----- stdlib version                (debug.pvvs)
         1xxxxxx - reserved for less common entry points
         1000000 ----- lowbitand                     (logic.pvvs)
         1000001 ----- <empty>

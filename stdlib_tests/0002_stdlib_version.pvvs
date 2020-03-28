@@ -1,0 +1,6 @@
+NSTTTTTTSN      | JSR > 111110 (stdlib_version)
+SSSTN           | PUSH 1 (count)
+NSTTTTSSTN      | JSR > 111001 (dumpstack)
+NNN             | DIE
+
+#include <debug.pvvs>

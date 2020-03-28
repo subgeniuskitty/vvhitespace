@@ -221,4 +221,19 @@ NSTTTTSTSN              | JSR > 111010 (debug:printsign)
 NSTTTTSTTN              | JSR > 111011 (debug:printmagnitude)
 NTN                     | RTS
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   stdlib_version (111110)
+@ Description:
+@   Returns the version of the stdlib.
+@   The version number should be a monotonically increasing integer.
+@ Call Stack:
+@   <empty>   <-- TOS
+@ Return Stack:
+@   version_number  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTTTTTSN             | Mark: 111110 (debug:printsignednumber)
+SSSTN                   | PUSH 1 (version)
+NTN                     | RTS
+
 #endif

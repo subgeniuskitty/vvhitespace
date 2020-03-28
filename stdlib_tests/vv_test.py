@@ -1,12 +1,13 @@
 #!/usr/local/bin/python3.6
 
 # (c) 2019 Aaron Taylor <ataylor at subgeniuskitty dot com>
-# All rights reserved.
+# See LICENSE.txt file for copyright and license details.
 
 # Quick and dirty tests for the VVhitespace stdlib.
+# Invoke directly or see README.md in this folder for more details.
 
-import os, subprocess
-
+# Configuration Options
+# All paths are relative to the PWD environment variable of the invoked script.
 preprocessor = 'cpp'
 include_path = '-I../stdlib'
 cpp_temp_file = 'test.pvvs'
@@ -16,10 +17,13 @@ temp_file = './test.vvs'
 path_to_tests = './'
 src_extension = '.pvvs'
 
+# List of tests to perform.
+# Tests should be ordered such that later tests rely exclusively on previously tested commands.
+# Format: ['filename_without_extension', 'string for stdin', 'string for expected stdout']
 tests = [
-        # Format: ['filename_without_extension', 'string for stdin', 'string for expected stdout']
         ['0001_dumpstack', '', 'TOS:\n2:\t+42\n1:\t+255\n'],
-        ['0002_dumpheap', '', '32:\t+255\n33:\t+42\n'],
+        ['0002_stdlib_version', '', 'TOS:\n1:\t+1\n'],
+        ['0003_dumpheap', '', '32:\t+255\n33:\t+42\n'],
         ['1001_stackrotate', '', 'TOS:\n14:\t+1\n13:\t+244\n12:\t+1\n11:\t+1\n10:\t+1\n9:\t+1\n8:\t+1\n7:\t+243\n6:\t+1\n5:\t+1\n4:\t+1\n3:\t+1\n2:\t+1\n1:\t+242\n'],
         ['1002_stackrotatereverse', '', 'TOS:\n14:\t+1\n13:\t+244\n12:\t+1\n11:\t+1\n10:\t+1\n9:\t+1\n8:\t+1\n7:\t+1\n6:\t+1\n5:\t+1\n4:\t+1\n3:\t+1\n2:\t+1\n1:\t+1\n'],
         ['1003_deepdup', '', 'TOS:\n15:\t+1\n14:\t+244\n13:\t+1\n12:\t+1\n11:\t+1\n10:\t+1\n9:\t+1\n8:\t+1\n7:\t+1\n6:\t+1\n5:\t+1\n4:\t+1\n3:\t+1\n2:\t+1\n1:\t+244\n'],
@@ -53,12 +57,18 @@ tests = [
         ['7001_atoi', '', '+42+42-42+0+0+0'],
         ] 
 
+# ------------------------------------------------------------------------------
+
+import os, subprocess
+
 for test in tests:
     subprocess.run([preprocessor, include_path, "-o", cpp_temp_file, path_to_tests + test[0] + src_extension])
     subprocess.run([compiler_path, '-i', cpp_temp_file, '-o', temp_file])
     result = subprocess.run([interpreter_path, '-i', temp_file], stdout=subprocess.PIPE, input=test[1].encode('utf-8'))
     if result.stdout.decode('utf-8') != test[2]:
         print('\n' + test[0])
+        print('\tExpected: ' + test[2])
+        print('\tReceived: ' + result.stdout.decode('utf-8'))
     else:
         print('.', end='', flush=True)
     os.remove(cpp_temp_file)
