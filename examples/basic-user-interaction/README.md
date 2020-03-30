@@ -88,17 +88,20 @@ substitutions in the string followed by the two substitutions in order, first a
 pointer to a string and then an integer. Finally, we have the string itself,
 with a null terminator at the end.
 
-It is time to call `printf and then exit.
+It is time to call `printf` and then exit.
 
     NSTTSSSN            | JSR > 1000 (printf)
     NNN                 | Terminate program
 
-Do not forget to include the library files for any subroutines called.
+Do not forget to include the library files for any subroutines called. These
+must be placed outside the path of normal execution flow. The end of the file
+is usually suitable.
 
     #include <stdio.pvvs>
     #include <string.pvvs>
     #include <convert.pvvs>
 
-The file `hello.pvvs` contains the program discussed and may be executed with a
-`make run` in this directory.
+That's the whole program. The file `hello.pvvs` contains an uncommented version
+of this exact source code and may be executed with a `make run` in this
+directory.
 
