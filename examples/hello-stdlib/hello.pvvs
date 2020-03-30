@@ -1,8 +1,0 @@
-@@ This program outputs "Hello, world!"
-
-A"Hello, world!\n"
-SSSSN           | ST: PUSH 0
-NSTTSSSN        | FC: JSR>1000 (printf; see stdlib)
-NNN             | FC: Terminate program
-
-#include <stdio.pvvs>
