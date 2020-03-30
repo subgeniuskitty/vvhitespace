@@ -1,3 +1,6 @@
+@ (c) 2020 Aaron Taylor <ataylor at subgeniuskitty dot com>
+@ See LICENSE.txt file for copyright and license details.
+
 #ifndef VVS_STDLIB_STRING
 #define VVS_STDLIB_STRING
 
