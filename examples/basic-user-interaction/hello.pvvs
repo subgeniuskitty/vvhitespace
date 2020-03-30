@@ -1,0 +1,33 @@
+@ This example uses printf to print a string containing two user inputs of type
+@ string and integer, both supplied by the user at runtime.
+
+A"Hello, %s! In a trusting world, %u is older than I am.\n"
+
+A"What is your name?\n"
+SSSSN               | PUSH 0
+NSTTSSSN            | JSR > 1000 (printf)
+SSSTSSSSSSSSSSSSN   | PUSH 0x1000 (buf_size)
+SSSTSSSSSSSSSSSSN   | PUSH 0x1000 (buf_addr)
+NSTTSSSTSN          | JSR > 100010 (get_user_string)
+
+A"How old age you?\n"
+SSSSN               | PUSH 0
+NSTTSSSN            | JSR > 1000 (printf)
+SSSTSSSSSSSSSSSSN   | PUSH 0x1000 (buf_size)
+SSSTSSSSSSSSSSSSSN  | PUSH 0x2000 (buf_addr)
+NSTTSSSTSN          | JSR > 100010 (get_user_string)
+SSSTSSSSSSSSSSSSSN  | PUSH 0x2000 (buf_addr)
+NSTTTSSSSN          | JSR > 110000 (atoi)
+SNN                 | DROP
+
+SSSTSSSSSSSSSSSSN   | PUSH 0x1000 (buf_addr)
+
+SSSTSN              | PUSH 2
+
+NSTTSSSN            | JSR > 1000 (printf)
+
+NNN                 | Terminate program
+
+#include <stdio.pvvs>
+#include <string.pvvs>
+#include <convert.pvvs>
