@@ -1,6 +1,8 @@
 # Overview #
 
-This folder contains example VVhitespace programs.
+This folder contains example VVhitespace programs. If you're just getting
+started, you probably want to read the `hello-world` and
+`basic-user-interaction` examples first.
 
 Each program can be built and run by executing `make run` in the example
 sub-directory.
