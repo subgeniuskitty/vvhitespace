@@ -119,12 +119,15 @@ NTN                   | RTS
 #include <stdio.pvvs>
 #include <convert.pvvs>
 #include <math.pvvs>
+#include <string.pvvs>
 NSSVTSTSSSTTN         | MARK: 10100011 (move_player)
 
 A"To which room do you wish to move?\n"
 SSSSN                 | PUSH 0 (number of string substitutions)
 NSTTSSSN              | JSR > 1000 (printf)
-NSTTSSTTSSTN          | JSR > 10011001 (get_line)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer address)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer size)
+NSTTSSSTSN            | JSR > 100010 (get_user_string)
 SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
 NSTTTSSSSN            | JSR > 110000 (atoi)
 SNN                   | DROP
@@ -234,9 +237,12 @@ NTN                   | RTS
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #include <stdio.pvvs>
+#include <string.pvvs>
 NSSVTSTSSSTSN         | MARK: 10100010 (move_or_shoot)
 
-NSTTSSTTSSTN          | JSR > 10011001 (get_line)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer address)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer size)
+NSTTSSSTSN            | JSR > 100010 (get_user_string)
 
 @ Examine the first character of the user input buffer for 'm' or 's'.
 @ If character is something else, prompt user to try again.
@@ -277,13 +283,16 @@ NTN                   | RTS
 @   (1 or 0 for True/False)   <--- TOS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #include <stdio.pvvs>
+#include <string.pvvs>
 NSSVTSSTTSSSN         | MARK: 10011000 (get_answer)
 
 @ TODO: Consider extending the GETCHAR instruction in VVS to indicate an empty
 @       buffer instead of blocking. This would allow a character by character
 @       check without printing a slew of retry messages if the buffer is
 @       non-empty.
-NSTTSSTTSSTN          | JSR > 10011001 (get_line)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer address)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer size)
+NSTTSSSTSN            | JSR > 100010 (get_user_string)
 
 @ Examine the first character of the user input buffer for 'y' or 'n'.
 @ If character is something else, prompt user to try again.
@@ -310,43 +319,6 @@ NTN                   | RTS
 @ User typed 'n'
 NSSVTSSTTSSSSSSSSSSTN | MARK: 10011000 00000001 (answer: no)
 SSSSN                 | PUSH 0
-NTN                   | RTS
-
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@ Name:
-@   get_line
-@ Description:
-@   Read one line of user input and store in buffer.
-@   Appends null terminator to end of string.
-@   This function does not perform any boundary checks/limits.
-@ Call Stack:
-@   <empty>
-@ Return Stack:
-@   <empty>
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-NSSVTSSTTSSTN         | MARK: 10011001 (get_line)
-
-@ Get one character from user on each pass through this loop.
-@ Terminate loop when line break character is received.
-SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
-NSSVTSSTTSSTSSSSSSSSN | MARK: 10011001 00000000 (input loop)
-SNS                   | DUP
-SNS                   | DUP
-TNTS                  | GETCHAR
-TTT                   | LOAD
-SNS                   | DUP
-TNSS                  | PUTCHAR
-SSSTSTSN              | PUSH 10 (ASCII '\n')
-TSST                  | SUBTRACT
-NTSTSSTTSSTSSSSSSSTN  | BRZ > 10011001 00000001 (input loop:terminate)
-@ Character was not ENTER. Increment buffer pointer and loop again.
-SSSTN                 | PUSH 1
-TSSS                  | ADD
-NSNTSSTTSSTSSSSSSSSN  | JMP > 10011001 00000000 (input loop)
-@ Character was ENTER. Overwrite the line feed with a null term and return.
-NSSVTSSTTSSTSSSSSSSTN | MARK: 10011001 00000001 (input loop:terminate)
-SSSSN                 | PUSH 0 (ASCII '\0')
-TTS                   | STORE
 NTN                   | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
