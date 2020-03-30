@@ -1,9 +1,0 @@
-@@ This program outputs "-42424242"
-
-SSTTSTSSSSTTTSTSTSTTTTSTTSSTSN 	| ST: Push -42424242
-NSTTSSTN        		| FC: JSR>1001 (print number from stack; see stdlib)
-SSSTSTSN        		| ST: Push +10 (ASCII '\n')
-TNSS            		| IO: Putchar
-NNN             		| FC: Terminate program
-
-#include <stdio.pvvs>
