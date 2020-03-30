@@ -169,9 +169,7 @@ arrays with a leading `1` (i.e. negative numbers) may appear quite different
 then expected in your source code.
 
 For example, to push a 64-bit array of all `1`'s on to the stack we must push
-`SSTTN`, or `-1`, not
-`SSSTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTN`, or
-`2^65-1`.
+`SSTTN`, or `-1`.
 
 
 ## Extending Heap Reservation ##
