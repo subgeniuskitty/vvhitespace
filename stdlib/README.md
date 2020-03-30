@@ -78,9 +78,6 @@ to use the function.
 
 # Resource Reservations #
 
-Since all labels share a global namespace, the standard library makes the
-following reservations:
-
 
 ## Entry Points ##
 
@@ -138,6 +135,9 @@ header comment for each function to learn the call and return stack.
 
 
 ## Labels ##
+
+Since all labels share a global namespace, the standard library makes the
+following reservations:
 
     00000000 0xxxxxxx - reserved for stdlib function entry points
     00000000 1xxxxxxx - available for use in user programs
