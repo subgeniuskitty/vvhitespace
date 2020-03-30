@@ -68,4 +68,83 @@ SNN                     | DROP
 SSSTN                   | PUSH 1
 NTN                     | RTS
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   get_user_string
+@ Description:
+@   Read one line of user input or read buffer_size characters, whichever comes
+@     first, and store at buffer_address.
+@   Appends null terminator to end of string.
+@ Call Stack:
+@   buffer_size (>0)
+@   buffer_address    <-- TOS
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
+NSSVTSSSTSN             | MARK: 100010 (get_user_string)
+
+@ Verify we were handed a plausible buffer size.
+SNT                     | SWAP
+SNS                     | DUP
+NTSSSTSSSTSSSSSSSSSN    | BRZ > 00100010 00000000 (get_user_string:bad_buffer_size)
+SNS                     | DUP
+NTTSSTSSSTSSSSSSSSSN    | BMI > 00100010 00000000 (get_user_string:bad_buffer_size)
+SNT                     | SWAP
+
+@ Push an offset counter on to the stack for use inside the loop.
+SSSSN                   | PUSH 0
+
+@ Get one character from user on each pass through this loop.
+@ TOS> offset, buffer_addr, buffer_size
+NSSVSSTSSSTSSSSSSSSTN   | MARK: 00100010 00000001 (get_user_string:main_loop)
+@ Have we reached the end of the buffer?
+SSSTTN                  | PUSH 3
+NSTTTSSN                | JSR > 1100 (deepdup)
+SSSTSN                  | PUSH 2
+NSTTTSSN                | JSR > 1100 (deepdup)
+TSST                    | SUBTRACT
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+NTSSSTSSSTSSSSSSSTTN    | BRZ > 00100010 00000011 (get_user_string:end_of_buffer)
+@ Get a character, store it in the buffer, and echo it back to user.
+SNS                     | DUP
+SSSTTN                  | PUSH 3
+NSTTTSSN                | JSR > 1100 (deepdup)
+TSSS                    | ADD
+SNS                     | DUP
+TNTS                    | GETCHAR
+TTT                     | LOAD
+SNS                     | DUP (for later testing)
+TNSS                    | PUTCHAR
+@ Did the user press ENTER?
+SSSTSTSN                | PUSH 10 (ASCII '\n')
+TSST                    | SUBTRACT
+NTSSSTSSSTSSSSSSSTSN    | BRZ > 00100010 00000010 (get_user_string:end_of_line)
+@ User did not press ENTER. Increment offset and loop again.
+SSSTN                   | PUSH 1
+TSSS                    | ADD
+NSNSSTSSSTSSSSSSSSTN    | JMP > 00100010 00000001 (get_user_string:main_loop)
+
+NSSVSSTSSSTSSSSSSSTSN   | MARK: 00100010 00000010 (get_user_string:end_of_line)
+TSSS                    | ADD
+SSSSN                   | PUSH 0 (ASCII '\0')
+TTS                     | STORE
+SNN                     | DROP
+NTN                     | RTS
+
+NSSVSSTSSSTSSSSSSSTTN   | MARK: 00100010 00000011 (get_user_string:end_of_buffer)
+SNN                     | DROP
+TSSS                    | ADD
+SSSTN                   | PUSH 1
+TSST                    | SUBTRACT
+SSSSN                   | PUSH 0 (ASCII '\0')
+TTS                     | STORE
+NTN                     | RTS
+
+NSSVSSTSSSTSSSSSSSSSN   | MARK: 00100010 00000000 (get_user_string:bad_buffer_size)
+SNN                     | DROP
+SNN                     | DROP
+NNN                     | DIE
+
 #endif

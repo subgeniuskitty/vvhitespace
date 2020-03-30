@@ -1,0 +1,32 @@
+SSSTN                   | PUSH 1 (buffer_size)
+SSSTSSSSSSSSSSSSN       | PUSH 0x1000 (buffer_address)
+NSTTSSSTSN              | JSR > 100010 (get_user_string)
+SSSTSSSSSSSSSSSSN       | PUSH 0x1000 (buffer_address)
+NSTTSSSSSN              | JSR > 100000 (strlen)
+NSTTTTTSTN              | JSR > 111101 (debug:printsignednumber)
+
+SSSTSN                  | PUSH 2 (buffer_size)
+SSSTSSSSSSSSSSSSN       | PUSH 0x1000 (buffer_address)
+NSTTSSSTSN              | JSR > 100010 (get_user_string)
+SSSTSSSSSSSSSSSSN       | PUSH 0x1000 (buffer_address)
+NSTTSSSSSN              | JSR > 100000 (strlen)
+NSTTTTTSTN              | JSR > 111101 (debug:printsignednumber)
+
+SSSTSSN                 | PUSH 4 (buffer_size)
+SSSTSSSSSSSSSSSSN       | PUSH 0x1000 (buffer_address)
+NSTTSSSTSN              | JSR > 100010 (get_user_string)
+SSSTSSSSSSSSSSSSN       | PUSH 0x1000 (buffer_address)
+NSTTSSSSSN              | JSR > 100000 (strlen)
+NSTTTTTSTN              | JSR > 111101 (debug:printsignednumber)
+
+SSSTSSN                 | PUSH 4 (buffer_size)
+SSSTSSSSSSSSSSSSN       | PUSH 0x1000 (buffer_address)
+NSTTSSSTSN              | JSR > 100010 (get_user_string)
+SSSTSSSSSSSSSSSSN       | PUSH 0x1000 (buffer_address)
+NSTTSSSSSN              | JSR > 100000 (strlen)
+NSTTTTTSTN              | JSR > 111101 (debug:printsignednumber)
+
+NNN                     | DIE
+
+#include <debug.pvvs>
+#include <string.pvvs>
