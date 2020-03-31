@@ -144,7 +144,7 @@ SNN                   | DROP
 A"*Oof!* (you hit the wall)\n"
 SSSSN                 | PUSH 0 (number of string substitutions)
 NSTTSSSN              | JSR > 1000 (printf)
-NSTTSSSSN             | JSR > 10000 (random)
+NSTTSSTTN             | JSR > 10011 (fastrand)
 SSSTTSN               | PUSH 6 (chance)
 TSTT                  | MODULO
 NTSTSTSSSTTSSSSSSTSN  | BRZ > 10100011 00000010 (woke the wumpus)
@@ -153,7 +153,7 @@ NSSVTSTSSSTTSSSSSSTSN | MARK: 10100011 00000010 (woke the wumpus)
 A"Your colorful comments awaken the wumpus!\n"
 SSSSN                 | PUSH 0 (number of string substitutions)
 NSTTSSSN              | JSR > 1000 (printf)
-NSTTSSSSN             | JSR > 10000 (random)
+NSTTSSTTN             | JSR > 10011 (fastrand)
 SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (ptr to number of tunnels per room)
 TSTT                  | MODULO
 SSSTSSSSSSSSSTTTN     | PUSH 0x1007 (ptr to wumpus location)
@@ -194,7 +194,7 @@ SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player location)
 TTT                   | LOAD
 NSTTSSSTTSTN          | JSR > 10001101 (room_has_pits)
 NTSTSTSSSTTSSSSSTSTN  | BRZ > 10100011 00000101 (no pits in new room)
-NSTTSSSSN             | JSR > 10000 (random)
+NSTTSSTTN             | JSR > 10011 (fastrand)
 SSSTTSN               | PUSH 6 (chance)
 TSTT                  | MODULO
 NTSTSTSSSTTSSSSSTTSN  | BRZ > 10100011 00000110 (survived the pits)
@@ -215,7 +215,7 @@ NTSTSTSSSTTSSSSSTTSN  | BRZ > 10100011 00000110 (no bats in new room)
 A"*flap*  *flap*  *flap*  (humongous bats pick you up and move you!)\n"
 SSSSN                 | PUSH 0 (number of string substitutions)
 NSTTSSSN              | JSR > 1000 (printf)
-NSTTSSSSN             | JSR > 10000 (random)
+NSTTSSTTN             | JSR > 10011 (fastrand)
 SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (ptr to number of tunnels per room)
 TSTT                  | MODULO
 SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player location)

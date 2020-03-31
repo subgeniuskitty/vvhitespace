@@ -233,7 +233,7 @@ NSNTSSTSTTSSSSSSSSTN  | JMP > 10010110 00000001 (main_loop)
 @ Build one random tunnel connection per pass through this loop.
 NSSVTSSTSTTSSSSSSSSTN | MARK: 10010110 00000001 (main_loop)
 @ Use 'random_number mod number_of_array_entries' to select a starting room.
-NSTTSSSSN             | JSR > 10000 (random)
+NSTTSSTTN             | JSR > 10011 (fastrand)
 SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
 TTT                   | LOAD
 TSTT                  | MODULO
@@ -246,7 +246,7 @@ TTT                   | LOAD
 @ TOS> start_room_num, start_array_index
 @ Now we randomly select a room for the endpoint.
 NSSVTSSTSTTSSSSSSTSSN | MARK: 10010110 00000100 (select_random_dst_room)
-NSTTSSSSN             | JSR > 10000 (random)
+NSTTSSTTN             | JSR > 10011 (fastrand)
 SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (BUFFER)
 TTT                   | LOAD
 TSTT                  | MODULO
@@ -507,7 +507,7 @@ NTN                   | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #include <math.pvvs>
 NSSVTSSSTSTSN         | MARK: 10001010 (get_random_room)
-NSTTSSSSN             | JSR > 10000 (random)
+NSTTSSTTN             | JSR > 10011 (fastrand)
 SSSTSSSSSSSSSSSSN     | PUSH 0x1000 (GAME_DATA_BASE+0 = num_rooms address)
 TTT                   | LOAD
 TSTT                  | MODULO
