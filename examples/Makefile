@@ -1,5 +1,5 @@
 # (c) 2019 Aaron Taylor <ataylor at subgeniuskitty dot com>
-# All rights reserved.
+# See LICENSE.txt file for copyright and license details.
 
 EXAMPLES != find . -mindepth 1 -maxdepth 1 -type d
 
