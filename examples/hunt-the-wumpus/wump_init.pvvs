@@ -20,7 +20,7 @@
 #include <stdio.pvvs>
 #include <wump_conf.pvvs>
 #include <wump_strings.pvvs>
-#include <wump_ui.pvvs>
+#include <wump_game.pvvs>
 NSSVTSSSSSTSN         | MARK: 10000010 (wump_init)
 
 @ Load the user-configurable options.

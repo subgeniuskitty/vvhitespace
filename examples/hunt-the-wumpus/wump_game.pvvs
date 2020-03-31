@@ -334,4 +334,428 @@ SNN                   | DROP
 SSSTN                 | PUSH 1
 NTN                   | RTS
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   seed_rng
+@ Description:
+@   Generate seed from keyboard input.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <logic.pvvs>
+NSSVTSSSSSTTN         | MARK: 10000011 (seed_rng)
+
+SSSTSSSSN             | PUSH 16 (loop counter)
+SSSSN                 | PUSH 0 (rng seed)
+
+NSSVTSSSSSTTSSSSSSSSN | MARK: 10000011 00000000 (seed_rng:main loop)
+@ Get character from user and print ASCII '.' as feedback.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TNTS                  | GETCHAR
+SSSTSTTTSN            | PUSH ASCII '.'
+TNSS                  | PUTCHAR
+@ Left shift the seed by 4 bits.
+SSSTSSN               | PUSH 4 (shift count)
+NSTTSTTSTN            | JSR > 101101 (lshift)
+@ XOR seed with character from user.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TTT                   | LOAD
+NSTTSTSTTN            | JSR > 101011 (xor)
+@ Decrement counter
+SNT                   | SWAP
+SSSTN                 | PUSH +1
+TSST                  | SUBTRACT
+@ Test for loop completion
+SNS                   | DUP
+NTSTSSSSSTTSSSSSSSTN  | BRZ > 10000011 00000001 (seed_rng:cleanup and return)
+SNT                   | SWAP
+NSNTSSSSSTTSSSSSSSSN  | JMP > 10000011 00000000 (seed_rng:main loop)
+
+@ Store seed, clean up and return.
+NSSVTSSSSSTTSSSSSSSTN | MARK: 10000011 00000001 (seed_rng:cleanup and return)
+SNN                   | DROP
+SSSSN                 | PUSH 0 (seed address)
+SNT                   | SWAP
+TTS                   | STORE
+SSSTSTSN              | PUSH ASCII '\n'
+SSSTSTSN              | PUSH ASCII '\n'
+TNSS                  | PUTCHAR
+TNSS                  | PUTCHAR
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   is_room_adjacent
+@ Description:
+@   Checks if 'room_number' is adjacent to the current player room.
+@ Call Stack:
+@   room_number  <-- TOS
+@ Return Stack:
+@   (1 or 0) for true/false  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stack.pvvs>
+NSSVTSTSSTSSN         | MARK: 10100100 (is_room_adjacent)
+
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (ptr to number_of_tunnels_per_room)
+TTT                   | LOAD
+SSSTN                 | PUSH +1
+TSST                  | SUBTRACT
+
+@ TOS> tunnel_index, destination_room_num
+NSSVTSTSSTSSSSSSSSSSN | MARK: 10100100 00000000 (is_room_adjacent:main_loop)
+SSSTSN                | PUSH +2
+NSTTTSSN              | JSR > 1100 (deepdup)
+SSSTSN                | PUSH +2
+NSTTTSSN              | JSR > 1100 (deepdup)
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player_location)
+TTT                   | LOAD
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+TSST                  | SUBTRACT
+NTSTSTSSTSSSSSSSSSTN  | BRZ > 10100100 00000001 (is_room_adjacent:found_tunnel)
+SSSTN                 | PUSH +1
+TSST                  | SUBTRACT
+SNS                   | DUP
+NTTTSTSSTSSSSSSSSTSN  | BMI > 10100100 00000010 (is_room_adjacent:no_match)
+NSNTSTSSTSSSSSSSSSSN  | JMP > 10100100 00000000 (is_room_adjacent:main_loop)
+
+NSSVTSTSSTSSSSSSSSSTN | MARK: 10100100 00000001 (is_room_adjacent:found_tunnel)
+SNN                   | DROP
+SNN                   | DROP
+SSSTN                 | PUSH +1
+NTN                   | RTS
+
+NSSVTSTSSTSSSSSSSSTSN | MARK: 10100100 00000010 (is_room_adjacent:no_match)
+SNN                   | DROP
+SNN                   | DROP
+SSSSN                 | PUSH 0
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   move_player
+@ Description:
+@   Prompts the player for a room number. Moves to that room, checking the new
+@   environment and executing consequences (fell in a pit, etc) as appropriate.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stdio.pvvs>
+#include <convert.pvvs>
+#include <math.pvvs>
+#include <string.pvvs>
+NSSVTSTSSSTTN         | MARK: 10100011 (move_player)
+
+A"To which room do you wish to move?\n"
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer address)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer size)
+NSTTSSSTSN            | JSR > 100010 (get_user_string)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+NSTTTSSSSN            | JSR > 110000 (atoi)
+SNN                   | DROP
+
+@ The desired room number is now on the TOS. Verify that it is valid.
+SNS                   | DUP
+NSTTSTSSTSSN          | JSR > 10100100 (is_room_adjacent)
+NTSTSTSSSTTSSSSSSSTN  | BRZ > 10100011 00000001 (invalid room number)
+NSNTSTSSSTTSSSSSSSSN  | JMP > 10100011 00000000 (valid room number)
+
+NSSVTSTSSSTTSSSSSSSTN | MARK: 10100011 00000001 (invalid room number)
+@ TOS> room_number
+SNN                   | DROP
+A"*Oof!* (you hit the wall)\n"
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSTTSSTTN             | JSR > 10011 (fastrand)
+SSSTTSN               | PUSH 6 (chance)
+TSTT                  | MODULO
+NTSTSTSSSTTSSSSSSTSN  | BRZ > 10100011 00000010 (woke the wumpus)
+NTN                   | RTS
+NSSVTSTSSSTTSSSSSSTSN | MARK: 10100011 00000010 (woke the wumpus)
+A"Your colorful comments awaken the wumpus!\n"
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSTTSSTTN             | JSR > 10011 (fastrand)
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (ptr to number of tunnels per room)
+TSTT                  | MODULO
+SSSTSSSSSSSSSTTTN     | PUSH 0x1007 (ptr to wumpus location)
+TTT                   | LOAD
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+SSSTSSSSSSSSSTTTN     | PUSH 0x1007 (ptr to wumpus location)
+SNT                   | SWAP
+TTS                   | STORE
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player location)
+TTT                   | LOAD
+NSTTSTSSSSSN          | JSR > 10100000 (room_has_wumpus)
+NTSTSTSSSTTSSSSSSTTN  | BRZ > 10100011 00000011 (wumpus did not move to player)
+NSTTTTTTTTTSSSSSSSSN  | JSR > 11111111 00000000 (wump_kill)
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NNN                   | DIE
+NSSVTSTSSSTTSSSSSSTTN | MARK: 10100011 00000011 (wumpus did not move to player)
+NTN                   | RTS
+
+NSSVTSTSSSTTSSSSSSSSN | MARK: 10100011 00000000 (valid room number)
+@ TOS> room_number
+@ Move player to new room
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player location)
+SNT                   | SWAP
+TTS                   | STORE
+@ Check for wumpus in new player location
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player location)
+TTT                   | LOAD
+NSTTSTSSSSSN          | JSR > 10100000 (room_has_wumpus)
+NTSTSTSSSTTSSSSSTSSN  | BRZ > 10100011 00000100 (no wumpus in new room)
+NSTTTTTTTTTSSSSSSSSN  | JSR > 11111111 00000000 (wump_kill)
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NNN                   | DIE
+NSSVTSTSSSTTSSSSSTSSN | MARK: 10100011 00000100 (no wumpus in new room)
+@ Check for pits in new player location
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player location)
+TTT                   | LOAD
+NSTTSSSTTSTN          | JSR > 10001101 (room_has_pits)
+NTSTSTSSSTTSSSSSTSTN  | BRZ > 10100011 00000101 (no pits in new room)
+NSTTSSTTN             | JSR > 10011 (fastrand)
+SSSTTSN               | PUSH 6 (chance)
+TSTT                  | MODULO
+NTSTSTSSSTTSSSSSTTSN  | BRZ > 10100011 00000110 (survived the pits)
+NSTTTTTTTTTSSSSSTSTN  | JSR > 11111111 00000101 (pit_kill)
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NNN                   | DIE
+NSSVTSTSSSTTSSSSSTTSN | MARK: 10100011 00000110 (survived the pits)
+NSTTTTTTTTTSSSSSTTSN  | JSR > 11111111 00000110 (pit_survive)
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSSVTSTSSSTTSSSSSTSTN | MARK: 10100011 00000101 (no pits in new room)
+@ Check for bats in new player location
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player location)
+TTT                   | LOAD
+NSTTSSSTTSSN          | JSR > 10001100 (room_has_bats)
+NTSTSTSSSTTSSSSSTTSN  | BRZ > 10100011 00000110 (no bats in new room)
+A"*flap*  *flap*  *flap*  (humongous bats pick you up and move you!)\n"
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSTTSSTTN             | JSR > 10011 (fastrand)
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (ptr to number of tunnels per room)
+TSTT                  | MODULO
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player location)
+TTT                   | LOAD
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+NSNTSTSSSTTSSSSSSSSN  | JMP > 10100011 00000000 (valid room number)
+NSSVTSTSSSTTSSSSSTTSN | MARK: 10100011 00000110 (no bats in new room)
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   move_or_shoot
+@ Description:
+@   Parse user input, branching to the appropriate subroutine to move or shoot.
+@   This function does not perform any boundary checks/limits.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stdio.pvvs>
+#include <string.pvvs>
+NSSVTSTSSSTSN         | MARK: 10100010 (move_or_shoot)
+
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer address)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer size)
+NSTTSSSTSN            | JSR > 100010 (get_user_string)
+
+@ Examine the first character of the user input buffer for 'm' or 's'.
+@ If character is something else, prompt user to try again.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TTT                   | LOAD
+SSSSTTSTTSTN          | PUSH 109 (ASCII 'm')
+TSST                  | SUBTRACT
+NTSTSTSSSTSSSSSSSSSN  | BRZ > 10100010 00000000 (move)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TTT                   | LOAD
+SSSSTTTSSTTN          | PUSH 115 (ASCII 's')
+TSST                  | SUBTRACT
+NTSTSTSSSTSSSSSSSSTN  | BRZ > 10100010 00000001 (shoot)
+NSTTTTTTTTTSSSSTSSSN  | JSR > 11111111 00001000 (problem_with_input)
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSNTSTSSSTSN          | JMP > 10100010 (move_or_shoot)
+
+@ User typed 'm'
+NSSVTSTSSSTSSSSSSSSSN | MARK: 10100010 00000000 (move)
+NSTTSTSSSTTN          | JSR > 10100011 (move_player)
+NTN                   | RTS
+
+@ User typed 's'
+NSSVTSTSSSTSSSSSSSSTN | MARK: 10100010 00000001 (shoot)
+@ TODO: JSR shoot
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   get_answer
+@ Description:
+@   Parse user input, returning 0 if user string started with 'n' or 1 if 'y'.
+@   This function does not perform any boundary checks/limits.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   (1 or 0 for True/False)   <--- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stdio.pvvs>
+#include <string.pvvs>
+NSSVTSSTTSSSN         | MARK: 10011000 (get_answer)
+
+@ TODO: Consider extending the GETCHAR instruction in VVS to indicate an empty
+@       buffer instead of blocking. This would allow a character by character
+@       check without printing a slew of retry messages if the buffer is
+@       non-empty.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer address)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer size)
+NSTTSSSTSN            | JSR > 100010 (get_user_string)
+
+@ Examine the first character of the user input buffer for 'y' or 'n'.
+@ If character is something else, prompt user to try again.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TTT                   | LOAD
+SSSSTTTTSSTN          | PUSH 121 (ASCII 'y')
+TSST                  | SUBTRACT
+NTSTSSTTSSSSSSSSSSSN  | BRZ > 10011000 00000000 (answer: yes)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+TTT                   | LOAD
+SSSSTTSTTTSN          | PUSH 110 (ASCII 'n')
+TSST                  | SUBTRACT
+NTSTSSTTSSSSSSSSSSTN  | BRZ > 10011000 00000001 (answer: no)
+NSTTTTTTTTTSSSSTSSSN  | JSR > 11111111 00001000 (problem_with_input)
+SSSSN                 | PUSH 0 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSNTSSTTSSSN          | JMP > 10011000 (get_answer)
+
+@ User typed 'y'
+NSSVTSSTTSSSSSSSSSSSN | MARK: 10011000 00000000 (answer: yes)
+SSSTN                 | PUSH 1
+NTN                   | RTS
+
+@ User typed 'n'
+NSSVTSSTTSSSSSSSSSSTN | MARK: 10011000 00000001 (answer: no)
+SSSSN                 | PUSH 0
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   print_cave_description
+@ Description:
+@   Prints information about the cave (number of rooms, etc).
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <stdio.pvvs>
+NSSVTSSTTSTTN         | MARK: 10011011 (print_cave_description)
+NSTTTTTTTTTSSSSTSTSN  | JSR > 11111111 00001010 (cave_description)
+SSSTSSSSSSSSSTSTN     | PUSH 0x1005 (number_of_arrows address)
+TTT                   | LOAD
+SSSTSSSSSSSSSSSTN     | PUSH 0x1001 (number_of_pits address)
+TTT                   | LOAD
+SSSTSSSSSSSSSSTSN     | PUSH 0x1002 (number_of_bats address)
+TTT                   | LOAD
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (number_of_tunnels address)
+TTT                   | LOAD
+SSSTSSSSSSSSSSSSN     | PUSH 0x1000 (number_of_rooms address)
+TTT                   | LOAD
+SSSTSTN               | PUSH 5 (number of substitions)
+NSTTSSSN              | JSR > 1000 (printf)
+NTN                   | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
+@   print_room_stats
+@ Description:
+@   Prints information about current room and hints about nearby rooms.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <wump_game.pvvs>
+#include <stdio.pvvs>
+#include <stack.pvvs>
+NSSVTSTSSSSTN         | MARK: 10100001 (print_room_stats)
+
+@ Print location and arrow quantity remaining.
+A"You are in room %u of the cave and have %u arrows remaining.\n"
+SSSTSSSSSSSSSTSTN     | PUSH 0x1005 (number_of_arrows address)
+TTT                   | LOAD
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (player_location address)
+TTT                   | LOAD
+SSSTSN                | PUSH 2 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+
+@ Print if bats/pits/wumpus nearby.
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (player_location address)
+TTT                   | LOAD
+SNS                   | DUP
+NSTTSSTTTSSN          | JSR > 10011100 (are_bats_near)
+NTSTSTSSSSTSSSSSSSSN  | BRZ > 10100001 00000000 (no_bats)
+A"*rustle* (Bats must be nearby.)\n"
+SSSSN                 | PUSH 0 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSSVTSTSSSSTSSSSSSSSN | MARK: 10100001 00000000 (no_bats)
+SNS                   | DUP
+NSTTSSTTTSTN          | JSR > 10011101 (are_pits_near)
+NTSTSTSSSSTSSSSSSSTN  | BRZ > 10100001 00000001 (no_pits)
+A"*whoosh* (You feel a draft from nearby pits.)\n"
+SSSSN                 | PUSH 0 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSSVTSTSSSSTSSSSSSSTN | MARK: 10100001 00000001 (no_pits)
+NSTTSSTTTTSN          | JSR > 10011110 (is_wumpus_near)
+NTSTSTSSSSTSSSSSSTSN  | BRZ > 10100001 00000010 (no_wumpus)
+A"*sniff* (You smell the evil Wumpus nearby!)\n"
+SSSSN                 | PUSH 0 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+NSSVTSTSSSSTSSSSSSTSN | MARK: 10100001 00000010 (no_wumpus)
+
+@ Print a list of nearby rooms.
+A"This room contains tunnels to the following rooms:"
+SSSSN                 | PUSH 0 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (player_location address)
+TTT                   | LOAD
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (number_of_links_per_room address)
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+@ Print one room on each pass through this loop.
+@ TOS> tunnel_index, room_number
+NSSVTSTSSSSTSSSSSSTTN | MARK: 10100001 00000011 (print_room_list_loop)
+A" %u"
+SSSTSTN               | PUSH 5
+NSTTTSSN              | JSR > 1100 (deepdup)
+SSSTTTN               | PUSH 7
+NSTTTSSN              | JSR > 1100 (deepdup)
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+SSSTN                 | PUSH 1 (number of substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+@ Test for end of loop
+SNS                   | DUP
+NTSTSTSSSSTSSSSSTSSN  | BRZ > 10100001 00000100 (print_room_list_loop_end)
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NSNTSTSSSSTSSSSSSTTN  | JMP > 10100001 00000011 (print_room_list_loop)
+@ Clean up and return.
+NSSVTSTSSSSTSSSSSTSSN | MARK: 10100001 00000100 (print_room_list_loop_end)
+SSSTSTSN              | PUSH 10 (ASCII '\n')
+TNSS                  | PUTCHAR
+SNN                   | DROP
+SNN                   | DROP
+NTN                   | RTS
+
 #endif

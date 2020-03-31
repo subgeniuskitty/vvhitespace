@@ -7,7 +7,7 @@
 NSNTSSSSSSSN          | JMP > 10000000 (wump)
 
 #include <wump_init.pvvs>
-#include <wump_ui.pvvs>
+#include <wump_game.pvvs>
 #include <wump_strings.pvvs>
 #include <stdio.pvvs>
 
