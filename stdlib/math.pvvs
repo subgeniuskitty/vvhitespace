@@ -50,6 +50,42 @@ NTN                     | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
+@   fastrand (10011)
+@ Description:
+@   Returns a pseudo-random number.
+@   Probably not as good as `random`, but much faster since it doesn't use XOR.
+@   Based on the POSIX.1-2001 example for random().
+@   Before using for the first time, seed heap[0] with a value.
+@ Call Stack:
+@   empty
+@ Return Stack:
+@   random number  <-- TOS
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+NSSVTSSTTN              | Mark: 10011 (fastrand)
+
+@ Generate the next seed value
+SSSSN                   | PUSH 0 (ptr)
+TTT                     | LOAD
+SSSTSSSSSTTTSSSTTSSTSSTTTSSTTSTTSTN | PUSH 1103515245
+TSSN                    | MULTIPLY
+SSSTTSSSSSSTTTSSTN      | PUSH 12345
+TSSS                    | ADD
+
+@ Store the next seed value but keep a copy on the stack.
+SNS                     | DUP
+SSSSN                   | PUSH 0 (ptr)
+SNT                     | SWAP
+TTS                     | STORE
+
+@ Calculate the random number and return.
+SSSTSSSSSSSSSSSSSSSSN   | PUSH 65536
+TSTS                    | DIVIDE
+SSSTSSSSSSSSSSSSSSSN    | PUSH 32768
+TSTT                    | MODULO
+NTN                     | RTS
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
 @   abs (10001)
 @ Description:
 @   Returns the absolute value of its argument

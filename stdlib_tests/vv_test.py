@@ -46,6 +46,7 @@ tests = [
         ['5001_abs', '', '+1+1+0+0'],
         ['5002_random', '', ''],
         ['5003_gcd', '', '+0+4+4+3+3+3'],
+        ['5004_fastrand', '', ''],
         ['6001_printstackstring', '', 'test'],
         ['6002_printheapstring', '', 'test'],
         ['6003_printnumbersign', '', '+-'],
