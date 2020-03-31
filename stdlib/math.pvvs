@@ -53,7 +53,7 @@ NTN                     | RTS
 @   fastrand (10011)
 @ Description:
 @   Returns a pseudo-random number.
-@   Probably not as good as `random`, but much faster since it doesn't use XOR.
+@   Probably not as good as `random`, but much faster since it does not use XOR.
 @   Based on the POSIX.1-2001 example for random().
 @   Before using for the first time, seed heap[0] with a value.
 @ Call Stack:
