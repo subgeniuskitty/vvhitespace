@@ -4,7 +4,7 @@ This example starts with the `Hello, world!` example from Wikipedia's
 Whitespace page, gradually rewriting it to use the ASCII string feature of the
 VVhitespace compiler and the `printf` subroutine from the stdlib.
 
-# "Hello, World!" in VVhitespace #
+# Code Commentary #
 
 Wikipedia's `Hello, World!` example is reproduced below. It follows a simple
 form, pushing an integer corresponding to an ASCII character onto the stack and
