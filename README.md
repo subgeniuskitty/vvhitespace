@@ -6,15 +6,10 @@ If you are impatient to get started, simply execute `make` in the top-level
 directory to build the compiler and interpreter, then move to one of the
 example directories like `examples/hunt-the-wumpus` and execute `make run`.
 
-VVhitespace is descended from Whitespace, adding a vertical tab to the language
-along with some restrictions to ease implementation. VVhitespace code is
-represented with the *whitespace characters* `[Tab]`, `[VTab]`, `[Space]`, and
-`[Newline]`. All other characters are considered commentary.
-
-VVhitespace makes a number of small changes to Whitespace with the intention of
-*taming* it by providing the tools necessary in order to make non-trivial
-whitespace-only applications. As proof of concept, I wrote an implementation of
-Hunt the Wumpus in VVhitespace.
+VVhitespace is descended from Whitespace, making a number of small changes with
+the intention of *taming* the language, providing the tools necessary to write
+non-trivial, whitespace-only applications. As a proof of concept, I have
+implemented Hunt the Wumpus in VVhitespace.
 
 This repository includes several distinct parts:
 
