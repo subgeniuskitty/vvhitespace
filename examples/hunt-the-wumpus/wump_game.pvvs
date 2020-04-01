@@ -855,7 +855,7 @@ NNN                   | DIE
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #include <stdio.pvvs>
 #include <string.pvvs>
-#include <wump_strings.pvvs
+#include <wump_strings.pvvs>
 NSSVTSTSSSTSN         | MARK: 10100010 (move_or_shoot)
 
 SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer address)
