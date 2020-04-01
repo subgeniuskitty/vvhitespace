@@ -26,10 +26,6 @@ NSSVTTTTTTTTSSSSSSTTN | Mark: 11111111 00000011 (shoot_self)
 A"\n*Thwack!*  A sudden piercing feeling informs you that the ricochet\nof your wild arrow has resulted in it wedging in your side, causing\nextreme agony.  The evil Wumpus, with its psychic powers, realizes this\nand immediately rushes to your side, not to help, alas, but to EAT YOU!\n(*CHOMP*)\n"
 NTN                   | RTS
 
-NSSVTTTTTTTTSSSSSTSSN | Mark: 11111111 00000100 (jump)
-A"\nWith a jaunty step you enter the magic tunnel.  As you do, you\nnotice that the walls are shimmering and glowing.  Suddenly you feel\na very curious, warm sensation and find yourself in room %u!!\n"
-NTN                   | RTS
-
 NSSVTTTTTTTTSSSSSTSTN | Mark: 11111111 00000101 (pit_kill)
 A"\n*AAAUUUUGGGGGHHHHHhhhhhhhhhh...*\nThe whistling sound and updraft as you walked into this room of the\ncave apparently wasn't enough to clue you in to the presence of the\nbottomless pit.  You have a lot of time to reflect on this error as\nyou fall many miles to the core of the earth.  Look on the bright side;\nyou can at least find out if Jules Verne was right...\n"
 NTN                   | RTS
