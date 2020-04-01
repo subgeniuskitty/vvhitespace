@@ -387,46 +387,50 @@ NTN                   | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
-@   is_room_adjacent
+@   are_rooms_adjacent
 @ Description:
-@   Checks if 'room_number' is adjacent to the current player room.
+@   Checks if 'room_number_1' is adjacent to 'room_number_2'.
 @ Call Stack:
-@   room_number  <-- TOS
+@   room_number_2
+@   room_number_1  <-- TOS
 @ Return Stack:
 @   (1 or 0) for true/false  <-- TOS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #include <stack.pvvs>
-NSSVTSTSSTSSN         | MARK: 10100100 (is_room_adjacent)
+NSSVTSTSSTSSN         | MARK: 10100100 (are_rooms_adjacent)
 
 SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (ptr to number_of_tunnels_per_room)
 TTT                   | LOAD
 SSSTN                 | PUSH +1
 TSST                  | SUBTRACT
 
-@ TOS> tunnel_index, destination_room_num
-NSSVTSTSSTSSSSSSSSSSN | MARK: 10100100 00000000 (is_room_adjacent:main_loop)
-SSSTSN                | PUSH +2
+@ TOS> tunnel_index, room_number_1, room_number_2
+NSSVTSTSSTSSSSSSSSSSN | MARK: 10100100 00000000 (main_loop)
+SSSTTN                | PUSH +3
 NSTTTSSN              | JSR > 1100 (deepdup)
-SSSTSN                | PUSH +2
+SSSTTN                | PUSH +3
 NSTTTSSN              | JSR > 1100 (deepdup)
-SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player_location)
-TTT                   | LOAD
+SSSTTN                | PUSH +3
+NSTTTSSN              | JSR > 1100 (deepdup)
+SNT                   | SWAP
 NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
 TSST                  | SUBTRACT
-NTSTSTSSTSSSSSSSSSTN  | BRZ > 10100100 00000001 (is_room_adjacent:found_tunnel)
+NTSTSTSSTSSSSSSSSSTN  | BRZ > 10100100 00000001 (found_tunnel)
 SSSTN                 | PUSH +1
 TSST                  | SUBTRACT
 SNS                   | DUP
-NTTTSTSSTSSSSSSSSTSN  | BMI > 10100100 00000010 (is_room_adjacent:no_match)
-NSNTSTSSTSSSSSSSSSSN  | JMP > 10100100 00000000 (is_room_adjacent:main_loop)
+NTTTSTSSTSSSSSSSSTSN  | BMI > 10100100 00000010 (no_match)
+NSNTSTSSTSSSSSSSSSSN  | JMP > 10100100 00000000 (main_loop)
 
-NSSVTSTSSTSSSSSSSSSTN | MARK: 10100100 00000001 (is_room_adjacent:found_tunnel)
+NSSVTSTSSTSSSSSSSSSTN | MARK: 10100100 00000001 (found_tunnel)
+SNN                   | DROP
 SNN                   | DROP
 SNN                   | DROP
 SSSTN                 | PUSH +1
 NTN                   | RTS
 
-NSSVTSTSSTSSSSSSSSTSN | MARK: 10100100 00000010 (is_room_adjacent:no_match)
+NSSVTSTSSTSSSSSSSSTSN | MARK: 10100100 00000010 (no_match)
+SNN                   | DROP
 SNN                   | DROP
 SNN                   | DROP
 SSSSN                 | PUSH 0
@@ -461,7 +465,9 @@ SNN                   | DROP
 
 @ The desired room number is now on the TOS. Verify that it is valid.
 SNS                   | DUP
-NSTTSTSSTSSN          | JSR > 10100100 (is_room_adjacent)
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player_location)
+TTT                   | LOAD
+NSTTSTSSTSSN          | JSR > 10100100 (are_rooms_adjacent)
 NTSTSTSSSTTSSSSSSSTN  | BRZ > 10100011 00000001 (invalid room number)
 NSNTSTSSSTTSSSSSSSSN  | JMP > 10100011 00000000 (valid room number)
 
@@ -554,6 +560,290 @@ NTN                   | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @ Name:
+@   shoot_arrow
+@ Description:
+@   Prompt user for list of rooms. Shoots an arrow through each room, checking
+@     the new environment and executing consequences (fell in a pit, etc) as
+@     appropriate.
+@ Call Stack:
+@   <empty>
+@ Return Stack:
+@   <empty>
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+#include <string.pvvs>
+#include <stack.pvvs>
+#include <stdio.pvvs>
+#include <math.pvvs>
+#include <wump_strings.pvvs>
+NSSVTSSTTSSTN         | MARK: 10011001 (shoot_arrow)
+
+A"Through which rooms do you wish to shoot your arrow?\n(type %u room numbers separated by spaces)\n"
+SSSTSSSSSSSSSTSSN     | PUSH 0x1004 (ptr to max_arrow_flight_distance)
+TTT                   | LOAD
+SSSTN                 | PUSH 1 (number of string substitutions)
+NSTTSSSN              | JSR > 1000 (printf)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer address)
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer size)
+NSTTSSSTSN            | JSR > 100010 (get_user_string)
+
+@ Loop, converting one room number from the user string per pass.
+@ But first, prepare the stack for the loop.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (USER_INPUT_BUFFER address)
+SSSTSSSSSSSSSTSSN     | PUSH 0x1004 (ptr to max_arrow_flight_distance)
+TTT                   | LOAD
+@ TOS> loop_counter, ptr_to_user_string
+NSSVTSSTTSSTSSSSSSSSN | MARK: 10011001 00000000 (process_room_loop)
+@ Test for end of loop (counter == 0)
+SNS                   | DUP
+NTSTSSTTSSTSSSSSSSTN  | BRZ > 10011001 00000001 (end of process_room_loop)
+@ Now jump forward in the user string to the next ASCII digit (or null term).
+SNT                   | SWAP
+NSSVTSSTTSSTSSSSSSTSN | MARK: 10011001 00000010 (next_ascii_digit_loop)
+SNS                   | DUP
+TTT                   | LOAD
+SNS                   | DUP
+NSTTSSSSTN            | JSR > 100001 (isdigit)
+NTSTSSTTSSTSSSSSSTTN  | BRZ > 10011001 00000011 (ascii_term_test)
+SNN                   | DROP
+NSNTSSTTSSTSSSSSTSSN  | JMP > 10011001 00000100 (next_ascii_digit_loop_end)
+NSSVTSSTTSSTSSSSSSTTN | MARK: 10011001 00000011 (ascii_term_test)
+NTSTSSTTSSTSSSSSTSSN  | BRZ > 10011001 00000100 (next_ascii_digit_loop_end)
+SSSTN                 | PUSH 1
+TSSS                  | ADD
+NSNTSSTTSSTSSSSSSTSN  | JMP > 10011001 00000010 (next_ascii_digit_loop)
+NSSVTSSTTSSTSSSSSTSSN | MARK: 10011001 00000100 (next_ascii_digit_loop_end)
+@ Call atoi with the newly updated pointer to process another room number.
+NSTTTSSSSN            | JSR > 110000 (atoi)
+SNT                   | SWAP
+SSSTTN                | PUSH 3 (rotation_depth)
+NSTTSTSN              | JSR > 1010 (stackrotate)
+@ Decrement the loop counter and loop again.
+SNT                   | SWAP
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NSNTSSTTSSTSSSSSSSSN  | JMP > 10011001 00000000 (process_room_loop)
+@ Loop is complete. Moving on.
+NSSVTSSTTSSTSSSSSSSTN | MARK: 10011001 00000001 (end of process_room_loop)
+SNN                   | DROP
+SNN                   | DROP
+
+@ Stack now contains only integers for room numbers (zero padded to full count).
+@ They are in reverse order, so reverse again.
+@ Temporarily use the USER_INPUT_BUFFER as a loop counter.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+SSSTSSSSSSSSSTSSN     | PUSH 0x1004 (ptr to max_arrow_flight_distance)
+TTT                   | LOAD
+TTS                   | STORE
+@ Now perform the reversal.
+NSSVTSSTTSSTSSSSSTSTN | MARK: 10011001 00000101 (reverse_loop)
+@ First shift the TOS element back to its final location.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+TTT                   | LOAD
+NSTTSTSN              | JSR > 1010 (stackrotate)
+@ Now decrement the loop counter.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+@ And check for the end of loop condition (counter < 2)
+SNS                   | DUP
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NTSTSSTTSSTSSSSSTTSN  | BRZ > 10011001 00000110 (reverse_loop_end)
+@ The loop continues. Store the new loop counter and go around again.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+SNT                   | SWAP
+TTS                   | STORE
+NSNTSSTTSSTSSSSSTSTN  | JMP > 10011001 00000101 (reverse_loop)
+@ End of loop. Clean up and continue.
+NSSVTSSTTSSTSSSSSTTSN | MARK: 10011001 00000110 (reverse_loop_end)
+SNN                   | DROP
+
+@@@@@ Initialization complete. @@@@@
+
+@ Stack now contains a list room numbers as integers, in order.
+
+@ Put a loop index and the starting location of the arrow on the stack.
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player_location, now arrow_location)
+TTT                   | LOAD
+SSSTSSSSSSSSSTSSN     | PUSH 0x1004 (ptr to max_arrow_flight_distance)
+TTT                   | LOAD
+
+@ TOS> loop_index, arrow_location, list_of_room_numbers ...
+@ Move the arrow through a new room for each pass of the loop.
+NSSVTSSTTSSTSSSSSTTTN | MARK: 10011001 00000111 (arrow_loop)
+@ Check loop index for end of loop condition (index==0).
+SNS                   | DUP
+NTSTSSTTSSTSSSSTTSTN  | BRZ > 10011001 00001101 (loop_end)
+@ Is the requested room number connected to the arrows current room?
+SNT                   | SWAP
+SNS                   | DUP
+SSSTSSN               | PUSH 4
+NSTTTSSN              | JSR > 1100 (deepdup)
+NSTTSTSSTSSN          | JSR > 10100100 (are_rooms_adjacent)
+NTSTSSTTSSTSSSSTSSSN  | BRZ > 10011001 00001000 (not_adjacent)
+@ Room was adjacent. Print update for user, clean up stack and jump ahead.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+SNT                   | SWAP
+TTS                   | STORE
+SNT                   | SWAP
+SSSTTSSSSSSSSSSSTN    | PUSH 0x3001
+SNT                   | SWAP
+TTS                   | STORE
+A"The arrow sails out of room %u and enters room %u.\n"
+SSSTTSSSSSSSSSSSTN    | PUSH 0x3001
+TTT                   | LOAD
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+TTT                   | LOAD
+SSSTSN                | PUSH 2
+NSTTSSSN              | JSR > 1000 (printf)
+SSSTTSSSSSSSSSSSTN    | PUSH 0x3001
+TTT                   | LOAD
+SNT                   | SWAP
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+TTT                   | LOAD
+SNT                   | SWAP
+NSNTSSTTSSTSSSSTSSTN  | JMP > 10011001 00001001 (room_is_valid)
+@ Room was not adjacent. Select a random adjacent room for the arrow.
+NSSVTSSTTSSTSSSSTSSSN | MARK: 10011001 00001000 (not_adjacent)
+SSSTTN                | PUSH 3
+NSTTSTTN              | JSR > 1011 (stackrotatereverse)
+@ TOS> (invalid) room_number, arrow_location, loop_index, rest_of_room_numbers ...
+@ Start a message to the user.
+@ First, store two values we will need when printing the user message.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+SNT                   | SWAP
+TTS                   | STORE
+SSSTTSSSSSSSSSSSTN    | PUSH 0x3001
+SNT                   | SWAP
+TTS                   | STORE
+A"*thunk* The arrow can't find a way from room %u to room %u "
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+TTT                   | LOAD
+SSSTTSSSSSSSSSSSTN    | PUSH 0x3001
+TTT                   | LOAD
+SSSTSN                | PUSH 2
+NSTTSSSN              | JSR > 1000 (printf)
+@ Now locate a random, connected room for the arrow to visit.
+NSTTSSSSN             | JSR > 10000 (random)
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (ptr to number_of_tunnels_per_room)
+TTT                   | LOAD
+TSTT                  | MODULO
+SSSTTSSSSSSSSSSSTN    | PUSH 0x3001
+TTT                   | LOAD
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+@ Now finish the message to the user.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+SNT                   | SWAP
+TTS                   | STORE
+A"and flys randomly into room %u!\n"
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+NSTTSSSN              | JSR > 1000 (printf)
+@ And cleanup the stack before continuing onward.
+SSSTTSSSSSSSSSSSSN    | PUSH 0x3000
+TTT                   | LOAD
+SNT                   | SWAP
+SSSTTSSSSSSSSSSSTN    | PUSH 0x3001
+TTT                   | LOAD
+SNT                   | SWAP
+
+NSSVTSSTTSSTSSSSTSSTN | MARK: 10011001 00001001 (room_is_valid)
+@ TOS> loop_index, arrow_location, list_of_room_numbers ...
+SSSTTN                | PUSH 3
+NSTTSTSN              | JSR > 1010 (stackrotate)
+SNN                   | DROP
+@ TOS> (new) arrow_location, loop_index, (smaller) list_of_room_numbers ...
+@ Does new room contain a wumpus?
+SNS                   | DUP
+NSTTSTSSSSSN          | JSR > 10100000 (room_has_wumpus)
+NTSTSSTTSSTSSSSTSTSN  | BRZ > 10011001 00001010 (no_wumpus_here)
+@ Player slew the wumpus!
+NSTTTTTTTTTSSSSSSSTN  | JSR > 11111111 00000001 (kill_wump)
+SSSSN                 | PUSH 0
+NSTTSSSN              | JSR > 1000 (printf)
+NNN                   | DIE
+@ No wumpus here. Does the new room contain the player?
+NSSVTSSTTSSTSSSSTSTSN | MARK: 10011001 00001010 (no_wumpus_here)
+SNS                   | DUP
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player_location)
+TTT                   | LOAD
+TSST                  | SUBTRACT
+NTSTSSTTSSTSSSSTSTTN  | BRZ > 10011001 00001011 (player_shot_self)
+NSNTSSTTSSTSSSSTTSSN  | JMP > 10011001 00001100 (no_events_in_room)
+NSSVTSSTTSSTSSSSTSTTN | MARK: 10011001 00001011 (player_shot_self)
+@ Player hit by own arrow!
+NSTTTTTTTTTSSSSSSTTN  | JSR > 11111111 00000011 (shoot_self)
+SSSSN                 | PUSH 0
+NSTTSSSN              | JSR > 1000 (printf)
+NNN                   | DIE
+@ No player here. Update loop index, cleanup stack and loop again.
+NSSVTSSTTSSTSSSSTTSSN | MARK: 10011001 00001100 (no_events_in_room)
+SNT                   | SWAP
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+NSNTSSTTSSTSSSSSTTTN  | JMP > 10011001 00000111 (arrow_loop)
+NSSVTSSTTSSTSSSSTTSTN | MARK: 10011001 00001101 (loop_end)
+SNN                   | DROP
+SNN                   | DROP
+A"The arrows wavers in its flight and can go no further!\n"
+SSSSN                 | PUSH 0
+NSTTSSSN              | JSR > 1000 (printf)
+
+@ Since the player did not kill the wumpus, there is a chance it will wake and move.
+NSTTSSSSN             | JSR > 10000 (random)
+SSSTTSN               | PUSH 6
+TSTT                  | MODULO
+NTSTSSTTSSTSSSSTTTSN  | BRZ > 10011001 00001110 (move_wumpus)
+NSNTSSTTSSTSSSTSSSSN  | JMP > 10011001 00010000 (wumpus_continues_to_slumber)
+NSSVTSSTTSSTSSSSTTTSN | MARK: 10011001 00001110 (move_wumpus)
+@ Move the wumpus to a random connected room.
+NSTTSSSSN             | JSR > 10000 (random)
+SSSTSSSSSSSSSSTTN     | PUSH 0x1003 (ptr to number_of_tunnels_per_room)
+TTT                   | LOAD
+TSTT                  | MODULO
+SSSTSSSSSSSSSTTTN     | PUSH 0x1007 (ptr to wumpus_location)
+TTT                   | LOAD
+NSTTSSSTSSSN          | JSR > 10001000 (get_tunnel_destination)
+SSSTSSSSSSSSSTTTN     | PUSH 0x1007 (ptr to wumpus_location)
+SNT                   | SWAP
+TTS                   | STORE
+@ Did the wumpus enter the player room?
+SSSTSSSSSSSSSTTTN     | PUSH 0x1007 (ptr to wumpus_location)
+TTT                   | LOAD
+SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (ptr to player_location)
+TTT                   | LOAD
+TSST                  | SUBTRACT
+NTSTSSTTSSTSSSSTTTTN  | BRZ > 10011001 00001111 (player_death)
+NSNTSSTTSSTSSSTSSSSN  | JMP > 10011001 00010000 (wumpus_continues_to_slumber)
+NSSVTSSTTSSTSSSSTTTTN | MARK: 10011001 00001111 (player_death)
+NSTTTTTTTTTSSSSSSSSN  | JSR > 11111111 00000000 (wump_kill)
+SSSSN                 | PUSH 0
+NSTTSSSN              | JSR > 1000 (printf)
+NNN                   | DIE
+
+NSSVTSSTTSSTSSSTSSSSN | MARK: 10011001 00010000 (wumpus_continues_to_slumber)
+@ Decrement the number of arrows.
+SSSTSSSSSSSSSTSTN     | PUSH 0x1005 (ptr to number_of_arrows)
+TTT                   | LOAD
+SSSTN                 | PUSH 1
+TSST                  | SUBTRACT
+SNS                   | DUP
+SSSTSSSSSSSSSTSTN     | PUSH 0x1005 (ptr to number_of_arrows)
+SNT                   | SWAP
+TTS                   | STORE
+@ Check for empty quiver.
+NTSTSSTTSSTSSSTSSSTN  | BRZ > 10011001 00010001 (empty_quiver)
+NTN                   | RTS
+NSSVTSSTTSSTSSSTSSSTN | MARK: 10011001 00010001 (empty_quiver)
+NSTTTTTTTTTSSSSSSTSN  | JSR > 11111111 00000010 (no_arrows)
+SSSSN                 | PUSH 0
+NSTTSSSN              | JSR > 1000 (printf)
+NNN                   | DIE
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@ Name:
 @   move_or_shoot
 @ Description:
 @   Parse user input, branching to the appropriate subroutine to move or shoot.
@@ -595,7 +885,7 @@ NTN                   | RTS
 
 @ User typed 's'
 NSSVTSTSSSTSSSSSSSSTN | MARK: 10100010 00000001 (shoot)
-@ TODO: JSR shoot
+NSTTSSTTSSTN          | JSR > 10011001 (shoot_arrow)
 NTN                   | RTS
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -691,7 +981,7 @@ NTN                   | RTS
 NSSVTSTSSSSTN         | MARK: 10100001 (print_room_stats)
 
 @ Print location and arrow quantity remaining.
-A"You are in room %u of the cave and have %u arrows remaining.\n"
+A"\n----------\n\nYou are in room %u of the cave and have %u arrows remaining.\n"
 SSSTSSSSSSSSSTSTN     | PUSH 0x1005 (number_of_arrows address)
 TTT                   | LOAD
 SSSTSSSSSSSSSTTSN     | PUSH 0x1006 (player_location address)

@@ -4,7 +4,7 @@ Welcome to VVhitespace!
 
 If you are impatient to get started, simply execute `make` in the top-level
 directory to build the compiler and interpreter, then move to one of the
-example directories like `examples/wumpus` and execute `make run`.
+example directories like `examples/hunt-the-wumpus` and execute `make run`.
 
 VVhitespace is descended from Whitespace, adding a vertical tab to the language
 along with some restrictions to ease implementation. VVhitespace code is
