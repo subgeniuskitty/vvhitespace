@@ -11,6 +11,11 @@ along with some restrictions to ease implementation. VVhitespace code is
 represented with the *whitespace characters* `[Tab]`, `[VTab]`, `[Space]`, and
 `[Newline]`. All other characters are considered commentary.
 
+VVhitespace makes a number of small changes to Whitespace with the intention of
+*taming* it by providing the tools necessary in order to make non-trivial
+whitespace-only applications. As proof of concept, I wrote an implementation of
+Hunt the Wumpus in VVhitespace.
+
 This repository includes several distinct parts:
 
   - A compiler, `vvc`, accepts human-readable VVhitespace source code and
