@@ -855,6 +855,7 @@ NNN                   | DIE
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #include <stdio.pvvs>
 #include <string.pvvs>
+#include <wump_strings.pvvs
 NSSVTSTSSSTSN         | MARK: 10100010 (move_or_shoot)
 
 SSSTTSSSSSSSSSSSSN    | PUSH 0x3000 (buffer address)
@@ -901,6 +902,7 @@ NTN                   | RTS
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #include <stdio.pvvs>
 #include <string.pvvs>
+#include <wump_strings.pvvs>
 NSSVTSSTTSSSN         | MARK: 10011000 (get_answer)
 
 @ TODO: Consider extending the GETCHAR instruction in VVS to indicate an empty
@@ -949,6 +951,7 @@ NTN                   | RTS
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 #include <stdio.pvvs>
+#include <wump_strings.pvvs>
 NSSVTSSTTSTTN         | MARK: 10011011 (print_cave_description)
 NSTTTTTTTTTSSSSTSTSN  | JSR > 11111111 00001010 (cave_description)
 SSSTSSSSSSSSSTSTN     | PUSH 0x1005 (number_of_arrows address)
@@ -975,7 +978,6 @@ NTN                   | RTS
 @ Return Stack:
 @   <empty>
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-#include <wump_game.pvvs>
 #include <stdio.pvvs>
 #include <stack.pvvs>
 NSSVTSTSSSSTN         | MARK: 10100001 (print_room_stats)
