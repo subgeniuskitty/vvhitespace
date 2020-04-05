@@ -105,3 +105,12 @@ That's the whole program. The file `hello.pvvs` contains an uncommented version
 of this exact source code and may be executed with a `make run` in this
 directory.
 
+# Example Output #
+
+    vvhitespace/examples/basic-user-interaction % make run
+    What is your name?
+    Rolf
+    How old age you?
+    42
+    Hello, Rolf! In a trusting world, 42 is older than I am.
+

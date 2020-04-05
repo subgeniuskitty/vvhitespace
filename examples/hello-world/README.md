@@ -136,3 +136,9 @@ Putting all that together, we discover a greatly simplified program.
     #include <stdio.pvvs>
 
 This is already saved in `hello.pvvs` which you can execute with `make run`.
+
+# Example Output #
+
+    vvhitespace/examples/basic-user-interaction % make run
+    Hello, world!
+
