@@ -167,7 +167,7 @@ Be cautious when pushing constants in your code for use as bit arrays. Due to
 the mismatch between the VVhitespace language's sign-magnitude representation
 of integers and the interpreter's internal twos-complement representation, bit
 arrays with a leading `1` (i.e. negative numbers) may appear quite different
-then expected in your source code.
+than expected in your source code.
 
 For example, to push a 64-bit array of all `1`'s on to the stack we must push
 `SSTTN`, or `-1`.

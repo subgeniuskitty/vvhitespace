@@ -77,7 +77,7 @@ Create a file named `~/.vim/syntax/vvhitespace.vim` containing the following:
 That's it! You should now see syntax highlighting when opening files with names
 ending in `*.pvvs`.
 
-If you don't any see syntax highlighting, check your `.vimrc` and other config
+If you don't see any syntax highlighting, check your `.vimrc` and other config
 locations for conflicting options. Try manually enabling syntax highlighting
 with the `syntax on` configuration directive.
 
