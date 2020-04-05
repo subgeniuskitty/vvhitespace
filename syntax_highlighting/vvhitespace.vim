@@ -6,7 +6,7 @@ if exists("b:current_syntax")
   finish
 endif
 
-let b:current_synax = "vvhitespace"
+let b:current_syntax = "vvhitespace"
 
 " Stack IMP
 syn match stackIMP '^[sS][sS]'

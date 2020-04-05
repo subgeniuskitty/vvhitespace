@@ -39,7 +39,7 @@ Create a file named `~/.vim/syntax/vvhitespace.vim` containing the following:
       finish
     endif
     
-    let b:current_synax = "vvhitespace"
+    let b:current_syntax = "vvhitespace"
     
     " Stack IMP
     syn match stackIMP '^[sS][sS]'
