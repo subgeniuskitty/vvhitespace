@@ -336,7 +336,7 @@ NSNSSSSTSSSSSSSSSSTN    | JMP > 00001000 00000001
 
 @@@@@@@@@@@@@@@@@@@@
 @ These are utility labels to call the appropriate type of output subroutine.
-@ After output, they decrement the substition counter and loop back to testing
+@ After output, they decrement the substitution counter and loop back to testing
 @ level 1 branches.
 @@@@@@@@@@@@@@@@@@@@
 
